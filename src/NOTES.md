@@ -89,8 +89,8 @@ The system operates using the following states:
 - **Wait()**: Non-blocking delay function that allows other operations to continue
 - **homingSequence()**: Handles the homing process for both motors
 - **CUTmovement()**: Controls the cutting operation
-- **YESwood()**: Handles the sequence when wood is present
-- **NOwood()**: Handles the sequence when no wood is present
+- **YESwood()**: Handles the sequence when wood is present (Basically checks whether the board is done)
+- **NOwood()**: Handles the sequence when no wood is present 
 
 ## Operation Flow
 

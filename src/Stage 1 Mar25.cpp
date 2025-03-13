@@ -3,36 +3,40 @@
 #include <Bounce2.h>
 
 // ===== PIN DEFINITIONS =====
-// ESP32 Breakout Board Layout:
-// Left side (top to bottom): 34, 35, 32, 33, 25, 26, 27, 14, 12, 13
-// Right side (top to bottom): 23, 22, 21, 19, 18, 5, 4, 0, 2, 15
+// Board Configuration v2:
+// - Left side: INPUT pins will be in the range 9-14, and OUTPUT pins will be in the range 4-18.
+// - Motor Pins: CUT motor uses pulse pin 1 and direction pin 2; POSITION motor uses pulse pin 39 and direction pin 38.
+// - Right side: Other pins remain as previously configured.
 
 // Motor Pin Definitions
-#define CUT_MOTOR_PULSE_PIN 22      // Right side, top
-#define CUT_MOTOR_DIR_PIN 23        // Right side, top
-#define POSITION_MOTOR_PULSE_PIN 32 // Left side, upper section
-#define POSITION_MOTOR_DIR_PIN 33   // Left side, upper section
+#define CUT_MOTOR_PULSE_PIN 1       // Cut motor pulse as specified
+#define CUT_MOTOR_DIR_PIN 2         // Cut motor direction as specified
 
-// Switch and Sensor Pin Definitions
-#define CUT_MOTOR_HOMING_SENSOR 25      // Left side, middle section
-#define POSITION_MOTOR_HOMING_SENSOR 27 // Left side, middle section
-#define RELOAD_SWITCH 14                  // Left side, near bottom
-#define START_CYCLE_SWITCH 18             // Right side, middle section
-#define WOOD_SENSOR 35                    // Left side, top
-#define WAS_WOOD_SUCTIONED_SENSOR 5       // Right side, middle section
+#define POSITION_MOTOR_PULSE_PIN 39 // Position motor pulse as specified
+#define POSITION_MOTOR_DIR_PIN 38   // Position motor direction as specified
+
+// Switch and Sensor Pin Definitions (Left side inputs assigned within 9-14)
+#define CUT_MOTOR_HOMING_SENSOR 9      // Left side input (was 15, now 9)
+#define POSITION_MOTOR_HOMING_SENSOR 10 // Left side input (was 17, now 10)
+#define RELOAD_SWITCH 11               // Left side input (was 18, now 11)
+#define WOOD_SENSOR 12                 // Left side input (was 5, now 12)
+
+// Switch and Sensor Pin Definitions (Right side remain unchanged except for conflict resolution)
+#define START_CYCLE_SWITCH 40          // Remains as specified
+#define WAS_WOOD_SUCTIONED_SENSOR 41   // Moved from 39 to 41 to avoid conflict
 
 // Clamp Pin Definitions
-#define POSITION_CLAMP 13           // Left side, bottom
-#define WOOD_SECURE_CLAMP 15        // Right side, bottom
+#define POSITION_CLAMP 4            // Left side output updated from 3 to 4 (must be between 4-18)
+#define WOOD_SECURE_CLAMP 35        // Right side, remains unchanged
 
 // LED Pin Definitions
-#define RED_LED 26    // Error LED - Left side, middle section
-#define YELLOW_LED 21  // Busy/Reload LED - Right side, upper section
-#define GREEN_LED 4    // Ready LED - Right side, lower section
-#define BLUE_LED 2     // Setup/No-Wood LED - Right side, near bottom
+#define RED_LED 16    // Left side, remains unchanged
+#define YELLOW_LED 42 // Right side, remains unchanged
+#define GREEN_LED 37  // Reassigned from 38 to 37 to avoid conflict with position motor dir
+#define BLUE_LED 36   // Right side, remains unchanged
 
 // Signal Output
-#define SIGNAL_TO_TA_PIN 19    // Right side, upper middle section
+#define SIGNAL_TO_TA_PIN 19    // Reassigned from 41 to 45 to avoid conflict
 
 // ===== CONSTANTS =====
 // System States
@@ -60,7 +64,6 @@ enum SystemState {
 #define CUT_RETURN_SPEED 3000
 #define CUT_ACCELERATION 2500
 #define CUT_HOMING_SPEED 300
-#define CUT_APPROACH_SPEED (CUT_HOMING_SPEED * 0.85) // 15% slower for sensor approach
 #define POSITION_NORMAL_SPEED 50000
 #define POSITION_RETURN_SPEED 50000
 #define POSITION_ACCELERATION 50000
@@ -403,13 +406,13 @@ void homingSequence() {
       cutMotor.setMaxSpeed(CUT_HOMING_SPEED);
       cutMotor.moveTo(10 * CUT_MOTOR_STEPS_PER_INCH); // Move slightly away from sensor
       if (cutMotor.distanceToGo() == 0) {
-        // Now move back to find the sensor at a slower approach speed
-        cutMotor.setSpeed(CUT_APPROACH_SPEED * CUT_HOMING_DIRECTION);
+        // Now move back to find the sensor using the homing speed directly
+        cutMotor.setSpeed(CUT_HOMING_SPEED * CUT_HOMING_DIRECTION);
         cutMotor.moveTo(-10000); // Move toward sensor (will stop when sensor activated)
       }
     } else {
-      // Move toward home sensor at slower approach speed
-      cutMotor.setSpeed(CUT_APPROACH_SPEED * CUT_HOMING_DIRECTION);
+      // Move toward home sensor using the homing speed directly
+      cutMotor.setSpeed(CUT_HOMING_SPEED * CUT_HOMING_DIRECTION);
       cutMotor.moveTo(-10000); // Large number in homing direction
     }
     
@@ -433,7 +436,7 @@ void homingSequence() {
         positionMotor.moveTo(-10000 * POSITION_MOTOR_STEPS_PER_INCH); // Move toward sensor
       }
     } else {
-      // Move toward home sensor
+      // Move toward home sensor using the homing speed directly
       positionMotor.setSpeed(POSITION_HOMING_SPEED * POSITION_HOMING_DIRECTION);
       positionMotor.moveTo(-10000 * POSITION_MOTOR_STEPS_PER_INCH);
     }
@@ -576,148 +579,133 @@ void CUTmovement() {
 }
 
 void YESwood() {
-  // Step sequence:
-  // 0: Initialize - Move back 0.1 inches with position clamp engaged, retract wood secure clamp, and start cut motor home
-  // 1: Wait for 0.1 inch movement to complete, then disengage position clamp and re-engage wood secure clamp
-  // 2: Return position motor to home position
-  // 3: Wait for position motor to reach home, engage position clamp
-  // 4: Verify cut motor has properly returned home by checking homing sensor
-  // 5: Move position motor to final position
-  // 6: Wait for position motor to reach final position
-  // 7: Complete operation
-  
   static int stage = 0;
   static long currentPos;
-  static bool positionClampEngaged = false;
-  static unsigned long clampTimer = 0;
+  static unsigned long timer = 0;
+  static bool homingSensorTriggered = false;
   
   // Always run both motors to ensure they continue moving
   positionMotor.run();
   cutMotor.run();
   
-  // Step 0: Initialize - Move back 0.1 inches with position clamp engaged and start cut motor home
+  // Stage 0: Initialization - move position motor 0.1 inch back and start cut motor fast move
   if (stage == 0) {
-    // Keep position clamp engaged during initial movement
+    // Engage position clamp during movement
     digitalWrite(POSITION_CLAMP, LOW);
     
     // Retract wood secure clamp
     digitalWrite(WOOD_SECURE_CLAMP, HIGH);
     
-    // Move 0.1 inches back from current position
+    // Move 0.1 inches back from current position with position motor
     currentPos = positionMotor.currentPosition();
     positionMotor.setMaxSpeed(POSITION_NORMAL_SPEED);
     positionMotor.setAcceleration(POSITION_ACCELERATION);
     positionMotor.moveTo(currentPos - (0.1 * POSITION_MOTOR_STEPS_PER_INCH));
     
-    // Start cut motor returning home immediately
+    // Initiate cut motor fast move: move to 0.3 inches away from home
     cutMotor.setMaxSpeed(CUT_RETURN_SPEED);
     cutMotor.setAcceleration(CUT_ACCELERATION);
-    cutMotor.moveTo(0);
+    long fastTarget = (long)(0.3 * CUT_MOTOR_STEPS_PER_INCH);
+    cutMotor.moveTo(fastTarget);
     
-    stage = 1; // Move to Step 1: Wait for 0.1 inch movement to complete
+    stage = 1;
     return;
   }
   
-  // Step 1: Wait for 0.1 inch movement to complete, then disengage position clamp and re-engage wood secure clamp
+  // Stage 1: Wait for position motor to complete its 0.1 inch move, then release clamps
   if (stage == 1) {
     if (positionMotor.distanceToGo() == 0) {
-      // After 0.1 inch, disengage position clamp
       digitalWrite(POSITION_CLAMP, HIGH);
-      
-      // Re-engage wood secure clamp
       digitalWrite(WOOD_SECURE_CLAMP, LOW);
-      
-      // Move directly to next stage without waiting
-      stage = 2; // Move to Step 2: Return position motor to home position
+      stage = 2;
     }
     return;
   }
   
-  // Step 2: Return position motor to home position
+  // Stage 2: Wait for cut motor to complete its fast move to 0.3 inches
   if (stage == 2) {
-    // Set up position motor for returning home
+    if (cutMotor.distanceToGo() == 0) {
+      // Prepare for slow move phase
+      homingSensorTriggered = false;
+      cutMotor.setMaxSpeed(CUT_RETURN_SPEED / 5); // Set to 1/5 the return speed
+      cutMotor.moveTo(0);  // Move to home
+      stage = 3;
+    }
+    return;
+  }
+  
+  // Stage 3: During slow move, continuously check the homing sensor
+  if (stage == 3) {
+    if (cutHomingSensor.read() == HIGH) {
+      homingSensorTriggered = true;
+    }
+    if (cutMotor.distanceToGo() == 0) {
+      // Slow move complete; check if sensor was triggered
+      if (!homingSensorTriggered) {
+        // Sensor was not triggered during slow move: enter error state
+        currentState = ERROR;
+        errorStartTime = millis();
+        stage = 0; // Reset for next cycle
+        return;
+      } else {
+        // Sensor triggered; proceed to next stage
+        stage = 4;
+      }
+    }
+    return;
+  }
+  
+  // Stage 4: Return position motor to home position
+  if (stage == 4) {
     positionMotor.setMaxSpeed(POSITION_RETURN_SPEED);
     positionMotor.setAcceleration(POSITION_RETURN_ACCELERATION);
     positionMotor.moveTo(0);
-    
-    stage = 3; // Move to Step 3: Wait for position motor to reach home
+    stage = 5;
     return;
   }
   
-  // Step 3: Wait for position motor to reach home, engage position clamp
-  if (stage == 3) {
-    // First check if position motor has reached home
-    if (positionMotor.distanceToGo() == 0) {
-      // Position motor is now at home position
-      // Engage position clamp immediately
-      digitalWrite(POSITION_CLAMP, LOW);
-      
-      // Move to next stage to check cut motor
-      stage = 4;
-    }
-    return;
-  }
-  
-  // Step 4: Verify cut motor has properly returned home by checking homing sensor
-  if (stage == 4) {
-    // Simply check if cut motor has completed its movement
-    if (cutMotor.distanceToGo() == 0) {
-      // Cut motor has reached home position, move to next stage
-      stage = 5; // Move to Step 5: Move position motor to final position
-    }
-    return;
-  }
-  
-  // Step 5: Move position motor to final position
+  // Stage 5: Wait for position motor to reach home; then engage position clamp
   if (stage == 5) {
-    // Retract wood secure clamp during the 3.45 inch movement
-    digitalWrite(WOOD_SECURE_CLAMP, HIGH);
-    
-    // Move position motor to final position
+    if (positionMotor.distanceToGo() == 0) {
+      digitalWrite(POSITION_CLAMP, LOW);
+      stage = 6;
+    }
+    return;
+  }
+  
+  // Stage 6: Move position motor to final position
+  if (stage == 6) {
     positionMotor.setMaxSpeed(POSITION_NORMAL_SPEED);
     positionMotor.setAcceleration(POSITION_ACCELERATION);
     positionMotor.moveTo(POSITION_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH);
-    
-    stage = 6; // Move to Step 6: Wait for position motor to reach final position
+    stage = 7;
     return;
   }
   
-  // Step 6: Wait for position motor to reach final position
-  if (stage == 6) {
+  // Stage 7: Wait for position motor to reach final position and retract wood secure clamp
+  if (stage == 7) {
     if (positionMotor.distanceToGo() == 0) {
-      // Extend wood secure clamp right after movement completes
       digitalWrite(WOOD_SECURE_CLAMP, LOW);
-      
-      stage = 7; // Move to Step 7: Complete operation
+      stage = 8;
     }
     return;
   }
   
-  // Step 7: Complete operation
-  if (stage == 7) {
-    // Reset cycle flags
+  // Stage 8: Complete operation
+  if (stage == 8) {
     cuttingCycleInProgress = false;
     signalSent = false;
-    
-    // Check for wood suction error
     if (woodSuctionError) {
-      // Enter error state
       currentState = ERROR;
       errorStartTime = millis();
     } else {
-      // Return to ready state
       currentState = READY;
-      
-      // Turn off busy LED
       digitalWrite(YELLOW_LED, LOW);
-      
-      // Turn on appropriate LED based on wood presence
       if (!woodPresent) {
-        digitalWrite(BLUE_LED, HIGH); // No wood LED
+        digitalWrite(BLUE_LED, HIGH);
       }
     }
-    
-    stage = 0; // Reset to beginning for next cycle
+    stage = 0;
     return;
   }
 }
