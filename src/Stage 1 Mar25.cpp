@@ -56,7 +56,7 @@ enum SystemState {
 #define POSITION_HOMING_DIRECTION -1
 
 // Speed and Acceleration Settings
-#define CUT_NORMAL_SPEED 120
+#define CUT_NORMAL_SPEED 105
 #define CUT_RETURN_SPEED 3000
 #define CUT_ACCELERATION 2500
 #define CUT_HOMING_SPEED 300
@@ -136,8 +136,8 @@ void setup() {
   initializeSystem();
   
   // Initialize Serial for debugging
-  Serial.begin(115200);
-  Serial.println("Stage 1 system starting...");
+  // Serial.begin(115200);
+  // Serial.println("Stage 1 system starting...");
   
   // Start in STARTUP state
   currentState = STARTUP;
@@ -146,7 +146,7 @@ void setup() {
   startCycleSwitch.update();
   if (startCycleSwitch.read() == HIGH) {
     startSwitchSafe = false;
-    Serial.println("WARNING: Start switch is ON at startup");
+    // Serial.println("WARNING: Start switch is ON at startup");
   } else {
     startSwitchSafe = true;
   }
@@ -157,8 +157,8 @@ void setup() {
 
 void initializeSystem() {
   // Initialize serial communication
-  Serial.begin(115200);
-  Serial.println("System initializing...");
+  // Serial.begin(115200);
+  // Serial.println("System initializing...");
   
   // Initialize motor pins
   pinMode(CUT_MOTOR_PULSE_PIN, OUTPUT);
@@ -217,11 +217,11 @@ void initializeSystem() {
   woodSuctionSensor.interval(SIGNAL_DEBOUNCE_INTERVAL);
   
   // Test and report homing sensor states
-  Serial.println("Initial sensor states:");
-  Serial.print("Cut homing sensor: ");
-  Serial.println(digitalRead(CUT_MOTOR_HOMING_SENSOR) == HIGH ? "HIGH (active)" : "LOW (inactive)");
-  Serial.print("Position homing sensor: ");
-  Serial.println(digitalRead(POSITION_MOTOR_HOMING_SENSOR) == HIGH ? "HIGH (active)" : "LOW (inactive)");
+  // Serial.println("Initial sensor states:");
+  // Serial.print("Cut homing sensor: ");
+  // Serial.println(digitalRead(CUT_MOTOR_HOMING_SENSOR) == HIGH ? "HIGH (active)" : "LOW (inactive)");
+  // Serial.print("Position homing sensor: ");
+  // Serial.println(digitalRead(POSITION_MOTOR_HOMING_SENSOR) == HIGH ? "HIGH (active)" : "LOW (inactive)");
   
   // Set system as not homed
   isHomed = false;
@@ -499,7 +499,7 @@ void CUTmovement() {
     checkedForWoodSuction = false;
     
     // Wait for clamps to fully engage
-    if (Wait(1, &clampTimer)) {
+    if (Wait(100, &clampTimer)) {
       stage = 1;  // Move to next stage
     }
     return;
@@ -660,89 +660,11 @@ void YESwood() {
   
   // Step 4: Verify cut motor has properly returned home by checking homing sensor
   if (stage == 4) {
-    static unsigned long cutMotorHomeTimeout = 0;
-    static bool retryAttempted = false;
-    static unsigned long retryWaitStart = 0;
-    
-    // Initialize timeout timer if not set
-    if (cutMotorHomeTimeout == 0) {
-      cutMotorHomeTimeout = millis();
-      Serial.print("Cut homing sensor state: ");
-      Serial.println(cutHomingSensor.read() == HIGH ? "HIGH (active)" : "LOW (inactive)");
-    }
-    
-    // If we're waiting after a retry attempt
-    if (retryWaitStart > 0) {
-      if (millis() - retryWaitStart < 500) {
-        // Still waiting
-        return;
-      }
-      
-      // Wait time is over, check sensor
-      retryWaitStart = 0;
-      
-      if (cutHomingSensor.read() == HIGH) {
-        // Success! Cut motor found home after retry
-        Serial.println("Cut motor found home after retry, proceeding to next step");
-        stage = 5; // Move to Step 5: Move position motor to final position
-        cutMotorHomeTimeout = 0;
-        retryAttempted = false;
-      } else {
-        // Still not at home after retry - error
-        Serial.println("ERROR: Cut motor failed to find home sensor after retry");
-        currentState = ERROR;
-        errorStartTime = millis();
-        digitalWrite(RED_LED, HIGH);
-        digitalWrite(YELLOW_LED, HIGH);
-        stage = 0;
-        cuttingCycleInProgress = false;
-        signalSent = false;
-        cutMotorHomeTimeout = 0;
-        retryAttempted = false;
-      }
-      return;
-    }
-    
-    // Check if motor has stopped moving
+    // Simply check if cut motor has completed its movement
     if (cutMotor.distanceToGo() == 0) {
-      // Motor has stopped, check sensor
-      if (cutHomingSensor.read() == HIGH) {
-        // Cut motor is properly homed, proceed to next step
-        Serial.println("Cut motor properly homed, proceeding to next step");
-        stage = 5; // Move to Step 5: Move position motor to final position
-        cutMotorHomeTimeout = 0;
-        retryAttempted = false;
-      } else if (!retryAttempted) {
-        // Not at home sensor, try one more time
-        Serial.println("Cut motor not on home sensor, trying one more time...");
-        retryAttempted = true;
-        
-        // Try to move the motor a bit more toward home
-        cutMotor.setMaxSpeed(CUT_APPROACH_SPEED);
-        cutMotor.setAcceleration(CUT_ACCELERATION);
-        cutMotor.move(CUT_HOMING_DIRECTION * 0.5 * CUT_MOTOR_STEPS_PER_INCH);
-      } else if (retryAttempted && retryWaitStart == 0) {
-        // Motor has stopped after retry attempt, start wait timer
-        retryWaitStart = millis();
-      }
+      // Cut motor has reached home position, move to next stage
+      stage = 5; // Move to Step 5: Move position motor to final position
     }
-    
-    // Check for timeout
-    if (millis() - cutMotorHomeTimeout > 5000) {
-      Serial.println("ERROR: Cut motor homing timeout");
-      cutMotor.stop();
-      currentState = ERROR;
-      errorStartTime = millis();
-      digitalWrite(RED_LED, HIGH);
-      digitalWrite(YELLOW_LED, HIGH);
-      stage = 0;
-      cuttingCycleInProgress = false;
-      signalSent = false;
-      cutMotorHomeTimeout = 0;
-      retryAttempted = false;
-      retryWaitStart = 0;
-    }
-    
     return;
   }
   
@@ -829,12 +751,6 @@ void NOwood() {
     // Turn on yellow LED to indicate operation in progress
     digitalWrite(YELLOW_LED, HIGH);
     
-    // If position motor is already at home (or very close), we can skip waiting for it
-    if (abs(positionMotor.currentPosition()) < 5) {
-      // Mark position motor as effectively at home
-      positionMotor.setCurrentPosition(0);
-    }
-    
     // Move to next stage
     stage = 1;
     return;
@@ -842,7 +758,7 @@ void NOwood() {
   
   // Step 1: Wait for both motors to complete their movement to home position
   if (stage == 1) {
-    // Check if both motors have reached home position
+    // Check if both motors have completed their movements
     if (cutMotor.distanceToGo() == 0 && positionMotor.distanceToGo() == 0) {
       // Both motors are at home, release the position clamp
       digitalWrite(POSITION_CLAMP, HIGH);
