@@ -3,40 +3,37 @@
 #include <Bounce2.h>
 
 // ===== PIN DEFINITIONS =====
-// Board Configuration v2:
-// - Left side: INPUT pins will be in the range 9-14, and OUTPUT pins will be in the range 4-18.
-// - Motor Pins: CUT motor uses pulse pin 1 and direction pin 2; POSITION motor uses pulse pin 39 and direction pin 38.
-// - Right side: Other pins remain as previously configured.
+// Using pin definitions from Feb25 code
 
 // Motor Pin Definitions
-#define CUT_MOTOR_PULSE_PIN 1       // Cut motor pulse as specified
-#define CUT_MOTOR_DIR_PIN 2         // Cut motor direction as specified
+#define CUT_MOTOR_PULSE_PIN 22       // Cut motor pulse (Feb25: 22)
+#define CUT_MOTOR_DIR_PIN 23         // Cut motor direction (Feb25: 23)
 
-#define POSITION_MOTOR_PULSE_PIN 39 // Position motor pulse as specified
-#define POSITION_MOTOR_DIR_PIN 38   // Position motor direction as specified
+#define POSITION_MOTOR_PULSE_PIN 32  // Position motor pulse (Feb25: 32)
+#define POSITION_MOTOR_DIR_PIN 33    // Position motor direction (Feb25: 33)
 
-// Switch and Sensor Pin Definitions (Left side inputs assigned within 9-14)
-#define CUT_MOTOR_HOMING_SENSOR 9      // Left side input (was 15, now 9)
-#define POSITION_MOTOR_HOMING_SENSOR 10 // Left side input (was 17, now 10)
-#define RELOAD_SWITCH 11               // Left side input (was 18, now 11)
-#define WOOD_SENSOR 12                 // Left side input (was 5, now 12)
+// Switch and Sensor Pin Definitions (Left side inputs)
+#define CUT_MOTOR_POSITION_SWITCH 25      // Cut motor position switch (Feb25: 25)
+#define POSITION_MOTOR_POSITION_SWITCH 27 // Position motor position switch (Feb25: 27)
+#define RELOAD_SWITCH 14                    // Reload switch (Feb25: 14)
+#define WOOD_SENSOR 35                      // Wood sensor (Feb25: 35)
 
-// Switch and Sensor Pin Definitions (Right side remain unchanged except for conflict resolution)
-#define START_CYCLE_SWITCH 40          // Remains as specified
-#define WAS_WOOD_SUCTIONED_SENSOR 41   // Moved from 39 to 41 to avoid conflict
+// Switch and Sensor Pin Definitions (Right side)
+#define START_CYCLE_SWITCH 18          // Start cycle switch (Feb25: 18)
+#define WAS_WOOD_SUCTIONED_SENSOR 5    // Was wood suctioned sensor (Feb25: 5)
 
 // Clamp Pin Definitions
-#define POSITION_CLAMP 4            // Left side output updated from 3 to 4 (must be between 4-18)
-#define WOOD_SECURE_CLAMP 35        // Right side, remains unchanged
+#define POSITION_CLAMP 13           // Position clamp (Feb25: 13)
+#define WOOD_SECURE_CLAMP 15         // Wood secure clamp (Feb25: 15)
 
 // LED Pin Definitions
-#define RED_LED 16    // Left side, remains unchanged
-#define YELLOW_LED 42 // Right side, remains unchanged
-#define GREEN_LED 37  // Reassigned from 38 to 37 to avoid conflict with position motor dir
-#define BLUE_LED 36   // Right side, remains unchanged
+#define RED_LED 26    // Red LED (Feb25: 26)
+#define YELLOW_LED 21 // Yellow LED (Feb25: 21)
+#define GREEN_LED 4   // Green LED (Feb25: 4)
+#define BLUE_LED 2    // Blue LED (Feb25: 2)
 
 // Signal Output
-#define SIGNAL_TO_TA_PIN 19    // Reassigned from 41 to 45 to avoid conflict
+#define SIGNAL_TO_STAGE_1TO2 19    // Signal to Stage1-to-2 (Feb25: 19)
 
 // ===== CONSTANTS =====
 // System States
@@ -170,8 +167,8 @@ void initializeSystem() {
   pinMode(POSITION_MOTOR_DIR_PIN, OUTPUT);
   
   // Initialize switch and sensor pins
-  pinMode(CUT_MOTOR_HOMING_SENSOR, INPUT_PULLUP);      // Active HIGH
-  pinMode(POSITION_MOTOR_HOMING_SENSOR, INPUT_PULLUP); // Active HIGH
+  pinMode(CUT_MOTOR_POSITION_SWITCH, INPUT_PULLUP);
+  pinMode(POSITION_MOTOR_POSITION_SWITCH, INPUT_PULLUP);
   pinMode(RELOAD_SWITCH, INPUT);                       // External pull-down
   pinMode(START_CYCLE_SWITCH, INPUT);                  // External pull-down
   pinMode(WOOD_SENSOR, INPUT_PULLUP);                  // Active LOW (LOW = wood present)
@@ -188,7 +185,7 @@ void initializeSystem() {
   pinMode(BLUE_LED, OUTPUT);
   
   // Initialize signal output pin
-  pinMode(SIGNAL_TO_TA_PIN, OUTPUT);
+  pinMode(SIGNAL_TO_STAGE_1TO2, OUTPUT);
   
   // Set initial state of outputs
   digitalWrite(POSITION_CLAMP, LOW);      // Engage position clamp
@@ -197,7 +194,7 @@ void initializeSystem() {
   digitalWrite(YELLOW_LED, LOW);          // Turn off busy LED
   digitalWrite(GREEN_LED, LOW);           // Turn off ready LED
   digitalWrite(BLUE_LED, HIGH);           // Turn on setup LED during startup
-  digitalWrite(SIGNAL_TO_TA_PIN, LOW);    // No signal to TA
+  digitalWrite(SIGNAL_TO_STAGE_1TO2, LOW);    // No signal to TA
   
   // Configure motors
   cutMotor.setMaxSpeed(CUT_NORMAL_SPEED);
@@ -206,9 +203,9 @@ void initializeSystem() {
   positionMotor.setAcceleration(POSITION_ACCELERATION);
   
   // Initialize bounce objects for debouncing switches
-  cutHomingSensor.attach(CUT_MOTOR_HOMING_SENSOR);
+  cutHomingSensor.attach(CUT_MOTOR_POSITION_SWITCH);
   cutHomingSensor.interval(SIGNAL_DEBOUNCE_INTERVAL);
-  positionHomingSensor.attach(POSITION_MOTOR_HOMING_SENSOR);
+  positionHomingSensor.attach(POSITION_MOTOR_POSITION_SWITCH);
   positionHomingSensor.interval(SIGNAL_DEBOUNCE_INTERVAL);
   reloadSwitch.attach(RELOAD_SWITCH);
   reloadSwitch.interval(SIGNAL_DEBOUNCE_INTERVAL);
@@ -222,9 +219,9 @@ void initializeSystem() {
   // Test and report homing sensor states
   // Serial.println("Initial sensor states:");
   // Serial.print("Cut homing sensor: ");
-  // Serial.println(digitalRead(CUT_MOTOR_HOMING_SENSOR) == HIGH ? "HIGH (active)" : "LOW (inactive)");
+  // Serial.println(digitalRead(CUT_MOTOR_POSITION_SWITCH) == HIGH ? "HIGH (active)" : "LOW (inactive)");
   // Serial.print("Position homing sensor: ");
-  // Serial.println(digitalRead(POSITION_MOTOR_HOMING_SENSOR) == HIGH ? "HIGH (active)" : "LOW (inactive)");
+  // Serial.println(digitalRead(POSITION_MOTOR_POSITION_SWITCH) == HIGH ? "HIGH (active)" : "LOW (inactive)");
   
   // Set system as not homed
   isHomed = false;
@@ -553,7 +550,7 @@ void CUTmovement() {
       woodPresent = (digitalRead(WOOD_SENSOR) == LOW); // LOW indicates wood present
       
       // Send signal to TA (Transfer Arm) regardless of wood presence
-      digitalWrite(SIGNAL_TO_TA_PIN, HIGH);
+      digitalWrite(SIGNAL_TO_STAGE_1TO2, HIGH);
       signalSent = true;
       
       // Reset stage for next cycle
@@ -563,7 +560,7 @@ void CUTmovement() {
       static unsigned long signalTimer = 0;
       if (Wait(200, &signalTimer)) {
         // Reset signal (LOW)
-        digitalWrite(SIGNAL_TO_TA_PIN, LOW);
+        digitalWrite(SIGNAL_TO_STAGE_1TO2, LOW);
         
         if (woodPresent) {
           // Wood present, move to YESwood state
@@ -636,12 +633,11 @@ void YESwood() {
   
   // Stage 3: During slow move, continuously check the homing sensor
   if (stage == 3) {
-    if (cutHomingSensor.read() == HIGH) {
-      homingSensorTriggered = true;
-    }
+    
     if (cutMotor.distanceToGo() == 0) {
+      delay(50);
       // Slow move complete; check if sensor was triggered
-      if (!homingSensorTriggered) {
+      if (cutHomingSensor.read() == LOW) {
         // Sensor was not triggered during slow move: enter error state
         currentState = ERROR;
         errorStartTime = millis();
