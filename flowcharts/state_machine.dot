@@ -1,7 +1,7 @@
 digraph StateMachine {
     // Graph styling
-    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=true];
-    node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#E0F4FF", color="#0078D7", penwidth=2.0];
+    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=true, concentrate=true];
+    node [fontname="Arial", fontsize=12, shape=box, style="filled", fillcolor="#E0F4FF", color="#0078D7", penwidth=2.0];
     edge [fontname="Arial", fontsize=11, color="#666666", penwidth=1.2, arrowsize=0.9];
 
     // Title
@@ -9,9 +9,9 @@ digraph StateMachine {
     label="ESP32-S3 Stage 1 State Machine";
 
     // State nodes with descriptive labels
-    STARTUP [label="STARTUP\nInitial state, sets clamps", fillcolor="#D4F4FA"];
-    HOMING [label="HOMING\nCalibrates motors to home positions", fillcolor="#D4F4FA"];
-    READY [label="READY\nWaiting for cycle switch", fillcolor="#CCFFCC"];
+    STARTUP [label="STARTUP\nInitial state, sets clamps", fillcolor="#D4F4FA", group=init];
+    HOMING [label="HOMING\nCalibrates motors to home positions", fillcolor="#D4F4FA", group=init];
+    READY [label="READY\nWaiting for cycle switch", fillcolor="#CCFFCC", fontsize=16, width=1.8, height=1.2, penwidth=3.0];
     RELOAD [label="RELOAD\nWaiting for reload switch off", fillcolor="#CCFFFF"];
     CUTTING [label="CUTTING\nExecuting cutting sequence", fillcolor="#FFFFCC"];
     YESWOOD [label="YESWOOD\nWood detected after cut", fillcolor="#E6FFE6"];
@@ -19,6 +19,16 @@ digraph StateMachine {
     ERROR [label="ERROR\nGeneral error state", fillcolor="#FFD2D2"];
     WOOD_SUCTION_ERROR [label="WOOD_SUCTION_ERROR\nWood suction failure", fillcolor="#FFCCCB"];
     CUT_MOTOR_HOME_ERROR [label="CUT_MOTOR_HOME_ERROR\nCut motor homing failure", fillcolor="#FFCCCB"];
+
+    // Define initialization box
+    subgraph cluster_init {
+        label="One-Time Initialization";
+        style="dashed";
+        color="#888888";
+        fontsize=14;
+        bgcolor="#F9F9F9";
+        STARTUP; HOMING;
+    }
 
     // Transition edges
     STARTUP -> HOMING [label="Immediate"];
