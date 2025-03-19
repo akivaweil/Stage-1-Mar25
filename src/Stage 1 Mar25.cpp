@@ -111,6 +111,15 @@ void movePositionMotorToPosition(float positionInches);
 bool isMotorInPosition(AccelStepper& motor, float targetPosition);
 void moveAwayThenHomeCutMotor();
 void runHomingSequence();
+void configureMotorsForHoming();
+void configureCutMotorForHoming();
+void configurePositionMotorForHoming();
+void configureMotorsForNormalOperation();
+void configureCutMotorForNormalOperation();
+void configurePositionMotorForNormalOperation();
+void configureMotorsForReturn();
+void configureCutMotorForReturn();
+void configurePositionMotorForReturn();
 
 // Main state machine update function
 void updateStateMachine() {
@@ -266,8 +275,7 @@ void handleHomingState() {
       
     case 1:  // Move cut motor away from home switch
       // Set motor speed for moving away
-      cutMotor.setMaxSpeed(CUT_MOTOR_HOMING_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+      configureCutMotorForHoming();
       
       // Move motor slightly away from home switch (negative direction)
       if (!cutMotor.isRunning()) {
@@ -295,8 +303,7 @@ void handleHomingState() {
       
     case 3:  // Move position motor away from home switch
       // Set motor speed for moving away
-      positionMotor.setMaxSpeed(POSITION_MOTOR_HOMING_SPEED);
-      positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+      configurePositionMotorForHoming();
       
       // Move motor slightly away from home switch (negative direction)
       if (!positionMotor.isRunning()) {
@@ -313,8 +320,7 @@ void handleHomingState() {
       
     case 4:  // Home cut motor
       // Set motor speed for homing
-      cutMotor.setMaxSpeed(CUT_MOTOR_HOMING_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+      configureCutMotorForHoming();
       
       // Start moving toward home if not already running
       if (!cutMotor.isRunning() && !readCutMotorHomingSwitch()) {
@@ -351,8 +357,7 @@ void handleHomingState() {
       
     case 5:  // Home position motor
       // Set motor speed for homing
-      positionMotor.setMaxSpeed(POSITION_MOTOR_HOMING_SPEED);
-      positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+      configurePositionMotorForHoming();
       
       // Start moving toward home if not already running
       if (!positionMotor.isRunning() && !readPositionMotorHomingSwitch()) {
@@ -460,8 +465,7 @@ void handleCuttingState() {
       
     case 1:  // Move to suction check position
       // Set motor speed
-      cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+      configureCutMotorForNormalOperation();
       
       // Start move to suction check position if not already moving
       if (!cutMotor.isRunning()) {
@@ -542,8 +546,7 @@ void handleYesWoodState() {
       retractPositionClamp();
       
       // Set position motor speed
-      positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
-      positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+      configurePositionMotorForNormalOperation();
       
       subState = 1;
       break;
@@ -562,8 +565,7 @@ void handleYesWoodState() {
       
     case 2:  // Return cut motor to home
       // Set cut motor speed for return
-      cutMotor.setMaxSpeed(CUT_MOTOR_RETURN_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+      configureCutMotorForReturn();
       
       // Start movement if not already moving
       if (!cutMotor.isRunning()) {
@@ -588,10 +590,7 @@ void handleNoWoodState() {
       retractWoodSecureClamp();
       
       // Set motor speeds for return
-      cutMotor.setMaxSpeed(CUT_MOTOR_RETURN_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
-      positionMotor.setMaxSpeed(POSITION_MOTOR_RETURN_SPEED);
-      positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+      configureMotorsForReturn();
       
       subState = 1;
       break;
@@ -762,8 +761,7 @@ void moveAwayThenHomeCutMotor() {
   switch (recoverySubState) {
     case 0:  // Start moving away from home
       // Set motor speed for moving away
-      cutMotor.setMaxSpeed(CUT_MOTOR_HOMING_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+      configureCutMotorForHoming();
       
       // Move motor away from home switch (negative direction)
       if (!cutMotor.isRunning()) {
@@ -783,8 +781,7 @@ void moveAwayThenHomeCutMotor() {
       
     case 2:  // Start moving toward home
       // Set motor speed for homing
-      cutMotor.setMaxSpeed(CUT_MOTOR_HOMING_SPEED);
-      cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+      configureCutMotorForHoming();
       
       // Move toward home position (positive direction)
       if (!cutMotor.isRunning()) {
@@ -1111,13 +1108,8 @@ bool performStartupSafetyCheck() {
 
 // Configure motors with their speeds and acceleration
 void configureMotors() {
-  // Configure cut motor
-  cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
-  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
-  
-  // Configure position motor
-  positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
-  positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+  // Use our new configuration functions instead of direct settings
+  configureMotorsForNormalOperation();
   
   // Set current position to 0
   cutMotor.setCurrentPosition(0);
@@ -1173,4 +1165,60 @@ void setup() {
   
   // Initial state
   currentState = STARTUP_STATE;
+}
+
+// Motor speed and acceleration configuration functions
+
+// Configure both motors for homing operations
+void configureMotorsForHoming() {
+  configureCutMotorForHoming();
+  configurePositionMotorForHoming();
+}
+
+// Configure cut motor for homing
+void configureCutMotorForHoming() {
+  cutMotor.setMaxSpeed(CUT_MOTOR_HOMING_SPEED);
+  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+}
+
+// Configure position motor for homing
+void configurePositionMotorForHoming() {
+  positionMotor.setMaxSpeed(POSITION_MOTOR_HOMING_SPEED);
+  positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+}
+
+// Configure both motors for normal operations
+void configureMotorsForNormalOperation() {
+  configureCutMotorForNormalOperation();
+  configurePositionMotorForNormalOperation();
+}
+
+// Configure cut motor for normal operations
+void configureCutMotorForNormalOperation() {
+  cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
+  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+}
+
+// Configure position motor for normal operations
+void configurePositionMotorForNormalOperation() {
+  positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
+  positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+}
+
+// Configure both motors for return operations
+void configureMotorsForReturn() {
+  configureCutMotorForReturn();
+  configurePositionMotorForReturn();
+}
+
+// Configure cut motor for return operations
+void configureCutMotorForReturn() {
+  cutMotor.setMaxSpeed(CUT_MOTOR_RETURN_SPEED);
+  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+}
+
+// Configure position motor for return operations
+void configurePositionMotorForReturn() {
+  positionMotor.setMaxSpeed(POSITION_MOTOR_RETURN_SPEED);
+  positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
 }
