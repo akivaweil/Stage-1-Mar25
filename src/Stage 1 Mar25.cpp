@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include <Bounce2.h>
+#include "CuttingOperations.h"
+#include "YesWoodOperations.h"
+#include "NoWoodOperations.h"
 
 // Enumerations
 enum State {
@@ -88,7 +91,6 @@ const float CUT_MOTOR_TRAVEL_DISTANCE = 8.5;  // inches
 const float POSITION_MOTOR_TRAVEL_DISTANCE = 3.45;  // inches
 const float CUT_MOTOR_NORMAL_SPEED = 80.0;  // steps/sec
 const float CUT_MOTOR_RETURN_SPEED = 2000.0;  // steps/sec
-const float CUT_MOTOR_CUTTING_SPEED = 50.0;  // steps/sec - slower speed for precise cutting
 const float POSITION_MOTOR_NORMAL_SPEED = 30000.0;  // steps/sec
 const float POSITION_MOTOR_RETURN_SPEED = 30000.0;  // steps/sec
 const float CUT_MOTOR_ACCELERATION = 2200.0;  // steps/sec²
@@ -97,8 +99,6 @@ const float CUT_MOTOR_HOMING_SPEED = 300.0;  // steps/sec
 const float POSITION_MOTOR_HOMING_SPEED = 2000.0;  // steps/sec
 
 // Constants for positions
-const float WAS_WOOD_SUCTIONED_POSITION = 0.3;  // inches
-const float TRANSFER_ARM_SIGNAL_POSITION = 7.2;  // inches
 const unsigned long MOTOR_MOVE_TIMEOUT = 10000; // 10 seconds
 
 // Function declarations
@@ -151,6 +151,31 @@ void extendPositionClamp();
 void retractPositionClamp();
 void extendWoodSecureClamp();
 void retractWoodSecureClamp();
+void enterState(State newState);
+void updateStateMachine();
+void initializePins();
+void initializeDebounce();
+void configureMotors();
+void updateAllSwitches();
+void runMotors();
+bool performStartupSafetyCheck();
+
+// Non-blocking delay function
+bool Wait(unsigned long delayTime, unsigned long* startTimePtr) {
+  // First time entering this function
+  if (*startTimePtr == 0) {
+    *startTimePtr = millis();
+    return false;
+  }
+  
+  // Check if the delay time has elapsed
+  if (millis() - *startTimePtr >= delayTime) {
+    *startTimePtr = 0;  // Reset for next use
+    return true;
+  }
+  
+  return false;
+}
 
 // State pattern implementation
 typedef void (*StateHandler)();
@@ -387,139 +412,6 @@ void handleReloadState() {
   
   if (!readReloadSwitch()) {
     enterState(READY_STATE);
-  }
-}
-
-// Handle cutting state - implements a non-blocking cutting sequence
-void handleCuttingState() {
-  static bool hasPastSuctionPosition = false;
-  static bool hasPastTransferArmPosition = false;
-  
-  switch (subState) {
-    case 0:  // Init cutting cycle
-      extendPositionClamp();
-      extendWoodSecureClamp();
-      hasSuctionBeenChecked = false;
-      hasTransferArmBeenSignaled = false;
-      hasPastSuctionPosition = false;
-      hasPastTransferArmPosition = false;
-      
-      // Set up for continuous motion to final position
-      CutMotor_CUTTING_settings();
-      if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
-      }
-      
-      subState = 1;
-      break;
-      
-    case 1:  // Monitor position during continuous movement and trigger actions at specific points
-      // Check if we've passed the suction check position
-      if (!hasSuctionBeenChecked && !hasPastSuctionPosition && 
-          cutMotor.currentPosition() >= WAS_WOOD_SUCTIONED_POSITION * CUT_MOTOR_STEPS_PER_INCH) {
-        
-        hasPastSuctionPosition = true;
-        
-        // Check suction without stopping the motor
-        if (isWoodSuctionProper()) {
-          hasSuctionBeenChecked = true;
-        } else {
-          // Stop the motor and transition to error state if suction fails
-          cutMotor.stop();
-          enterState(WOOD_SUCTION_ERROR_STATE);
-          return;
-        }
-      }
-      
-      // Check if we've passed the transfer arm signal position
-      if (hasSuctionBeenChecked && !hasTransferArmBeenSignaled && !hasPastTransferArmPosition && 
-          cutMotor.currentPosition() >= TRANSFER_ARM_SIGNAL_POSITION * CUT_MOTOR_STEPS_PER_INCH) {
-        
-        hasPastTransferArmPosition = true;
-        
-        // Signal transfer arm without stopping the motor
-        signalTransferArm(HIGH);
-        hasTransferArmBeenSignaled = true;
-      }
-      
-      // Check if we've completed the full travel
-      if (isMotorInPosition(cutMotor, CUT_MOTOR_TRAVEL_DISTANCE * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 2;
-      }
-      break;
-      
-    case 2:  // Check wood presence after completing the cut
-      if (isWoodPresent()) {
-        enterState(YESWOOD_STATE);
-      } else {
-        enterState(NOWOOD_STATE);
-      }
-      break;
-  }
-}
-
-// Handle yes wood state - wood was detected after cutting
-void handleYesWoodState() {
-  switch (subState) {
-    case 0:  // Prepare for next position
-      retractPositionClamp();
-      PositionMotor_NORMAL_settings();
-      subState = 1;
-      break;
-      
-    case 1:  // Move position motor for next cut
-      if (!positionMotor.isRunning()) {
-        movePositionMotorToPosition(POSITION_MOTOR_TRAVEL_DISTANCE);
-      }
-      
-      if (isMotorInPosition(positionMotor, POSITION_MOTOR_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH)) {
-        subState = 2;
-      }
-      break;
-      
-    case 2:  // Return cut motor to home
-      CutMotor_RETURN_settings();
-      
-      if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(0);
-      }
-      
-      if (isMotorInPosition(cutMotor, 0)) {
-        enterState(READY_STATE);
-      }
-      break;
-  }
-}
-
-// Handle no wood state - no wood was detected after cutting
-void handleNoWoodState() {
-  switch (subState) {
-    case 0:  // Prepare for return to home
-      retractPositionClamp();
-      retractWoodSecureClamp();
-      Motors_RETURN_settings();
-      subState = 1;
-      break;
-      
-    case 1:  // Return cut motor to home
-      if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(0);
-      }
-      
-      if (isMotorInPosition(cutMotor, 0)) {
-        subState = 2;
-      }
-      break;
-      
-    case 2:  // Return position motor to home
-      if (!positionMotor.isRunning()) {
-        movePositionMotorToPosition(0);
-      }
-      
-      if (isMotorInPosition(positionMotor, 0)) {
-        enterState(READY_STATE);
-      }
-      break;
   }
 }
 
@@ -773,8 +665,7 @@ void updateBlueBlinkPattern() {
   static unsigned long lastBlinkTime = 0;
   static bool ledState = false;
   
-  if (millis() - lastBlinkTime >= 500) {
-    lastBlinkTime = millis();
+  if (Wait(500, &lastBlinkTime)) {
     ledState = !ledState;
     setBlueLed(ledState);
   }
@@ -785,8 +676,7 @@ void setWoodSuctionErrorPattern() {
   static bool ledState = false;
   
   // Fast blinking for wood suction error: 200ms on, 200ms off
-  if (millis() - lastBlinkTime >= 200) {
-    lastBlinkTime = millis();
+  if (Wait(200, &lastBlinkTime)) {
     ledState = !ledState;
     setRedLed(ledState);
   }
@@ -908,9 +798,11 @@ void signalTransferArm(bool state) {
 
 // Function to update transfer arm signal timing (call this in loop)
 void updateTransferArmSignal() {
-  if (transferArmSignalActive && (millis() - transferArmSignalStartTime >= 500)) {
-    digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, LOW);
-    transferArmSignalActive = false;
+  if (transferArmSignalActive) {
+    if (Wait(500, &transferArmSignalStartTime)) {
+      digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, LOW);
+      transferArmSignalActive = false;
+    }
   }
 }
 
@@ -923,10 +815,10 @@ void initializePins() {
   pinMode(POSITION_MOTOR_DIR_PIN, OUTPUT);
   
   // Configure switch and sensor pins with appropriate pull-up/down resistors
-  pinMode(CUT_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLUP);    // Active HIGH
-  pinMode(POSITION_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLUP); // Active HIGH
-  pinMode(RELOAD_SWITCH_PIN, INPUT_PULLUP);                // Active HIGH
-  pinMode(CYCLE_SWITCH_PIN, INPUT_PULLUP);                 // Active HIGH
+  pinMode(CUT_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLDOWN);    // Active HIGH
+  pinMode(POSITION_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLDOWN); // Active HIGH
+  pinMode(RELOAD_SWITCH_PIN, INPUT_PULLDOWN);                // Active HIGH
+  pinMode(CYCLE_SWITCH_PIN, INPUT_PULLDOWN);                 // Active HIGH
   pinMode(YES_OR_NO_WOOD_SENSOR_PIN, INPUT_PULLUP);          // Active LOW
   pinMode(WAS_WOOD_SUCTIONED_SENSOR_PIN, INPUT_PULLUP);      // Active LOW (but reads HIGH when proper)
   
@@ -955,16 +847,16 @@ void initializePins() {
 
 // Initialize switch debouncing with 15ms debounce time
 void initializeDebounce() {
-  cutMotorHomingSwitch.attach(CUT_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLUP);
+  cutMotorHomingSwitch.attach(CUT_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLDOWN);
   cutMotorHomingSwitch.interval(DEBOUNCE_TIME);
   
-  positionMotorHomingSwitch.attach(POSITION_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLUP);
+  positionMotorHomingSwitch.attach(POSITION_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLDOWN);
   positionMotorHomingSwitch.interval(DEBOUNCE_TIME);
   
-  reloadSwitch.attach(RELOAD_SWITCH_PIN, INPUT_PULLUP);
+  reloadSwitch.attach(RELOAD_SWITCH_PIN, INPUT_PULLDOWN);
   reloadSwitch.interval(DEBOUNCE_TIME);
   
-  cycleSwitch.attach(CYCLE_SWITCH_PIN, INPUT_PULLUP);
+  cycleSwitch.attach(CYCLE_SWITCH_PIN, INPUT_PULLDOWN);
   cycleSwitch.interval(DEBOUNCE_TIME);
   
   yesOrNoWoodSensor.attach(YES_OR_NO_WOOD_SENSOR_PIN, INPUT_PULLUP);
@@ -1070,12 +962,6 @@ float inchesToSteps(float inches, float stepsPerInch) {
 // Convert motor steps to inches
 float stepsToInches(long steps, float stepsPerInch) {
   return (float)steps / stepsPerInch;
-}
-
-// Move cut motor to specified position in inches
-void moveCutMotorToPosition(float positionInches) {
-  long steps = positionInches * CUT_MOTOR_STEPS_PER_INCH;
-  cutMotor.moveTo(steps);
 }
 
 // Move position motor to specified position in inches

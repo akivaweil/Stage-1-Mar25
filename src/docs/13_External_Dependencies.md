@@ -97,8 +97,8 @@ void runMotors() {
 #include <Bounce2.h>
 
 // Create instances
-Bounce cutMotorPositionSwitch = Bounce();
-Bounce positionMotorPositionSwitch = Bounce();
+Bounce cutMotorHomingSwitch = Bounce();
+Bounce positionMotorHomingSwitch = Bounce();
 Bounce reloadSwitch = Bounce();
 Bounce cycleSwitch = Bounce();
 Bounce yesOrNoWoodSensor = Bounce();
@@ -106,13 +106,13 @@ Bounce wasWoodSuctionedSensor = Bounce();
 
 void initializeDebounce() {
   // Attach and configure each switch
-  cutMotorPositionSwitch.attach(CUT_MOTOR_POSITION_SWITCH_PIN, INPUT_PULLUP);
-  cutMotorPositionSwitch.interval(DEBOUNCE_TIME);
+  cutMotorHomingSwitch.attach(CUT_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLDOWN);
+  cutMotorHomingSwitch.interval(DEBOUNCE_TIME);
   
-  positionMotorPositionSwitch.attach(POSITION_MOTOR_POSITION_SWITCH_PIN, INPUT_PULLUP);
-  positionMotorPositionSwitch.interval(DEBOUNCE_TIME);
+  positionMotorHomingSwitch.attach(POSITION_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLDOWN);
+  positionMotorHomingSwitch.interval(DEBOUNCE_TIME);
   
-  reloadSwitch.attach(RELOAD_SWITCH_PIN, INPUT_PULLUP);
+  reloadSwitch.attach(RELOAD_SWITCH_PIN, INPUT_PULLDOWN);
   reloadSwitch.interval(DEBOUNCE_TIME);
   
   cycleSwitch.attach(CYCLE_SWITCH_PIN, INPUT_PULLUP);
@@ -127,8 +127,8 @@ void initializeDebounce() {
 
 // Update all switches in each loop iteration
 void updateAllSwitches() {
-  cutMotorPositionSwitch.update();
-  positionMotorPositionSwitch.update();
+  cutMotorHomingSwitch.update();
+  positionMotorHomingSwitch.update();
   reloadSwitch.update();
   cycleSwitch.update();
   yesOrNoWoodSensor.update();
@@ -136,21 +136,5 @@ void updateAllSwitches() {
 }
 ```
 
-## platformio.ini Configuration
 
-Here's a complete configuration for PlatformIO:
-
-```ini
-[env:esp32dev]
-platform = espressif32
-board = esp32dev
-framework = arduino
-monitor_speed = 115200
-lib_deps =
-    waspinator/AccelStepper @ ^1.61
-    thomasfredericks/Bounce2 @ ^2.7.0
-build_flags =
-    -D ESP32
-    ;-D DEBUG_MODE          ; Uncomment to enable debugging
-    ;-D MOCK_HARDWARE       ; Uncomment for mock hardware testing
 ``` 

@@ -16,14 +16,16 @@ enum State {
   NOWOOD_STATE,
   ERROR_STATE,
   WOOD_SUCTION_ERROR_STATE,
-  CUT_MOTOR_HOME_ERROR_STATE
+  CUT_MOTOR_HOME_ERROR_STATE,
+  POSITION_MOTOR_HOME_ERROR_STATE
 };
 
 // Error type enumeration
 enum ErrorType {
   NO_ERROR,
   WOOD_SUCTION_ERROR,
-  CUT_MOTOR_HOME_ERROR
+  CUT_MOTOR_HOME_ERROR,
+  POSITION_MOTOR_HOME_ERROR
 };
 ```
 
@@ -37,8 +39,8 @@ const int POSITION_MOTOR_PULSE_PIN = 21;
 const int POSITION_MOTOR_DIR_PIN = 20;
 
 // Switch and sensor pins
-const int CUT_MOTOR_POSITION_SWITCH_PIN = 10;
-const int POSITION_MOTOR_POSITION_SWITCH_PIN = 9;
+const int CUT_MOTOR_HOMING_SWITCH_PIN = 10;
+const int POSITION_MOTOR_HOMING_SWITCH_PIN = 9;
 const int RELOAD_SWITCH_PIN = 14;
 const int CYCLE_SWITCH_PIN = 13;
 const int YES_OR_NO_WOOD_SENSOR_PIN = 11;
@@ -100,7 +102,7 @@ const float POSITION_MOTOR_RETRACT_DISTANCE = 0.1;  // inches
 
 ```cpp
 // Timing constants
-const unsigned long DEBOUNCE_TIME = 10;  // ms for switch debouncing
+const unsigned long DEBOUNCE_TIME = 15;  // ms for switch debouncing
 const unsigned long BLUE_LED_BLINK_INTERVAL = 2000;  // ms for blue LED blink during homing
 const unsigned long RED_LED_ERROR_FLASH_ON = 200;  // ms for error LED flash on time
 const unsigned long RED_LED_ERROR_FLASH_OFF = 200;  // ms for error LED flash off time
