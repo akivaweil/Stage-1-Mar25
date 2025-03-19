@@ -17,14 +17,14 @@ The cutting cycle follows these specific steps:
 8. **Initial Clamp Management**: Retract the position clamp prior to returning home, while keeping wood secure clamp extended
 9. **Complete Return**: Continue movement until both motors reach their home position
 10. **Home Position Check**: Wait 50ms after the cut motor reaches position zero, then verify the cut motor position switch reads HIGH. If not, trigger the CUT_MOTOR_HOME_ERROR_STATE
-11. **Position Clamp Engagement**: Extend position clamp once position zero is reached
+11. **Position Clamp Engagement and Secure Clamp Release**: Extend position clamp and simultaneously retract secure wood clamp once position zero is reached, allowing the position clamp to drag the wood forward without restriction
 12. **Positioning Operation**: Move position motor to 3.45 inches for next cut, ensuring it first returns to zero
 13. **Cycle Complete**: Return to READY_STATE
 
 ## No Wood Sequence (NOWOOD_STATE)
 
 7. **Clamp Management**: Retract wood secure clamp
-8. **Home Return**: Both motors return to home position
+8. **Home Return**: With the position clamps still extended, Both motors return to home position
 9. **Position Clamp Release**: Retract position clamp
 10. **Cycle Complete**: Set no-wood flag and return to READY_STATE. The system still allows one final cut to be performed before NOWOOD_STATE movements are executed
 
