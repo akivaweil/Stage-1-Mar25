@@ -93,6 +93,11 @@ const float POSITION_MOTOR_ACCELERATION = 30000.0;  // steps/sec²
 const float CUT_MOTOR_HOMING_SPEED = 300.0;  // steps/sec
 const float POSITION_MOTOR_HOMING_SPEED = 2000.0;  // steps/sec
 
+// Constants for positions
+const float SUCTION_CHECK_POSITION = 0.3;  // inches
+const float TRANSFER_ARM_SIGNAL_POSITION = 7.2;  // inches
+const unsigned long MOTOR_MOVE_TIMEOUT = 10000; // 10 seconds
+
 // Function declarations
 void handleStartupState();
 void handleHomingState();
@@ -120,50 +125,31 @@ void PositionMotor_NORMAL_settings();
 void Motors_RETURN_settings();
 void CutMotor_RETURN_settings();
 void PositionMotor_RETURN_settings();
+bool cycleToggleDetected();
+void resetErrorAndHomeSystem();
+void ensureMotorsAtHome();
+
+// State pattern implementation
+typedef void (*StateHandler)();
+
+// Array of function pointers - indexes match State enum values
+StateHandler stateHandlers[] = {
+  handleStartupState,
+  handleHomingState,
+  handleReadyState,
+  handleReloadState,
+  handleCuttingState,
+  handleYesWoodState,
+  handleNoWoodState,
+  handleErrorState,
+  handleWoodSuctionErrorState,
+  handleCutMotorHomeErrorState
+};
 
 // Main state machine update function
 void updateStateMachine() {
-  switch (currentState) {
-    case STARTUP_STATE:
-      handleStartupState();
-      break;
-      
-    case HOMING_STATE:
-      handleHomingState();
-      break;
-      
-    case READY_STATE:
-      handleReadyState();
-      break;
-      
-    case RELOAD_STATE:
-      handleReloadState();
-      break;
-      
-    case CUTTING_STATE:
-      handleCuttingState();
-      break;
-      
-    case YESWOOD_STATE:
-      handleYesWoodState();
-      break;
-      
-    case NOWOOD_STATE:
-      handleNoWoodState();
-      break;
-      
-    case ERROR_STATE:
-      handleErrorState();
-      break;
-      
-    case WOOD_SUCTION_ERROR_STATE:
-      handleWoodSuctionErrorState();
-      break;
-      
-    case CUT_MOTOR_HOME_ERROR_STATE:
-      handleCutMotorHomeErrorState();
-      break;
-  }
+  // Direct lookup - no switch needed
+  stateHandlers[currentState]();
 }
 
 // State transition function
@@ -389,10 +375,10 @@ void handleCuttingState() {
       CutMotor_NORMAL_settings();
       
       if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(0.3);
+        moveCutMotorToPosition(SUCTION_CHECK_POSITION);
       }
       
-      if (isMotorInPosition(cutMotor, 0.3 * CUT_MOTOR_STEPS_PER_INCH)) {
+      if (isMotorInPosition(cutMotor, SUCTION_CHECK_POSITION * CUT_MOTOR_STEPS_PER_INCH)) {
         subState = 2;
       }
       break;
@@ -408,9 +394,9 @@ void handleCuttingState() {
       break;
       
     case 3:  // Continue cutting to transfer arm signal position
-      moveCutMotorToPosition(7.2);
+      moveCutMotorToPosition(TRANSFER_ARM_SIGNAL_POSITION);
       
-      if (isMotorInPosition(cutMotor, 7.2 * CUT_MOTOR_STEPS_PER_INCH)) {
+      if (isMotorInPosition(cutMotor, TRANSFER_ARM_SIGNAL_POSITION * CUT_MOTOR_STEPS_PER_INCH)) {
         subState = 4;
       }
       break;
@@ -514,47 +500,16 @@ void handleErrorState() {
   extendPositionClamp();
   extendWoodSecureClamp();
   
-  if (!isMotorInPosition(cutMotor, 0)) {
-    moveCutMotorToPosition(0);
+  ensureMotorsAtHome();
+  
+  if (cycleToggleDetected()) {
+    resetErrorAndHomeSystem();
   }
-  
-  if (!isMotorInPosition(positionMotor, 0)) {
-    movePositionMotorToPosition(0);
-  }
-  
-  bool currentCycleSwitchState = readCycleSwitch();
-  
-  if (prevCycleSwitchState == false && currentCycleSwitchState == true) {
-    currentError = NO_ERROR;
-    enterState(HOMING_STATE);
-  }
-  
-  prevCycleSwitchState = currentCycleSwitchState;
 }
 
 // Handle wood suction error state
 void handleWoodSuctionErrorState() {
-  updateRedLEDErrorPattern(WOOD_SUCTION_ERROR);
-  
-  extendPositionClamp();
-  extendWoodSecureClamp();
-  
-  if (!isMotorInPosition(cutMotor, 0)) {
-    moveCutMotorToPosition(0);
-  }
-  
-  if (!isMotorInPosition(positionMotor, 0)) {
-    movePositionMotorToPosition(0);
-  }
-  
-  bool currentCycleSwitchState = readCycleSwitch();
-  
-  if (prevCycleSwitchState == false && currentCycleSwitchState == true) {
-    currentError = NO_ERROR;
-    enterState(HOMING_STATE);
-  }
-  
-  prevCycleSwitchState = currentCycleSwitchState;
+  handleErrorState();
 }
 
 // Handle cut motor home error state
@@ -1035,4 +990,30 @@ void CutMotor_RETURN_settings() {
 void PositionMotor_RETURN_settings() {
   positionMotor.setMaxSpeed(POSITION_MOTOR_RETURN_SPEED);
   positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+}
+
+// Ensures both motors return to home position
+void ensureMotorsAtHome() {
+  // Return motors to home position if they're not already there
+  if (!isMotorInPosition(cutMotor, 0)) {
+    moveCutMotorToPosition(0);
+  }
+  
+  if (!isMotorInPosition(positionMotor, 0)) {
+    movePositionMotorToPosition(0);
+  }
+}
+
+// Detects a cycle switch toggle (OFF to ON)
+bool cycleToggleDetected() {
+  bool currentCycleSwitchState = readCycleSwitch();
+  bool result = (prevCycleSwitchState == false && currentCycleSwitchState == true);
+  prevCycleSwitchState = currentCycleSwitchState;
+  return result;
+}
+
+// Resets error state and returns to homing
+void resetErrorAndHomeSystem() {
+  currentError = NO_ERROR;
+  enterState(HOMING_STATE);
 }
