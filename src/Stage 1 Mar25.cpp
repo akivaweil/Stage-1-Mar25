@@ -8,34 +8,34 @@
 // ===== PIN DEFINITIONS =====
 
 // Motor Pin Definitions
-#define CUT_MOTOR_PULSE_PIN 48       // Controls the pulse signal to the cut motor driver - moves the sliding table saw carriage
-#define CUT_MOTOR_DIR_PIN 47         // Controls the direction of the cut motor (forward/backward movement)
+const int CUT_MOTOR_PULSE_PIN = 39;       // Controls the pulse signal to the cut motor driver - moves the sliding table saw carriage
+const int CUT_MOTOR_DIR_PIN = 38;         // Controls the direction of the cut motor (forward/backward movement)
 
-#define POSITION_MOTOR_PULSE_PIN 21  // Controls the pulse signal to the position motor driver - feeds wood forward for next cut or retrieves the wood during the NOwood operation.
-#define POSITION_MOTOR_DIR_PIN 20    // Controls the direction of the position motor (forward/backward movement)
+const int POSITION_MOTOR_PULSE_PIN = 1;  // Controls the pulse signal to the position motor driver - feeds wood forward for next cut
+const int POSITION_MOTOR_DIR_PIN = 2;    // Controls the direction of the position motor (forward/backward movement)
 
 // Switch and Sensor Pin Definitions (Left side inputs)
-#define CUT_MOTOR_HOMING_SWITCH 10      // Limit switch that detects when cut motor is at home position
-#define POSITION_MOTOR_HOMING_SWITCH 9 // Limit switch that detects when position motor is at home position
-#define RELOAD_SWITCH 14                  // Manual switch to enter reload mode - disengages clamps for material loading
-#define WOOD_SENSOR 11                    // Sensor that detects if wood is present (LOW when wood is detected)
+const int CUT_MOTOR_HOMING_SWITCH = 10;      // Limit switch that detects when cut motor is at home position
+const int POSITION_MOTOR_HOMING_SWITCH = 9;  // Limit switch that detects when position motor is at home position
+const int RELOAD_SWITCH = 14;                // Manual switch to enter reload mode - disengages clamps for material loading
+const int WOOD_SENSOR = 11;                  // Sensor that detects if wood is present (LOW when wood is detected)
 
 // Switch and Sensor Pin Definitions (Right side)
-#define CYCLE_SWITCH 13          // Switch that initiates the cutting cycle when activated. This can be left on for continuous operation. The system will cut the wood until no wood is detecteed.
-#define WAS_WOOD_SUCTIONED_SENSOR 8    // Sensor that checks if wood was properly suctioned during cutting (error detection)
+const int CYCLE_SWITCH = 13;              // Switch that initiates the cutting cycle when activated
+const int WAS_WOOD_SUCTIONED_SENSOR = 8;  // Sensor that checks if wood was properly suctioned during cutting (error detection)
 
-// Clamp Pin Definitions
-#define POSITION_CLAMP 18           // Controls the pneumatic clamp that holds the positioning mechanism (LOW = extended)
-#define WOOD_SECURE_CLAMP 17        // Controls the pneumatic clamp that secures the wood piece (LOW = extended)
+// Clamp Pin Definitions (LOW = Extended/Engaged, HIGH = Retracted)
+const int POSITION_CLAMP = 18;           // Controls the pneumatic clamp that holds the positioning mechanism
+const int WOOD_SECURE_CLAMP = 17;        // Controls the pneumatic clamp that secures the wood piece
 
 // LED Pin Definitions
-#define RED_LED 7    // Error indicator LED - blinks during error conditions
-#define YELLOW_LED 6 // Operation in progress indicator - on during cutting or when in reload mode
-#define GREEN_LED 16   // Ready indicator - on when system is ready to begin a cutting cycle
-#define BLUE_LED 15    // Setup/special mode indicator - on during startup or when no wood present
+const int RED_LED = 7;     // Error indicator LED - blinks during error conditions
+const int YELLOW_LED = 6;  // Operation in progress indicator - on during cutting or when in reload mode
+const int GREEN_LED = 16;  // Ready indicator - on when system is ready to begin a cutting cycle
+const int BLUE_LED = 15;   // Setup/special mode indicator - on during startup or when no wood present
 
 // Signal Output
-#define SIGNAL_TO_STAGE_1TO2 19    // Output signal to the next stage in the process (Stage 2) when cutting is complete
+const int SIGNAL_TO_STAGE_1TO2 = 19;    // Output signal to the next stage in the process (Stage 2) when cutting is complete
 
 // ===== CONSTANTS =====
 // System States
@@ -50,42 +50,13 @@ enum SystemState {
   ERROR
 };
 
-// -------------------- ERROR TYPES --------------------
+// Error Types
 enum ErrorType {
   NONE,
   WOOD_SUCTION_ERROR,
   CUT_MOTOR_HOME_ERROR
 };
 
-// -------------------- PIN ASSIGNMENTS --------------------
-// Motor Control Pins
-const int CUT_MOTOR_PULSE_PIN = 39;
-const int CUT_MOTOR_DIR_PIN = 38;
-const int POSITION_MOTOR_PULSE_PIN = 1;
-const int POSITION_MOTOR_DIR_PIN = 2;
-
-// Switch and Sensor Pins
-const int CUT_MOTOR_POS_SWITCH_PIN = 10;
-const int POSITION_MOTOR_POS_SWITCH_PIN = 9;
-const int RELOAD_SWITCH_PIN = 14;
-const int CYCLE_SWITCH_PIN = 13;
-const int WOOD_SENSOR_PIN = 11;
-const int WOOD_SUCTION_SENSOR_PIN = 12;
-
-// Clamp Pins (LOW = Extended/Engaged, HIGH = Retracted)
-const int POSITION_CLAMP_PIN = 18;
-const int WOOD_SECURE_CLAMP_PIN = 17;
-
-// LED Pins
-const int RED_LED_PIN = 16;
-const int YELLOW_LED_PIN = 15;
-const int GREEN_LED_PIN = 7;
-const int BLUE_LED_PIN = 6;
-
-// Signal Output
-const int SIGNAL_TO_TA_PIN = 19;
-
-// -------------------- MOTOR PARAMETERS --------------------
 // Motor Calibration
 const float CUT_MOTOR_STEPS_PER_INCH = 76.0;
 const float POSITION_MOTOR_STEPS_PER_INCH = 1000.0;
@@ -107,34 +78,29 @@ const float POSITION_MOTOR_RETURN_ACCELERATION = 30000;
 const float CUT_MOTOR_HOMING_SPEED = 300;
 const float POSITION_MOTOR_HOMING_SPEED = 2000;
 
-// -------------------- POSITION CONSTANTS --------------------
+// Signal Debounce Interval
+const int SIGNAL_DEBOUNCE_INTERVAL = 10; // 10ms debounce
+
+// Position Constants
 const long CUT_MOTOR_FULL_TRAVEL = CUT_MOTOR_STEPS_PER_INCH * CUT_MOTOR_TRAVEL_DISTANCE;
 const long POSITION_MOTOR_FULL_TRAVEL = POSITION_MOTOR_STEPS_PER_INCH * POSITION_MOTOR_TRAVEL_DISTANCE;
 const long CUT_MOTOR_WOOD_SUCTION_CHECK_POS = CUT_MOTOR_STEPS_PER_INCH * 0.5;  // 0.5 inch
 const long CUT_MOTOR_TA_SIGNAL_POS = CUT_MOTOR_STEPS_PER_INCH * 7.2;           // 7.2 inches
 const long POSITION_MOTOR_CLAMP_RETRACT_POS = POSITION_MOTOR_STEPS_PER_INCH * 0.1; // 0.1 inch
 
-// -------------------- SYSTEM VARIABLES --------------------
+// ===== STEPPER MOTOR OBJECTS =====
+// 1 = step interface type (Step/Dir pins)
+AccelStepper cutMotor(1, CUT_MOTOR_PULSE_PIN, CUT_MOTOR_DIR_PIN);
+AccelStepper positionMotor(1, POSITION_MOTOR_PULSE_PIN, POSITION_MOTOR_DIR_PIN);
+
+// ===== SYSTEM VARIABLES =====
 SystemState currentState = STARTUP;
 ErrorType currentError = NONE;
 bool isNoWoodCycleCompleted = false;
 bool signalSentToTA = false;
 bool woodSuctionChecked = false;
 
-// -------------------- TIMING VARIABLES --------------------
-unsigned long startTime = 0;
-unsigned long blinkStartTime = 0;
-unsigned long errorBlinkStartTime = 0;
-
-// -------------------- DEBOUNCE OBJECTS --------------------
-Bounce cutMotorPosSwitchDebounce = Bounce();
-Bounce positionMotorPosSwitchDebounce = Bounce();
-Bounce reloadSwitchDebounce = Bounce();
-Bounce cycleSwitchDebounce = Bounce();
-Bounce woodSensorDebounce = Bounce();
-Bounce woodSuctionSensorDebounce = Bounce();
-
-// System Flags
+// Flags
 bool isHomed = false;
 bool isReloadMode = false;
 bool isWoodPresent = false;
@@ -146,12 +112,14 @@ bool isCuttingCycleInProgress = false;
 bool isContinuousModeActive = false;
 bool requireCycleSwitchReset = false;  // Requires cycle switch to be reset (toggled off and back on) if it was ON at startup
 bool hasCheckedForWoodSuction = false;
-bool isNoWoodCycleCompleted = false;  // Flag to track if we just completed a NOwood operation
 
 // Timers
+unsigned long startTime = 0;
 unsigned long currentTime = 0;
 unsigned long lastBlinkTime = 0;
+unsigned long blinkStartTime = 0;
 unsigned long lastErrorBlinkTime = 0;
+unsigned long errorBlinkStartTime = 0;
 unsigned long errorStartTime = 0;
 unsigned long positionMoveStartTime = 0;
 unsigned long delayStartTime = 0;
@@ -159,6 +127,14 @@ unsigned long delayStartTime = 0;
 // LED States
 bool blinkState = false;
 bool errorBlinkState = false;
+
+// ===== DEBOUNCE OBJECTS =====
+Bounce cutHomingSensor = Bounce();
+Bounce positionHomingSensor = Bounce();
+Bounce reloadSwitch = Bounce();
+Bounce cycleSwitch = Bounce();
+Bounce woodSensor = Bounce();
+Bounce woodSuctionSensor = Bounce();
 
 // ===== FUNCTION PROTOTYPES =====
 // Core System Functions
@@ -172,12 +148,162 @@ void homingSequence();
 void Ready();
 void CUTmovement();
 void YESwood();  // Renamed from positioningOperation
-void NOwood();  // Renamed from noWoodOperation
+void NOwood();   // Renamed from noWoodOperation
 void handleCutMotorHomingError();
 void suctionError();
 
 // Utility Functions
 bool Wait(unsigned long delayTime, unsigned long* startTimePtr);
+void handleStartup();
+void handleHoming();
+void handleReady();
+void handleReload();
+void handleCutting();
+void handleYesWood();
+void handleNoWood();
+void handleError();
+void setLEDs(bool red, bool yellow, bool green, bool blue);
+void blinkLED(int pin, int interval);
+void blinkErrorPattern();
+void extendClamp(int clampPin);
+void retractClamp(int clampPin);
+bool isClampExtended(int clampPin);
+bool isClampRetracted(int clampPin);
+bool isCutMotorAtHome();
+bool isPositionMotorAtHome();
+bool checkWoodPresent();
+bool isWoodSuctionCorrect();
+bool isCycleSwitchOn();
+bool isReloadSwitchOn();
+
+// -------------------- UTILITY FUNCTIONS --------------------
+// LED Control Functions
+void setLEDs(bool red, bool yellow, bool green, bool blue) {
+  digitalWrite(RED_LED, red ? HIGH : LOW);
+  digitalWrite(YELLOW_LED, yellow ? HIGH : LOW);
+  digitalWrite(GREEN_LED, green ? HIGH : LOW);
+  digitalWrite(BLUE_LED, blue ? HIGH : LOW);
+}
+
+void blinkLED(int pin, int interval) {
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastBlinkTime >= interval) {
+    lastBlinkTime = currentMillis;
+    blinkState = !blinkState;
+    digitalWrite(pin, blinkState ? HIGH : LOW);
+  }
+}
+
+void blinkErrorPattern() {
+  static enum {
+    START_PATTERN,
+    LED_ON,
+    LED_OFF,
+    PATTERN_PAUSE
+  } patternState = START_PATTERN;
+  
+  static int flashCount = 0;
+  const int totalFlashes = 3;
+  const int onTime = 200;   // LED on time in ms
+  const int offTime = 200;  // LED off time in ms
+  const int pauseTime = 1000; // Pause time in ms
+  
+  switch(patternState) {
+    case START_PATTERN:
+      flashCount = 0;
+      digitalWrite(RED_LED, LOW);
+      errorBlinkStartTime = millis();
+      patternState = LED_ON;
+      break;
+      
+    case LED_ON:
+      digitalWrite(RED_LED, HIGH);
+      if (millis() - errorBlinkStartTime >= onTime) {
+        errorBlinkStartTime = millis();
+        patternState = LED_OFF;
+      }
+      break;
+      
+    case LED_OFF:
+      digitalWrite(RED_LED, LOW);
+      if (millis() - errorBlinkStartTime >= offTime) {
+        flashCount++;
+        if (flashCount < totalFlashes) {
+          errorBlinkStartTime = millis();
+          patternState = LED_ON;
+        } else {
+          errorBlinkStartTime = millis();
+          patternState = PATTERN_PAUSE;
+        }
+      }
+      break;
+      
+    case PATTERN_PAUSE:
+      if (millis() - errorBlinkStartTime >= pauseTime) {
+        patternState = START_PATTERN;
+      }
+      break;
+  }
+}
+
+// Clamp Functions
+void extendClamp(int clampPin) {
+  digitalWrite(clampPin, LOW);  // Extend clamp (LOW = extended)
+}
+
+void retractClamp(int clampPin) {
+  digitalWrite(clampPin, HIGH); // Retract clamp (HIGH = retracted)
+}
+
+bool isClampExtended(int clampPin) {
+  return digitalRead(clampPin) == LOW;
+}
+
+bool isClampRetracted(int clampPin) {
+  return digitalRead(clampPin) == HIGH;
+}
+
+// Sensor/Switch Check Functions
+bool isCutMotorAtHome() {
+  return cutHomingSensor.read() == HIGH; // Switch is HIGH when triggered
+}
+
+bool isPositionMotorAtHome() {
+  return positionHomingSensor.read() == HIGH; // Switch is HIGH when triggered
+}
+
+bool checkWoodPresent() {
+  return woodSensor.read() == LOW; // LOW when wood is present
+}
+
+bool isWoodSuctionCorrect() {
+  return woodSuctionSensor.read() == LOW; // LOW when suction is correct
+}
+
+bool isCycleSwitchOn() {
+  return cycleSwitch.read() == HIGH; // HIGH when switch is ON
+}
+
+bool isReloadSwitchOn() {
+  return reloadSwitch.read() == HIGH; // HIGH when switch is ON
+}
+
+// -------------------- NON-BLOCKING DELAY FUNCTION --------------------
+bool Wait(unsigned long delayTime, unsigned long* startTimePtr) {
+  // First time entering this function
+  if (*startTimePtr == 0) {
+    *startTimePtr = millis();
+    return false;
+  }
+  
+  // Check if the delay time has elapsed
+  if (millis() - *startTimePtr >= delayTime) {
+    *startTimePtr = 0;  // Reset for next use
+    return true;
+  }
+  
+  return false;
+}
 
 void setup() {
   // Initialize the system
@@ -217,10 +343,10 @@ void initializeSystem() {
   // Initialize switch and sensor pins
   pinMode(CUT_MOTOR_HOMING_SWITCH, INPUT_PULLUP);
   pinMode(POSITION_MOTOR_HOMING_SWITCH, INPUT_PULLUP);
-  pinMode(RELOAD_SWITCH, INPUT);                       // External pull-down
-  pinMode(CYCLE_SWITCH, INPUT);                  // External pull-down
-  pinMode(WOOD_SENSOR, INPUT_PULLUP);                  // Active LOW (LOW = wood present)
-  pinMode(WAS_WOOD_SUCTIONED_SENSOR, INPUT);           // External pull-down
+  pinMode(RELOAD_SWITCH, INPUT);                // External pull-down
+  pinMode(CYCLE_SWITCH, INPUT);                 // External pull-down
+  pinMode(WOOD_SENSOR, INPUT_PULLUP);           // Active LOW (LOW = wood present)
+  pinMode(WAS_WOOD_SUCTIONED_SENSOR, INPUT);    // External pull-down
   
   // Initialize clamp pins
   pinMode(POSITION_CLAMP, OUTPUT);
@@ -245,10 +371,10 @@ void initializeSystem() {
   digitalWrite(SIGNAL_TO_STAGE_1TO2, LOW);    // No signal to TA
   
   // Configure motors
-  cutMotor.setMaxSpeed(CUTTINGSPEED);
-  cutMotor.setAcceleration(CUT_ACCELERATION);
-  positionMotor.setMaxSpeed(POSITION_NORMAL_SPEED);
-  positionMotor.setAcceleration(POSITION_ACCELERATION);
+  cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
+  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+  positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
+  positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
   
   // Initialize bounce objects for debouncing switches
   cutHomingSensor.attach(CUT_MOTOR_HOMING_SWITCH);
@@ -275,12 +401,14 @@ void initializeSystem() {
   isHomed = false;
 }
 
-void readSwitchStates () {
+void readSwitchStates() {
   // Update all debounced switches
   cutHomingSensor.update();
   positionHomingSensor.update();
   reloadSwitch.update();
   cycleSwitch.update();
+  woodSensor.update();
+  woodSuctionSensor.update();
   
   // Read wood sensor (active LOW)
   isWoodPresent = (digitalRead(WOOD_SENSOR) == LOW);
@@ -376,196 +504,10 @@ void loop() {
   positionMotor.run();
 }
 
-// -------------------- NON-BLOCKING DELAY FUNCTION --------------------
-bool Wait(unsigned long delayTime, unsigned long* startTimePtr) {
-  // First time entering this function
-  if (*startTimePtr == 0) {
-    *startTimePtr = millis();
-    return false;
-  }
-  
-  // Check if the delay time has elapsed
-  if (millis() - *startTimePtr >= delayTime) {
-    *startTimePtr = 0;  // Reset for next use
-    return true;
-  }
-  
-  return false;
-}
+// -------------------- MACHINE OPERATION FUNCTIONS --------------------
 
-// -------------------- FUNCTION PROTOTYPES --------------------
-void setupSystem();
-void updateSwitches();
-void updateState();
-void handleStartup();
-void handleHoming();
-void handleReady();
-void handleReload();
-void handleCutting();
-void handleYesWood();
-void handleNoWood();
-void handleError();
-void setLEDs(bool red, bool yellow, bool green, bool blue);
-void blinkLED(int pin, int interval);
-void blinkErrorPattern();
-void extendClamp(int clampPin);
-void retractClamp(int clampPin);
-bool isClampExtended(int clampPin);
-bool isClampRetracted(int clampPin);
-bool isCutMotorAtHome();
-bool isPositionMotorAtHome();
-bool isWoodPresent();
-bool isWoodSuctionCorrect();
-bool isCycleSwitchOn();
-bool isReloadSwitchOn();
-
-// -------------------- SETUP FUNCTION --------------------
-void setup() {
-  // Initialize serial communication
-  // Serial.begin(115200);  // Commented out as specified
-  
-  // Call setup function
-  setupSystem();
-}
-
-// -------------------- MAIN LOOP --------------------
-void loop() {
-  // Update all switch readings with debounce
-  updateSwitches();
-  
-  // Run stepper motors
-  cutMotor.run();
-  positionMotor.run();
-  
-  // Handle the current state
-  updateState();
-}
-
-// -------------------- SETUP SYSTEM --------------------
-void setupSystem() {
-  // Setup pin modes
-  pinMode(CUT_MOTOR_POS_SWITCH_PIN, INPUT_PULLUP);
-  pinMode(POSITION_MOTOR_POS_SWITCH_PIN, INPUT_PULLUP);
-  pinMode(RELOAD_SWITCH_PIN, INPUT_PULLUP);
-  pinMode(CYCLE_SWITCH_PIN, INPUT_PULLUP);
-  pinMode(WOOD_SENSOR_PIN, INPUT_PULLUP);
-  pinMode(WOOD_SUCTION_SENSOR_PIN, INPUT_PULLUP);
-  
-  pinMode(POSITION_CLAMP_PIN, OUTPUT);
-  pinMode(WOOD_SECURE_CLAMP_PIN, OUTPUT);
-  
-  pinMode(RED_LED_PIN, OUTPUT);
-  pinMode(YELLOW_LED_PIN, OUTPUT);
-  pinMode(GREEN_LED_PIN, OUTPUT);
-  pinMode(BLUE_LED_PIN, OUTPUT);
-  
-  pinMode(SIGNAL_TO_TA_PIN, OUTPUT);
-  
-  // Initialize switch debouncing
-  cutMotorPosSwitchDebounce.attach(CUT_MOTOR_POS_SWITCH_PIN);
-  positionMotorPosSwitchDebounce.attach(POSITION_MOTOR_POS_SWITCH_PIN);
-  reloadSwitchDebounce.attach(RELOAD_SWITCH_PIN);
-  cycleSwitchDebounce.attach(CYCLE_SWITCH_PIN);
-  woodSensorDebounce.attach(WOOD_SENSOR_PIN);
-  woodSuctionSensorDebounce.attach(WOOD_SUCTION_SENSOR_PIN);
-  
-  // Set 20ms debounce time for all switches
-  cutMotorPosSwitchDebounce.interval(20);
-  positionMotorPosSwitchDebounce.interval(20);
-  reloadSwitchDebounce.interval(20);
-  cycleSwitchDebounce.interval(20);
-  woodSensorDebounce.interval(20);
-  woodSuctionSensorDebounce.interval(20);
-  
-  // Initialize outputs
-  digitalWrite(SIGNAL_TO_TA_PIN, LOW); // Initialize transfer arm signal as LOW
-  retractClamp(POSITION_CLAMP_PIN);    // Initialize clamps as retracted
-  retractClamp(WOOD_SECURE_CLAMP_PIN);
-  
-  // Turn off all LEDs initially
-  setLEDs(false, false, false, false);
-  
-  // Set motor parameters
-  cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
-  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
-  
-  positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
-  positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
-  
-  // Set initial state
-  currentState = STARTUP;
-  
-  // Check if cycle switch is ON at startup (safety feature)
-  cycleSwitchDebounce.update();
-  if (isCycleSwitchOn()) {
-    // Safety feature: Wait until cycle switch is turned OFF before proceeding
-    while (isCycleSwitchOn()) {
-      cycleSwitchDebounce.update();
-      blinkLED(RED_LED_PIN, 200); // Fast blink to indicate error
-      delay(10); // Small delay for switch reading
-    }
-  }
-}
-
-// -------------------- UPDATE SWITCHES --------------------
-void updateSwitches() {
-  cutMotorPosSwitchDebounce.update();
-  positionMotorPosSwitchDebounce.update();
-  reloadSwitchDebounce.update();
-  cycleSwitchDebounce.update();
-  woodSensorDebounce.update();
-  woodSuctionSensorDebounce.update();
-}
-
-// -------------------- UPDATE STATE --------------------
-void updateState() {
-  switch(currentState) {
-    case STARTUP:
-      handleStartup();
-      break;
-    case HOMING:
-      handleHoming();
-      break;
-    case READY:
-      handleReady();
-      break;
-    case RELOAD:
-      handleReload();
-      break;
-    case CUTTING:
-      handleCutting();
-      break;
-    case YESWOOD:
-      handleYesWood();
-      break;
-    case NOWOOD:
-      handleNoWood();
-      break;
-    case ERROR:
-      handleError();
-      break;
-    default:
-      // Should never get here, but reset to startup if it happens
-      currentState = STARTUP;
-      break;
-  }
-}
-
-// -------------------- STATE HANDLER: STARTUP --------------------
-void handleStartup() {
-  // Turn on blue LED during startup
-  setLEDs(false, false, false, true);
-  
-  // Wait a brief moment to ensure system is initialized
-  if (Wait(1000, &startTime)) {
-    // Move directly to homing state
-    currentState = HOMING;
-    startTime = 0; // Reset timer for next state
-  }
-}
-
-// -------------------- STATE HANDLER: HOMING --------------------
-void handleHoming() {
+// Homing Sequence
+void homingSequence() {
   static enum {
     HOMING_START,
     MOVE_FROM_SWITCHES_IF_NEEDED,
@@ -576,7 +518,7 @@ void handleHoming() {
   } homingState = HOMING_START;
   
   // Blink blue LED during homing
-  blinkLED(BLUE_LED_PIN, 500);
+  blinkLED(BLUE_LED, 500);
   
   switch(homingState) {
     case HOMING_START:
@@ -658,8 +600,8 @@ void handleHoming() {
       
     case HOMING_COMPLETE:
       // Homing complete, extend both clamps
-      extendClamp(POSITION_CLAMP_PIN);
-      extendClamp(WOOD_SECURE_CLAMP_PIN);
+      extendClamp(POSITION_CLAMP);
+      extendClamp(WOOD_SECURE_CLAMP);
       
       // Transition to READY state
       // Serial.println("Homing complete");  // Commented out as specified
@@ -669,8 +611,8 @@ void handleHoming() {
   }
 }
 
-// -------------------- STATE HANDLER: READY --------------------
-void handleReady() {
+// Ready state handler
+void Ready() {
   // Set LEDs - Green ON, others OFF
   setLEDs(false, false, true, false);
   
@@ -681,7 +623,7 @@ void handleReady() {
   }
   
   // Check cycle switch and if wood is present to start cycle
-  if (isCycleSwitchOn() && isWoodPresent()) {
+  if (isCycleSwitchOn() && checkWoodPresent()) {
     // Reset cycle variables
     signalSentToTA = false;
     woodSuctionChecked = false;
@@ -689,26 +631,8 @@ void handleReady() {
   }
 }
 
-// -------------------- STATE HANDLER: RELOAD --------------------
-void handleReload() {
-  // Set LEDs - Green and Blue ON
-  setLEDs(false, true, true, true);
-  
-  // Retract both clamps to allow wood loading/unloading
-  retractClamp(POSITION_CLAMP_PIN);
-  retractClamp(WOOD_SECURE_CLAMP_PIN);
-  
-  // Return to READY state when reload switch is released
-  if (!isReloadSwitchOn()) {
-    // Re-extend both clamps before returning to ready
-    extendClamp(POSITION_CLAMP_PIN);
-    extendClamp(WOOD_SECURE_CLAMP_PIN);
-    currentState = READY;
-  }
-}
-
-// -------------------- STATE HANDLER: CUTTING --------------------
-void handleCutting() {
+// Cut movement state handler
+void CUTmovement() {
   static enum {
     INIT_CUTTING,
     VERIFY_CLAMPS,
@@ -733,12 +657,12 @@ void handleCutting() {
       
     case VERIFY_CLAMPS:
       // Verify both clamps are extended
-      if (isClampExtended(POSITION_CLAMP_PIN) && isClampExtended(WOOD_SECURE_CLAMP_PIN)) {
+      if (isClampExtended(POSITION_CLAMP) && isClampExtended(WOOD_SECURE_CLAMP)) {
         cuttingState = EXECUTE_CUT;
       } else {
         // Ensure clamps are extended
-        extendClamp(POSITION_CLAMP_PIN);
-        extendClamp(WOOD_SECURE_CLAMP_PIN);
+        extendClamp(POSITION_CLAMP);
+        extendClamp(WOOD_SECURE_CLAMP);
         
         // Wait a brief moment for clamps to engage
         if (Wait(200, &startTime)) {
@@ -770,14 +694,14 @@ void handleCutting() {
       // Send signal to TA when cut motor reaches the signal position
       if (!signalSentToTA && cutMotor.currentPosition() >= CUT_MOTOR_TA_SIGNAL_POS) {
         // Serial.println("Sending signal to TA");  // Commented out as specified
-        digitalWrite(SIGNAL_TO_TA_PIN, HIGH);
+        digitalWrite(SIGNAL_TO_STAGE_1TO2, HIGH);
         signalSentToTA = true;
       }
       
       // When cut motor completes its travel
       if (cutMotor.distanceToGo() == 0) {
         // Turn off TA signal if it was on
-        digitalWrite(SIGNAL_TO_TA_PIN, LOW);
+        digitalWrite(SIGNAL_TO_STAGE_1TO2, LOW);
         
         // Check if wood is present for next cut
         cuttingState = CHECK_WOOD;
@@ -786,7 +710,7 @@ void handleCutting() {
       
     case CHECK_WOOD:
       // Determine next state based on wood sensor
-      if (isWoodPresent()) {
+      if (checkWoodPresent()) {
         currentState = YESWOOD;
       } else {
         currentState = NOWOOD;
@@ -797,8 +721,8 @@ void handleCutting() {
   }
 }
 
-// -------------------- STATE HANDLER: YESWOOD --------------------
-void handleYesWood() {
+// Yes Wood state handler
+void YESwood() {
   static enum {
     INIT_YESWOOD,
     RETURN_MOTORS,
@@ -835,7 +759,7 @@ void handleYesWood() {
       
     case RETRACT_POSITION_CLAMP:
       // Retract position clamp when motor has moved enough
-      retractClamp(POSITION_CLAMP_PIN);
+      retractClamp(POSITION_CLAMP);
       
       // Check if both motors have reached home
       if (cutMotor.distanceToGo() == 0 && positionMotor.distanceToGo() == 0) {
@@ -861,7 +785,7 @@ void handleYesWood() {
       
     case EXTEND_POSITION_CLAMP:
       // Extend position clamp
-      extendClamp(POSITION_CLAMP_PIN);
+      extendClamp(POSITION_CLAMP);
       
       // Wait for clamp to fully extend
       if (Wait(200, &startTime)) {
@@ -882,10 +806,10 @@ void handleYesWood() {
       
     case VERIFY_WOOD_CLAMP:
       // Verify wood secure clamp is extended
-      if (isClampExtended(WOOD_SECURE_CLAMP_PIN)) {
+      if (isClampExtended(WOOD_SECURE_CLAMP)) {
         yesWoodState = YESWOOD_COMPLETE;
       } else {
-        extendClamp(WOOD_SECURE_CLAMP_PIN);
+        extendClamp(WOOD_SECURE_CLAMP);
         // Wait a brief moment for clamp to engage
         if (Wait(200, &startTime)) {
           yesWoodState = YESWOOD_COMPLETE;
@@ -909,8 +833,8 @@ void handleYesWood() {
   }
 }
 
-// -------------------- STATE HANDLER: NOWOOD --------------------
-void handleNoWood() {
+// No Wood state handler
+void NOwood() {
   static enum {
     INIT_NOWOOD,
     RETRACT_WOOD_CLAMP,
@@ -933,7 +857,7 @@ void handleNoWood() {
       
     case RETRACT_WOOD_CLAMP:
       // Retract wood secure clamp
-      retractClamp(WOOD_SECURE_CLAMP_PIN);
+      retractClamp(WOOD_SECURE_CLAMP);
       
       // Wait a brief moment for clamp to retract
       if (Wait(200, &startTime)) {
@@ -954,7 +878,7 @@ void handleNoWood() {
       
     case RETRACT_POSITION_CLAMP:
       // Retract position clamp
-      retractClamp(POSITION_CLAMP_PIN);
+      retractClamp(POSITION_CLAMP);
       
       // Wait a brief moment for clamp to retract
       if (Wait(200, &startTime)) {
@@ -975,197 +899,67 @@ void handleNoWood() {
   }
 }
 
-// -------------------- STATE HANDLER: ERROR --------------------
-void handleError() {
+// Error handling functions
+void handleCutMotorHomingError() {
   static enum {
     INIT_ERROR,
-    DISPLAY_ERROR,
-    HANDLE_CUT_HOME_ERROR,
-    WAIT_FOR_ACKNOWLEDGMENT
+    RETRY_MOVE,
+    WAIT_ACK
   } errorState = INIT_ERROR;
   
-  static int errorRetryCount = 0;
+  static int retryCount = 0;
   
   switch(errorState) {
     case INIT_ERROR:
-      // Initialize error handling
-      // Serial.print("Error state: ");  // Commented out as specified
-      
+      // Serial.println("Cut motor homing error");  // Commented out as specified
       // Stop motors
       cutMotor.stop();
       positionMotor.stop();
-      
-      // Turn off TA signal if it was on
-      digitalWrite(SIGNAL_TO_TA_PIN, LOW);
-      
-      errorState = DISPLAY_ERROR;
+      errorState = RETRY_MOVE;
       break;
       
-    case DISPLAY_ERROR:
-      // Display error via LED pattern
-      blinkErrorPattern();
-      
-      if (currentError == CUT_MOTOR_HOME_ERROR) {
-        errorState = HANDLE_CUT_HOME_ERROR;
-      } else {
-        errorState = WAIT_FOR_ACKNOWLEDGMENT;
-      }
-      break;
-      
-    case HANDLE_CUT_HOME_ERROR:
-      // Attempt to recover from cut motor home error
-      if (errorRetryCount < 2) { // Try two recovery attempts
-        // Move cut motor forward 1 inch
-        cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
+    case RETRY_MOVE:
+      if (retryCount < 2) {
+        // Move cut motor away from home
         cutMotor.moveTo(cutMotor.currentPosition() + CUT_MOTOR_STEPS_PER_INCH);
-        
         if (cutMotor.distanceToGo() == 0) {
-          // Retry homing after moving forward
-          errorRetryCount++;
-          errorState = WAIT_FOR_ACKNOWLEDGMENT;
+          retryCount++;
+          errorState = WAIT_ACK;
         }
       } else {
-        // After two attempts, wait for user acknowledgment
-        errorState = WAIT_FOR_ACKNOWLEDGMENT;
+        errorState = WAIT_ACK;
       }
       break;
       
-    case WAIT_FOR_ACKNOWLEDGMENT:
-      // Wait for reload switch to be pressed as acknowledgment
-      if (isReloadSwitchOn()) {
-        // Reset error state
-        errorRetryCount = 0;
-        currentError = NONE;
-        errorState = INIT_ERROR;
-        
-        // Return to homing state to re-establish system
+    case WAIT_ACK:
+      if (isErrorAcknowledged) {
+        // Reset and return to homing
+        retryCount = 0;
+        hasHomingError = false;
+        isErrorAcknowledged = false;
         currentState = HOMING;
+        errorState = INIT_ERROR;
       }
       break;
   }
 }
 
-// -------------------- LED CONTROL FUNCTIONS --------------------
-void setLEDs(bool red, bool yellow, bool green, bool blue) {
-  digitalWrite(RED_LED_PIN, red ? HIGH : LOW);
-  digitalWrite(YELLOW_LED_PIN, yellow ? HIGH : LOW);
-  digitalWrite(GREEN_LED_PIN, green ? HIGH : LOW);
-  digitalWrite(BLUE_LED_PIN, blue ? HIGH : LOW);
-}
-
-void blinkLED(int pin, int interval) {
-  unsigned long currentTime = millis();
+void suctionError() {
+  static bool waitingForAck = false;
   
-  if (currentTime - blinkStartTime >= interval) {
-    digitalWrite(pin, !digitalRead(pin)); // Toggle LED state
-    blinkStartTime = currentTime;
-  }
-}
-
-void blinkErrorPattern() {
-  // Different patterns based on error type
-  int onTime = 200;  // Time LED is on (ms)
-  int offTime = 200; // Time LED is off between flashes (ms)
-  int pauseTime = 1000; // Time between patterns (ms)
-  int numFlashes = 0;
-  
-  switch(currentError) {
-    case WOOD_SUCTION_ERROR:
-      numFlashes = 3;
-      break;
-    case CUT_MOTOR_HOME_ERROR:
-      numFlashes = 2;
-      break;
-    default:
-      numFlashes = 1; // Default for unknown errors
-      break;
+  if (!waitingForAck) {
+    // Serial.println("Suction error detected");  // Commented out as specified
+    // Stop motors
+    cutMotor.stop();
+    positionMotor.stop();
+    waitingForAck = true;
   }
   
-  static enum {
-    START_PATTERN,
-    LED_ON,
-    LED_OFF,
-    PATTERN_PAUSE
-  } patternState = START_PATTERN;
-  
-  static int flashCount = 0;
-  
-  switch(patternState) {
-    case START_PATTERN:
-      flashCount = 0;
-      digitalWrite(RED_LED_PIN, LOW);
-      errorBlinkStartTime = millis();
-      patternState = LED_ON;
-      break;
-      
-    case LED_ON:
-      digitalWrite(RED_LED_PIN, HIGH);
-      if (millis() - errorBlinkStartTime >= onTime) {
-        errorBlinkStartTime = millis();
-        patternState = LED_OFF;
-      }
-      break;
-      
-    case LED_OFF:
-      digitalWrite(RED_LED_PIN, LOW);
-      if (millis() - errorBlinkStartTime >= offTime) {
-        flashCount++;
-        errorBlinkStartTime = millis();
-        
-        if (flashCount >= numFlashes) {
-          patternState = PATTERN_PAUSE;
-        } else {
-          patternState = LED_ON;
-        }
-      }
-      break;
-      
-    case PATTERN_PAUSE:
-      if (millis() - errorBlinkStartTime >= pauseTime) {
-        patternState = START_PATTERN;
-      }
-      break;
+  if (isErrorAcknowledged) {
+    // Reset and return to homing
+    waitingForAck = false;
+    hasWoodSuctionError = false;
+    isErrorAcknowledged = false;
+    currentState = HOMING;
   }
-}
-
-// -------------------- CLAMP CONTROL FUNCTIONS --------------------
-void extendClamp(int clampPin) {
-  digitalWrite(clampPin, LOW); // LOW = Extended/Engaged
-}
-
-void retractClamp(int clampPin) {
-  digitalWrite(clampPin, HIGH); // HIGH = Retracted
-}
-
-bool isClampExtended(int clampPin) {
-  return digitalRead(clampPin) == LOW;
-}
-
-bool isClampRetracted(int clampPin) {
-  return digitalRead(clampPin) == HIGH;
-}
-
-// -------------------- SENSOR/SWITCH CHECK FUNCTIONS --------------------
-bool isCutMotorAtHome() {
-  return cutMotorPosSwitchDebounce.read() == HIGH; // Switch is HIGH when triggered
-}
-
-bool isPositionMotorAtHome() {
-  return positionMotorPosSwitchDebounce.read() == HIGH; // Switch is HIGH when triggered
-}
-
-bool isWoodPresent() {
-  return woodSensorDebounce.read() == LOW; // LOW when wood is present
-}
-
-bool isWoodSuctionCorrect() {
-  return woodSuctionSensorDebounce.read() == LOW; // LOW when suction is correct
-}
-
-bool isCycleSwitchOn() {
-  return cycleSwitchDebounce.read() == HIGH; // HIGH when switch is ON
-}
-
-bool isReloadSwitchOn() {
-  return reloadSwitchDebounce.read() == HIGH; // HIGH when switch is ON
 }
