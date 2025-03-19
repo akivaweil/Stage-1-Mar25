@@ -1,0 +1,18 @@
+0000000000000000000000000000000000000000 363d5696a0a2af0aadb358c468f3bf21173d136b akivaweil <akivaweil@gmail.com> 1741669157 -0700	commit (initial): first commit
+363d5696a0a2af0aadb358c468f3bf21173d136b 1de7daa615932f0e1630239c5e24032eff615b41 akivaweil <akivaweil@gmail.com> 1741671414 -0700	commit: Working but no homing sensor error detection
+1de7daa615932f0e1630239c5e24032eff615b41 0f63d6ebd4af2292a6831672bce973872f4b136f akivaweil <akivaweil@gmail.com> 1741674852 -0700	commit: Keeps tripping the error detection
+0f63d6ebd4af2292a6831672bce973872f4b136f f3def406191c9ee2f96304a769d319f20c3c568d akivaweil <akivaweil@gmail.com> 1741889554 -0700	commit: Cleaned up a bit
+f3def406191c9ee2f96304a769d319f20c3c568d fd78c249d9a3a293f62ce289028b9abdcb0e5dac akivaweil <akivaweil@gmail.com> 1741895628 -0700	commit: Hopefully fixed error detection
+fd78c249d9a3a293f62ce289028b9abdcb0e5dac 1fedf9eb8573955f7a24335252bca46d668659f8 akivaweil <akivaweil@gmail.com> 1741896067 -0700	commit: uploaded to regular esp32
+1fedf9eb8573955f7a24335252bca46d668659f8 4b74c95c2ae1d1628b35473278a10049878de603 akivaweil <akivaweil@gmail.com> 1741930606 -0700	commit: Lots of cleaning up and understanding the code
+4b74c95c2ae1d1628b35473278a10049878de603 94997ac1f6f8a1495005b37a896d5acdc93e7309 akivaweil <akivaweil@gmail.com> 1742140844 -0700	commit: Cleaned up naming more
+94997ac1f6f8a1495005b37a896d5acdc93e7309 9af806c295057784aa4e0467a66e2bd0ebb1ce45 akivaweil <akivaweil@gmail.com> 1742252429 -0700	commit: Pre redoing code based on one prompt
+9af806c295057784aa4e0467a66e2bd0ebb1ce45 c499f2ca5fb1393c90b804070332280df3911e94 akivaweil <akivaweil@gmail.com> 1742260501 -0700	commit: First code after using notes to one prompt
+c499f2ca5fb1393c90b804070332280df3911e94 c499f2ca5fb1393c90b804070332280df3911e94 akivaweil <akivaweil@gmail.com> 1742356758 -0700	reset: moving to HEAD
+c499f2ca5fb1393c90b804070332280df3911e94 9af806c295057784aa4e0467a66e2bd0ebb1ce45 akivaweil <akivaweil@gmail.com> 1742356759 -0700	checkout: moving from main to 9af806c295057784aa4e0467a66e2bd0ebb1ce45
+9af806c295057784aa4e0467a66e2bd0ebb1ce45 df31cdf6dd01455d372c42309681ede7badaf81b akivaweil <akivaweil@gmail.com> 1742357123 -0700	commit: New pins for S3
+df31cdf6dd01455d372c42309681ede7badaf81b c499f2ca5fb1393c90b804070332280df3911e94 akivaweil <akivaweil@gmail.com> 1742357135 -0700	checkout: moving from df31cdf6dd01455d372c42309681ede7badaf81b to main
+c499f2ca5fb1393c90b804070332280df3911e94 6afd5f53f7043288ea213b4e5e4b2ed91cf42cae akivaweil <akivaweil@gmail.com> 1742357152 -0700	commit (merge): new pins for s3
+6afd5f53f7043288ea213b4e5e4b2ed91cf42cae 52f6d79bb1577f7b3118d9564ba09472c957e09a akivaweil <akivaweil@gmail.com> 1742357237 -0700	commit: merge
+52f6d79bb1577f7b3118d9564ba09472c957e09a 9af806c295057784aa4e0467a66e2bd0ebb1ce45 akivaweil <akivaweil@gmail.com> 1742357300 -0700	checkout: moving from main to 9af806c295057784aa4e0467a66e2bd0ebb1ce45
+9af806c295057784aa4e0467a66e2bd0ebb1ce45 52f6d79bb1577f7b3118d9564ba09472c957e09a akivaweil <akivaweil@gmail.com> 1742357310 -0700	checkout: moving from 9af806c295057784aa4e0467a66e2bd0ebb1ce45 to main
