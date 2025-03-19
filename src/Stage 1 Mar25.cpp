@@ -5,9 +5,6 @@
 #include <AccelStepper.h>
 #include <Bounce2.h>
 
-<<<<<<< HEAD
-// -------------------- SYSTEM STATES --------------------
-=======
 // ===== PIN DEFINITIONS =====
 
 // Motor Pin Definitions
@@ -42,7 +39,6 @@
 
 // ===== CONSTANTS =====
 // System States
->>>>>>> df31cdf6dd01455d372c42309681ede7badaf81b
 enum SystemState {
   STARTUP,
   HOMING,
@@ -138,12 +134,6 @@ Bounce cycleSwitchDebounce = Bounce();
 Bounce woodSensorDebounce = Bounce();
 Bounce woodSuctionSensorDebounce = Bounce();
 
-<<<<<<< HEAD
-// -------------------- STEPPER MOTOR OBJECTS --------------------
-// 1 = step interface type (Step/Dir pins)
-AccelStepper cutMotor(1, CUT_MOTOR_PULSE_PIN, CUT_MOTOR_DIR_PIN);
-AccelStepper positionMotor(1, POSITION_MOTOR_PULSE_PIN, POSITION_MOTOR_DIR_PIN);
-=======
 // System Flags
 bool isHomed = false;
 bool isReloadMode = false;
@@ -385,7 +375,6 @@ void loop() {
   cutMotor.run();
   positionMotor.run();
 }
->>>>>>> df31cdf6dd01455d372c42309681ede7badaf81b
 
 // -------------------- NON-BLOCKING DELAY FUNCTION --------------------
 bool Wait(unsigned long delayTime, unsigned long* startTimePtr) {
