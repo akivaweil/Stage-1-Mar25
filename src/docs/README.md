@@ -20,7 +20,6 @@ This automated wood cutting machine uses two stepper motors and two pneumatic cl
 ### Implementation Guidelines
 - [Code Structure](09_Code_Structure.md) - Function definitions and organization
 - [State Machine Implementation](10_State_Machine.md) - State management code templates
-- [Testing Strategy](11_Testing_Strategy.md) - Validation and testing procedures
 
 ### Reference
 - [Constants and Variables](12_Constants_Variables.md) - All defined values
