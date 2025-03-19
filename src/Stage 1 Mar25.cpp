@@ -366,6 +366,7 @@ void homingSequence() {
     if (cutHomingSensor.read() == HIGH && !cutMotorMovedAway) {
       // Move exactly 1 inch away from sensor first to ensure proper homing
       cutMotor.setMaxSpeed(CUT_HOMING_SPEED);
+      cutMotor.setAcceleration(CUT_ACCELERATION / 8);
       cutMotor.moveTo(1 * CUT_MOTOR_STEPS_PER_INCH); // Move 1 inch away from sensor
       
       // Check if the 1-inch move-away is complete
@@ -549,33 +550,22 @@ void CUTmovement() {
     cutMotor.moveTo(targetPosition);
     
   
-  // Step 2: Wait for cutting motion to complete and check for wood suction error
-    // Check for wood suction error during the cutting movement
+  // Step 2: Wait for cutting motion to complete and continuously check for wood suction error
     if (cutMotor.currentPosition() >= (0.3 * CUT_MOTOR_STEPS_PER_INCH) && 
         cutMotor.currentPosition() <= (0.5 * CUT_MOTOR_STEPS_PER_INCH) && 
         !hasCheckedForWoodSuction) {
-      
-      // Update the sensor status and FORCE a direct read of the sensor pin
+      // Now we're at the position to check - read the sensor directly
+      // For WAS_WOOD_SUCTIONED_SENSOR, LOW means error
       woodSuctionSensor.update();
       int sensorValue = digitalRead(WAS_WOOD_SUCTIONED_SENSOR);
-      
-      // Only check if wood is present
-      if (isWoodPresent) {
-        // If sensor is LOW (not suctioned properly), trigger error
-        // Make sure to directly read the pin value to avoid any debounce delay
-        if (sensorValue == LOW) {
-          // Set the wood suction error flag
+
+      // If wood is present and sensor is LOW, trigger error
+      if (isWoodPresent && sensorValue == LOW) {
           hasWoodSuctionError = true;
-          
-          // Stop the cut motor
           cutMotor.stop();
-          
-          // Enter error state
           currentState = ERROR;
           errorStartTime = millis();
-          
           return;
-        }
       }
       
       // Mark that we've checked for wood suction
@@ -823,7 +813,7 @@ void NOwood() {
       // Now rehome the cut motor
       // First set parameters for homing
       cutMotor.setMaxSpeed(CUT_HOMING_SPEED / 5); // 5x slower for precise homing
-      cutMotor.setAcceleration(CUT_ACCELERATION / 5);
+      cutMotor.setAcceleration(CUT_ACCELERATION / 10);
       
       // Move toward home sensor using continuous motion in the homing direction at 5x slower speed
       cutMotor.setSpeed((CUT_HOMING_SPEED / 5) * CUT_HOMING_DIRECTION);
