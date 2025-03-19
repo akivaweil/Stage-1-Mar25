@@ -1,10 +1,5 @@
-#include "CuttingOperations.h"
+#include "../include/CuttingOperations.h"
 #include <Arduino.h>
-
-// Constants for cutting operations
-const float CUT_MOTOR_CUTTING_SPEED = 50.0;  // steps/sec - slower speed for precise cutting
-const float WAS_WOOD_SUCTIONED_POSITION = 0.3;  // inches
-const float TRANSFER_ARM_SIGNAL_POSITION = 7.2;  // inches
 
 // Configure cut motor for cutting operations (specific speed for cutting)
 void CutMotor_CUTTING_settings() {

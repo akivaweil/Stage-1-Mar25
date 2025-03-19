@@ -1,4 +1,4 @@
-#include "NoWoodOperations.h"
+#include "../include/NoWoodOperations.h"
 
 // Handle no wood state - no wood was detected after cutting
 void handleNoWoodState() {

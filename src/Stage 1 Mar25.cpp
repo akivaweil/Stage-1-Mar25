@@ -1,31 +1,10 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include <Bounce2.h>
-#include "CuttingOperations.h"
-#include "YesWoodOperations.h"
-#include "NoWoodOperations.h"
-
-// Enumerations
-enum State {
-  STARTUP_STATE,
-  HOMING_STATE,
-  READY_STATE,
-  RELOAD_STATE,
-  CUTTING_STATE,
-  YESWOOD_STATE,
-  NOWOOD_STATE,
-  ERROR_STATE,
-  WOOD_SUCTION_ERROR_STATE,
-  CUT_MOTOR_HOME_ERROR_STATE,
-  POSITION_MOTOR_HOME_ERROR_STATE
-};
-
-enum ErrorType {
-  NO_ERROR,
-  WOOD_SUCTION_ERROR,
-  CUT_MOTOR_HOME_ERROR,
-  POSITION_MOTOR_HOME_ERROR
-};
+#include "../include/CommonDefinitions.h"
+#include "../include/CuttingOperations.h"
+#include "../include/YesWoodOperations.h"
+#include "../include/NoWoodOperations.h"
 
 // Pin definitions
 const int CUT_MOTOR_PULSE_PIN = 48;
@@ -97,6 +76,11 @@ const float CUT_MOTOR_ACCELERATION = 2200.0;  // steps/sec²
 const float POSITION_MOTOR_ACCELERATION = 30000.0;  // steps/sec²
 const float CUT_MOTOR_HOMING_SPEED = 300.0;  // steps/sec
 const float POSITION_MOTOR_HOMING_SPEED = 2000.0;  // steps/sec
+
+// Constants for cutting operations
+const float CUT_MOTOR_CUTTING_SPEED = 50.0;  // steps/sec - slower speed for precise cutting
+const float WAS_WOOD_SUCTIONED_POSITION = 0.3;  // inches
+const float TRANSFER_ARM_SIGNAL_POSITION = 7.2;  // inches
 
 // Constants for positions
 const unsigned long MOTOR_MOVE_TIMEOUT = 10000; // 10 seconds

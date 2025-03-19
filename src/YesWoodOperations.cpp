@@ -1,4 +1,4 @@
-#include "YesWoodOperations.h"
+#include "../include/YesWoodOperations.h"
 
 // Handle yes wood state - wood was detected after cutting
 void handleYesWoodState() {
