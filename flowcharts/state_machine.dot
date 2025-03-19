@@ -34,7 +34,7 @@ digraph StateMachine {
     
     CUTTING -> YESWOOD [label="Wood detected"];
     CUTTING -> NOWOOD [label="No wood detected"];
-    CUTTING -> WOOD_SUCTION_ERROR [label="Suction failure"];
+    CUTTING -> WOOD_SUCTION_ERROR [label="Suction failure", color="#CC0000"];
     
     YESWOOD -> READY [label="Operation complete or\nreload requested"];
     YESWOOD -> CUTTING [label="Continue cutting while\nwood is available", color="#006600", penwidth=1.8];

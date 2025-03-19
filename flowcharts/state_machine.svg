@@ -147,8 +147,8 @@
 <!-- CUTTING&#45;&gt;WOOD_SUCTION_ERROR -->
 <g id="edge10" class="edge">
 <title>CUTTING&#45;&gt;WOOD_SUCTION_ERROR</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M544.12,-270.7C577.24,-262.11 615.28,-250.27 648,-235 763.3,-181.18 883.47,-88.14 937.55,-43.94"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="939.29,-46.58 944.25,-38.43 935.29,-41.72 939.29,-46.58"/>
+<path fill="none" stroke="#cc0000" stroke-width="1.2" d="M544.12,-270.7C577.24,-262.11 615.28,-250.27 648,-235 763.3,-181.18 883.47,-88.14 937.55,-43.94"/>
+<polygon fill="#cc0000" stroke="#cc0000" stroke-width="1.2" points="939.29,-46.58 944.25,-38.43 935.29,-41.72 939.29,-46.58"/>
 <text text-anchor="middle" x="847.77" y="-150.05" font-family="Arial" font-size="11.00">Suction failure</text>
 </g>
 <!-- YESWOOD&#45;&gt;READY -->
