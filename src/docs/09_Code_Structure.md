@@ -55,6 +55,8 @@ The following functions should be implemented to create a complete control syste
 
 ### 7. Homing Functions
 - `void runHomingSequence()` - Full homing sequence for both motors
+- `void moveAwayThenHomeCutMotor()` - Moves cut motor away by 1 inch with reduced acceleration, then homes
+- `void moveAwayThenHomePositionMotor()` - Moves position motor away by 1 inch with reduced acceleration, then homes
 - `bool attemptCutMotorRehome()` - Used during error recovery
 - `bool checkHomeSwitches()` - Verifies home switches are functioning
 
