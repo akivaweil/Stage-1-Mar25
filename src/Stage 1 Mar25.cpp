@@ -803,11 +803,11 @@ void NOwood() {
     if (cutMotor.distanceToGo() == 0) {
       // Now rehome the cut motor
       // First set parameters for homing
-      cutMotor.setMaxSpeed(CUT_HOMING_SPEED);
+      cutMotor.setMaxSpeed(CUT_HOMING_SPEED / 5); // 5x slower for precise homing
       cutMotor.setAcceleration(CUT_ACCELERATION);
       
-      // Move toward home sensor using continuous motion in the homing direction
-      cutMotor.setSpeed(CUT_HOMING_SPEED * CUT_HOMING_DIRECTION);
+      // Move toward home sensor using continuous motion in the homing direction at 5x slower speed
+      cutMotor.setSpeed((CUT_HOMING_SPEED / 5) * CUT_HOMING_DIRECTION);
       
       // Move to next stage
       stage = 4;
@@ -823,7 +823,8 @@ void NOwood() {
     // Use setSpeed for continuous motion until sensor is triggered
     if (cutHomingSensor.read() != HIGH) {
       // Continue moving at constant speed in homing direction until sensor is hit
-      cutMotor.setSpeed(CUT_HOMING_SPEED * CUT_HOMING_DIRECTION);
+      // Use 5x slower speed for more precise homing
+      cutMotor.setSpeed((CUT_HOMING_SPEED / 5) * CUT_HOMING_DIRECTION);
       cutMotor.runSpeed(); // Direct control of motor at constant speed
     } else {
       // Stop the motor when sensor is triggered
