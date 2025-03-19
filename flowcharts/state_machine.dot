@@ -6,7 +6,7 @@ digraph StateMachine {
 
     // Title
     labelloc="t";
-    label="ESP32 Stage 1 State Machine";
+    label="ESP32-S3 Stage 1 State Machine";
 
     // State nodes with descriptive labels
     STARTUP [label="STARTUP\nInitial state, sets clamps", fillcolor="#D4F4FA"];
@@ -36,7 +36,10 @@ digraph StateMachine {
     CUTTING -> NOWOOD [label="No wood detected"];
     CUTTING -> WOOD_SUCTION_ERROR [label="Suction failure"];
     
-    YESWOOD -> READY [label="Sequence complete"];
+    YESWOOD -> READY [label="Operation complete or\nreload requested"];
+    YESWOOD -> CUTTING [label="Continue cutting while\nwood is available", color="#006600", penwidth=1.8];
+    YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor fails\nto home", color="#CC0000"];
+    
     NOWOOD -> READY [label="Return complete"];
     
     ERROR -> HOMING [label="Cycle toggle detected"];
