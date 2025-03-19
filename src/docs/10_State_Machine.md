@@ -1,8 +1,23 @@
 # State Machine Implementation
 
-## State Machine Template
+## State Machine Overview
 
-The following code template demonstrates how to implement the state machine for the wood cutting machine:
+The wood cutting machine operates as a finite state machine with 10 distinct states. Each state has well-defined entry and exit conditions, with specific operations performed within each state.
+
+## State Definitions
+
+1. **STARTUP_STATE**: Initial state on power-up, performs basic initialization
+2. **HOMING_STATE**: Finds reference positions for motors
+3. **READY_STATE**: System ready for operation, awaiting cycle start
+4. **RELOAD_STATE**: System in reload mode, allows wood loading
+5. **CUTTING_STATE**: Performing cutting operation
+6. **YESWOOD_STATE**: Wood detected after cutting, positioning for next cut
+7. **NOWOOD_STATE**: No wood detected after cutting, returning to home
+8. **ERROR_STATE**: General error handling state
+9. **WOOD_SUCTION_ERROR_STATE**: Specialized error handling for suction failures
+10. **CUT_MOTOR_HOME_ERROR_STATE**: Specialized error handling for homing failures
+
+## State Machine Implementation
 
 ```cpp
 void updateStateMachine() {
@@ -48,7 +63,13 @@ void updateStateMachine() {
       break;
   }
 }
+```
 
+## State Transition Function
+
+The state transition function handles cleanup of the previous state and initialization of the new state:
+
+```cpp
 void enterState(State newState) {
   // Exit actions for current state
   switch (currentState) {
@@ -132,7 +153,8 @@ void enterState(State newState) {
     case CUTTING_STATE:
       // Enter cutting state - turn on yellow LED
       digitalWrite(YELLOW_LED_PIN, HIGH);
-      isCycleInProgress = true;
+      hasSuctionBeenChecked = false;
+      hasTransferArmBeenSignaled = false;
       break;
       
     case YESWOOD_STATE:
@@ -149,85 +171,132 @@ void enterState(State newState) {
       break;
       
     case WOOD_SUCTION_ERROR_STATE:
-      // Enter wood suction error - setup specific error pattern
+      // Enter wood suction error state
       currentError = WOOD_SUCTION_ERROR;
       break;
       
     case CUT_MOTOR_HOME_ERROR_STATE:
-      // Enter cut motor home error - setup specific error pattern
+      // Enter cut motor home error state
       currentError = CUT_MOTOR_HOME_ERROR;
-      homingAttemptCount = 0;
       break;
   }
 }
 ```
 
-## Example State Handler Implementation
+## Individual State Handlers
 
-Here's an example implementation of the cutting state handler:
+Each state has its own handler function that implements the state-specific logic:
+
+### Startup State
 
 ```cpp
-void handleCuttingState() {
+void handleStartupState() {
+  // Initialize system by setting all clamps to their default positions
+  extendPositionClamp();
+  extendWoodSecureClamp();
+
+  // Set initial state for Transfer Arm signal
+  digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, LOW);
+
+  // Immediately transition to homing state
+  enterState(HOMING_STATE);
+}
+```
+
+### Homing State
+
+```cpp
+void handleHomingState() {
+  // Implementation for the homing state
+  // This will be a state machine within a state machine
+  // to handle the homing sequence non-blocking
+  
   switch (subState) {
-    case 0:  // Init cutting cycle
-      digitalWrite(YELLOW_LED_PIN, HIGH);  // Turn on yellow LED
-      
-      // Verify clamps are extended
-      if (!areClampsPropertyExtended()) {
-        extendPositionClamp();
-        extendWoodSecureClamp();
-        break;  // Wait for clamps to extend fully
-      }
-      
-      // Start cut motor moving to cutting position
-      moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
-      hasSuctionBeenChecked = false;
-      hasTransferArmBeenSignaled = false;
-      hasWoodSensorBeenChecked = false;
+    case 0:  // Check if motors are already at home
+      // Logic for checking home position...
       subState = 1;
       break;
       
-    case 1:  // Monitor cutting progress
-      // Check if cut motor has reached suction check position
-      if (!hasSuctionBeenChecked && 
-          stepsToInches(cutMotor.currentPosition(), CUT_MOTOR_STEPS_PER_INCH) >= WOOD_SUCTION_CHECK_POSITION) {
-        // Check suction sensor
-        if (!isWoodSuctionProper()) {
-          enterState(WOOD_SUCTION_ERROR_STATE);
-          return;
-        }
-        hasSuctionBeenChecked = true;
-      }
+    case 1:  // Move motors away from home if needed
+      // Logic for moving away from home...
+      subState = 2;
+      break;
       
-      // Check if cut motor has reached transfer arm signal position
-      if (!hasTransferArmBeenSignaled && 
-          stepsToInches(cutMotor.currentPosition(), CUT_MOTOR_STEPS_PER_INCH) >= TRANSFER_ARM_SIGNAL_POSITION) {
-        signalTransferArm(HIGH);  // Signal transfer arm
-        hasTransferArmBeenSignaled = true;
+    case 2:  // Home cut motor
+      // Logic for homing cut motor...
+      if (readCutMotorPositionSwitch()) {
+        cutMotor.setCurrentPosition(0);
+        subState = 3;
       }
+      break;
       
-      // Check if cut motor has reached its target position
-      if (isMotorInPosition(cutMotor, inchesToSteps(CUT_MOTOR_TRAVEL_DISTANCE, CUT_MOTOR_STEPS_PER_INCH))) {
-        signalTransferArm(LOW);  // Turn off transfer arm signal
-        
-        // Check wood sensor to determine next state
-        if (isWoodPresent()) {
-          enterState(YESWOOD_STATE);
-        } else {
-          enterState(NOWOOD_STATE);
-        }
+    case 3:  // Home position motor
+      // Logic for homing position motor...
+      if (readPositionMotorPositionSwitch()) {
+        positionMotor.setCurrentPosition(0);
+        isHomingComplete = true;
+        enterState(READY_STATE);
       }
       break;
   }
 }
 ```
 
-## Using Sub-States for Complex State Handling
+### Ready State
 
-Each state can have multiple sub-states to handle complex sequences:
+```cpp
+void handleReadyState() {
+  // Set the green LED on to indicate ready status
+  digitalWrite(GREEN_LED_PIN, HIGH);
+  
+  // Check if reload switch is activated
+  if (readReloadSwitch()) {
+    enterState(RELOAD_STATE);
+    return;
+  }
+  
+  // Check if cycle switch is activated and ready to cycle
+  if (readCycleSwitch()) {
+    // Check if needCycleSwitchToggle flag is set
+    if (!needCycleSwitchToggle) {
+      // System is ready to start the cutting cycle
+      enterState(CUTTING_STATE);
+      return;
+    }
+  }
+  
+  // If cycle switch was ON at startup, wait until it's toggled OFF then ON
+  if (needCycleSwitchToggle && !readCycleSwitch()) {
+    needCycleSwitchToggle = false;
+  }
+}
+```
 
-1. Initialize `subState = 0` when entering a new state
-2. Increment `subState` as steps of the sequence are completed
-3. Use `switch (subState)` within each state handler to manage the sequence
+## Error Handling
 
-This approach allows complex sequences to be broken into manageable steps while maintaining the overall state machine structure. 
+The system has three different error states to handle various error conditions:
+
+1. **ERROR_STATE**: General error handling
+2. **WOOD_SUCTION_ERROR_STATE**: Handles errors related to wood suction
+3. **CUT_MOTOR_HOME_ERROR_STATE**: Handles errors related to cut motor homing
+
+Each error state has its own recovery procedure. The system may attempt automatic recovery in some cases, or require operator intervention (cycle switch toggle) in others.
+
+## LED Status Indicators
+
+Each state has a distinct LED pattern to indicate the current system status:
+
+- STARTUP_STATE: Blue LED on
+- HOMING_STATE: Blue LED blinking
+- READY_STATE: Green LED on
+- RELOAD_STATE: Blue LED on
+- CUTTING_STATE: Yellow LED on
+- YESWOOD_STATE: Green and Yellow LEDs on
+- NOWOOD_STATE: Blue and Green LEDs on
+- ERROR_STATE: Red LED blinking
+- WOOD_SUCTION_ERROR_STATE: Specific Red LED pattern for wood suction error
+- CUT_MOTOR_HOME_ERROR_STATE: Specific Red LED pattern for homing error
+
+## Non-Blocking Operation
+
+All state operations are implemented in a non-blocking manner. No delays are used during motor movements or other operations. The system uses state machines and timers to track progress without blocking the main loop. 

@@ -1,29 +1,97 @@
-# Wood Cutting Machine - Stage 1 Documentation
+# Wood Cutting Machine - ESP32-S3 Controller Documentation
 
-## Overview
-This automated wood cutting machine uses two stepper motors and two pneumatic clamps to precisely cut wood boards to specified lengths. The system follows a specific cutting cycle sequence with integrated safety features, homing capabilities, and error detection systems.
+## Core Design Principles
 
-## Documentation Sections
+### 1. Non-Blocking Operations
+- All motor movements must be implemented using non-blocking approaches
+- All operations must return to the main loop quickly
+- The AccelStepper library is used for motor control
 
-### Hardware and System Configuration
-- [Hardware Components](01_Hardware_Components.md) - Motors, clamps, switches, and sensors
-- [Pin Assignments](02_Pin_Assignments.md) - Pinout and connections
-- [Motor Configuration](03_Motor_Configuration.md) - Speeds, acceleration, and calibration
+### 2. Immediate Command Execution
+- No unnecessary delays in command execution
+- Commands must execute immediately when issued
+- Clamp operations must be instantaneous (no delays)
 
-### System Behavior
-- [System States](04_System_States.md) - All state definitions and transitions
-- [Error Handling](05_Error_Handling.md) - Error detection and recovery procedures
-- [Cutting Cycle Sequence](06_Cutting_Cycle.md) - Step-by-step operation
-- [Homing Sequence](07_Homing_Sequence.md) - Establishing reference positions
-- [Operation Logic](08_Operation_Logic.md) - Overall system logic and behavior
+### 3. Serial Print Limitations
+- No Serial.print statements during any motor movements
+- Serial printing only allowed in IDLE_STATE, ERROR_STATE, or when motors are confirmed stopped
+- Serial prints may be used for diagnostic information when not moving
 
-### Implementation Guidelines
-- [Code Structure](09_Code_Structure.md) - Function definitions and organization
-- [State Machine Implementation](10_State_Machine.md) - State management code templates
+### 4. Standardized State Machine
+- System operates as a finite state machine with clear state transitions
+- Each state has well-defined entry and exit conditions
+- State machine is implemented in a non-blocking way
 
-### Reference
-- [Constants and Variables](12_Constants_Variables.md) - All defined values
-- [External Dependencies](13_External_Dependencies.md) - Required libraries
+### 5. Safety First Design
+- Continuous monitoring of safety conditions
+- Immediate response to error conditions
+- Comprehensive error recovery procedures
+
+## System States
+
+| State | Description | Transition In | Transition Out |
+|-------|-------------|---------------|----------------|
+| IDLE_STATE | System ready for operation | After homing complete | When start button pressed |
+| HOMING_STATE | Finding reference positions | On startup or after error reset | To IDLE_STATE when complete |
+| CUTTING_STATE | Performing cutting operation | From IDLE_STATE when cycle starts | To YESWOOD/NOWOOD_STATE when complete |
+| ERROR_STATE | Error condition detected | From any state when error detected | To HOMING_STATE after reset |
+| YESWOOD_STATE | Wood present detected after cut | From CUTTING_STATE when wood detected | To IDLE_STATE when positioning complete |
+| NOWOOD_STATE | No wood detected after cut | From CUTTING_STATE when no wood detected | To IDLE_STATE when complete |
+
+## Documentation Structure
+
+### Core Documentation
+1. [**System States**](04_System_States.md) - State machine definitions and transitions
+2. [**Operation Logic**](08_Operation_Logic.md) - Overall system behavior and implementation
+3. [**Pin Assignments**](02_Pin_Assignments.md) - Hardware connections and logic levels
+4. [**Error Handling**](05_Error_Handling.md) - Error detection and recovery procedures
+
+### Operation Documentation
+5. [**Homing Sequence**](07_Homing_Sequence.md) - Reference position establishment process
+6. [**Cutting Cycle**](06_Cutting_Cycle.md) - Cutting operation workflow
+7. [**Motor Configuration**](03_Motor_Configuration.md) - Motor parameters and settings
+
+### Additional Reference
+8. [**Hardware Components**](01_Hardware_Components.md) - Physical components used in the system
+9. [**Code Structure**](09_Code_Structure.md) - Software architecture guidelines
+10. [**Constants and Variables**](12_Constants_Variables.md) - System constants reference
 
 ## Getting Started
-For new developers, we recommend reading the documentation in the order listed above. The [System States](04_System_States.md) and [Cutting Cycle Sequence](06_Cutting_Cycle.md) documents provide the best overview of how the system works. 
+
+### 1. System Overview
+The wood cutting machine uses two stepper motors to control a cutting mechanism and a positioning system. The machine cuts wooden boards to precise lengths through a controlled sequence of operations. The system uses position switches for homing, sensors for detecting the presence of wood, and pneumatic clamps for securing the wood during cutting.
+
+### 2. Key Components
+- **ESP32-S3 Controller**: Main control board (Freenove ESP32-S3)
+- **Stepper Motors**: For cut and position control
+- **Pneumatic Clamps**: For securing wood during operations
+- **Position Switches**: For detecting home positions (active HIGH)
+- **Sensors**: For detecting wood presence and suction (active LOW)
+
+### 3. Implementation Requirements
+- Use non-blocking programming techniques
+- Implement proper debouncing (15ms) for all inputs
+- Verify all logic levels match documentation (active HIGH/LOW)
+- Ensure clamp operations occur immediately
+- Maintain safety checks at all times
+
+### 4. Getting Started for Developers
+1. Read the [System States](04_System_States.md) document to understand the state machine
+2. Review the [Pin Assignments](02_Pin_Assignments.md) to understand hardware connections
+3. Study the [Homing Sequence](07_Homing_Sequence.md) and [Cutting Cycle](06_Cutting_Cycle.md) documents
+4. Implement the core state machine as described in [Operation Logic](08_Operation_Logic.md)
+
+## Logic Levels Reference
+
+| Input/Output | Logic Level | Active State |
+|--------------|-------------|--------------|
+| Position Switches | Active HIGH | HIGH when triggered |
+| Button Inputs | Active LOW | LOW when pressed |
+| Wood Present Sensor | Active LOW | LOW when wood present |
+| Vacuum Sensor | Active LOW | HIGH when suction proper |
+| Clamp Outputs | Active LOW | LOW to extend (engage) |
+| LED Outputs | Active HIGH | HIGH to illuminate |
+| Transfer Arm Signal | Active HIGH | HIGH pulse for 500ms |
+
+## E-Stop Implementation
+The Emergency Stop button is a hardware cut-off that directly interrupts power to the motors and does not connect to the ESP32-S3. This physical safety mechanism operates independently of the controller software. 
