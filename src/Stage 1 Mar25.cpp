@@ -173,7 +173,7 @@ void initializeSystem() {
   pinMode(RELOAD_SWITCH, INPUT);                       // External pull-down
   pinMode(CYCLE_SWITCH, INPUT);                  // External pull-down
   pinMode(WOOD_SENSOR, INPUT_PULLUP);                  // Active LOW (LOW = wood present)
-  pinMode(WAS_WOOD_SUCTIONED_SENSOR, INPUT);           // External pull-down
+  pinMode(WAS_WOOD_SUCTIONED_SENSOR, INPUT_PULLUP);    // Active LOW (LOW = error)
   
   // Initialize clamp pins
   pinMode(POSITION_CLAMP, OUTPUT);
@@ -522,6 +522,13 @@ void CUTmovement() {
   // 4. Transition to YESwood or NOwood based on wood presence
   
   static unsigned long clampTimer = 0;
+  static bool cycleStarted = false;
+  
+  // Reset flags at the beginning of each cut cycle
+  if (!cycleStarted) {
+    hasCheckedForWoodSuction = false;
+    cycleStarted = true;
+  }
   
   // Set cut motor parameters and start movement
   cutMotor.setMaxSpeed(CUTTINGSPEED);
@@ -547,13 +554,16 @@ void CUTmovement() {
     if (cutMotor.currentPosition() >= (0.3 * CUT_MOTOR_STEPS_PER_INCH) && 
         cutMotor.currentPosition() <= (0.5 * CUT_MOTOR_STEPS_PER_INCH) && 
         !hasCheckedForWoodSuction) {
-      // Now we're at the position to check - read the sensor directly
-      // For WAS_WOOD_SUCTIONED_SENSOR, HIGH means wood is properly suctioned, LOW means error
-      woodSuctionSensor.update();
       
+      // Update the sensor status and FORCE a direct read of the sensor pin
+      woodSuctionSensor.update();
+      int sensorValue = digitalRead(WAS_WOOD_SUCTIONED_SENSOR);
+      
+      // Only check if wood is present
       if (isWoodPresent) {
-        // If wood present and sensor is LOW (not suctioned properly), trigger error
-        if (digitalRead(WAS_WOOD_SUCTIONED_SENSOR) == LOW) {
+        // If sensor is LOW (not suctioned properly), trigger error
+        // Make sure to directly read the pin value to avoid any debounce delay
+        if (sensorValue == LOW) {
           // Set the wood suction error flag
           hasWoodSuctionError = true;
           
@@ -580,7 +590,8 @@ void CUTmovement() {
       digitalWrite(SIGNAL_TO_STAGE_1TO2, HIGH);
       isSignalSent = true;
       
-      // Reset stage for next cycle
+      // Reset cycle flags
+      cycleStarted = false;
       
       // Wait a moment for the signal to be received
       static unsigned long signalTimer = 0;
@@ -852,7 +863,7 @@ void NOwood() {
     isSignalSent = false;
     
     // Reset global flags
-    hasCheckedForWoodSuction = false;
+    hasCheckedForWoodSuction = false;  // Make sure this is reset for the next cycle
     
     // Set flag to indicate NOwood cycle just completed
     isNoWoodCycleCompleted = true;
