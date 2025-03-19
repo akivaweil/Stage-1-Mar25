@@ -171,18 +171,14 @@ void enterState(State newState) {
   // Exit actions for current state
   switch (currentState) {
     case CUTTING_STATE:
-      // Ensure transfer arm signal is off when exiting cutting state
       signalTransferArm(LOW);
       break;
       
     case ERROR_STATE:
     case WOOD_SUCTION_ERROR_STATE:
     case CUT_MOTOR_HOME_ERROR_STATE:
-      // Turn off error LED when exiting error states
       setRedLed(false);
       break;
-      
-    // Handle other state exits as needed
   }
   
   // Update state
@@ -193,7 +189,6 @@ void enterState(State newState) {
   // Entry actions for new state
   switch (newState) {
     case HOMING_STATE:
-      // Reset homing variables when entering homing state
       homingAttemptCount = 0;
       isHomingComplete = false;
       isCutMotorHomed = false;
@@ -201,36 +196,29 @@ void enterState(State newState) {
       break;
       
     case READY_STATE:
-      // Turn on green LED
       setGreenLed(true);
       break;
       
     case RELOAD_STATE:
-      // Turn on blue LED for reload
       setBlueLed(true);
-      // Retract clamps to allow loading wood
       retractPositionClamp();
       retractWoodSecureClamp();
       break;
       
     case CUTTING_STATE:
-      // Reset variables for cutting state
       hasSuctionBeenChecked = false;
       hasTransferArmBeenSignaled = false;
       break;
       
     case ERROR_STATE:
-      // Default error state
       currentError = NO_ERROR;
       break;
       
     case WOOD_SUCTION_ERROR_STATE:
-      // Set the specific error type
       currentError = WOOD_SUCTION_ERROR;
       break;
       
     case CUT_MOTOR_HOME_ERROR_STATE:
-      // Set the specific error type
       currentError = CUT_MOTOR_HOME_ERROR;
       break;
   }
@@ -238,30 +226,22 @@ void enterState(State newState) {
 
 // Handle startup state - immediately transition to homing
 void handleStartupState() {
-  // Initialize system by setting all clamps to their default positions
   extendPositionClamp();
   extendWoodSecureClamp();
-
-  // Set initial state for Transfer Arm signal
   digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, LOW);
-
-  // Immediately transition to homing state
   enterState(HOMING_STATE);
 }
 
 // Handle homing state - implements a non-blocking homing sequence
 void handleHomingState() {
-  // Implementation for the homing state as a state machine
   switch (subState) {
     case 0:  // Check if motors are already at home
-      // Check if cut motor is already at home position (switch is active HIGH)
       if (readCutMotorHomingSwitch()) {
         subState = 1;  // Need to move cut motor away from home
       } else {
         subState = 2;  // Cut motor already away from home, check position motor
       }
       
-      // Check if position motor is already at home position (switch is active HIGH)
       if (readPositionMotorHomingSwitch()) {
         if (subState == 2) {
           subState = 3;  // Need to move position motor away from home
@@ -274,123 +254,85 @@ void handleHomingState() {
       break;
       
     case 1:  // Move cut motor away from home switch
-      // Set motor speed for moving away
       CutMotor_HOMING_settings();
       
-      // Move motor slightly away from home switch (negative direction)
       if (!cutMotor.isRunning()) {
         cutMotor.move(-300);  // Move 300 steps away
       }
       
-      // Check if motor has moved away from switch
       if (!readCutMotorHomingSwitch() || cutMotor.distanceToGo() == 0) {
-        // Motor has moved away or completed movement
         cutMotor.stop();
         
-        // Check if position motor also needs to move away
         if (readPositionMotorHomingSwitch()) {
-          subState = 3;  // Move position motor away next
+          subState = 3;
         } else {
-          subState = 4;  // Proceed to homing cut motor
+          subState = 4;
         }
       }
       break;
       
     case 2:  // Intermediate case - should never reach here
-      // Safety case - proceed to next appropriate state
       subState = (readPositionMotorHomingSwitch()) ? 3 : 4;
       break;
       
     case 3:  // Move position motor away from home switch
-      // Set motor speed for moving away
       PositionMotor_HOMING_settings();
       
-      // Move motor slightly away from home switch (negative direction)
       if (!positionMotor.isRunning()) {
         positionMotor.move(-300);  // Move 300 steps away
       }
       
-      // Check if motor has moved away from switch
       if (!readPositionMotorHomingSwitch() || positionMotor.distanceToGo() == 0) {
-        // Motor has moved away or completed movement
         positionMotor.stop();
-        subState = 4;  // Proceed to homing cut motor
+        subState = 4;
       }
       break;
       
     case 4:  // Home cut motor
-      // Set motor speed for homing
       CutMotor_HOMING_settings();
       
-      // Start moving toward home if not already running
       if (!cutMotor.isRunning() && !readCutMotorHomingSwitch()) {
         cutMotor.move(15000);  // Move enough steps to reach home
       }
       
-      // Check if home position reached
       if (readCutMotorHomingSwitch()) {
-        // Stop immediately when home position reached
         cutMotor.stop();
-        
-        // Set current position as zero
         cutMotor.setCurrentPosition(0);
-        
-        // Cut motor is now homed
         isCutMotorHomed = true;
-        
-        // Proceed to home position motor
         subState = 5;
       } else if (cutMotor.distanceToGo() == 0) {
-        // Failed to find home within expected distance
         homingAttemptCount++;
         
         if (homingAttemptCount >= 3) {
-          // Multiple attempts failed, go to homing error state
           enterState(CUT_MOTOR_HOME_ERROR_STATE);
           return;
         } else {
-          // Try again from a different position
-          subState = 1;  // Go back to moving away first
+          subState = 1;
         }
       }
       break;
       
     case 5:  // Home position motor
-      // Set motor speed for homing
       PositionMotor_HOMING_settings();
       
-      // Start moving toward home if not already running
       if (!positionMotor.isRunning() && !readPositionMotorHomingSwitch()) {
         positionMotor.move(10000);  // Move enough steps to reach home
       }
       
-      // Check if home position reached
       if (readPositionMotorHomingSwitch()) {
-        // Stop immediately when home position reached
         positionMotor.stop();
-        
-        // Set current position as zero
         positionMotor.setCurrentPosition(0);
-        
-        // Position motor is now homed
         isPositionMotorHomed = true;
-        
-        // Both motors are now homed
         isHomingComplete = true;
-        
-        // Transition to READY_STATE
         enterState(READY_STATE);
       } else if (positionMotor.distanceToGo() == 0) {
-        // Failed to find home within expected distance
         homingAttemptCount++;
         
         if (homingAttemptCount >= 3) {
-          // Multiple attempts failed, go to error state
           enterState(ERROR_STATE);
           return;
         } else {
-          // Try again from a different position
-          subState = 3;  // Go back to moving away first
+          subState = 3;
         }
       }
       break;
@@ -399,30 +341,23 @@ void handleHomingState() {
 
 // Handle ready state - checks cycle switch toggle requirement
 void handleReadyState() {
-  // Set the green LED on to indicate ready status
   setGreenLed(true);
   
-  // Check if reload switch is activated
   if (readReloadSwitch()) {
     enterState(RELOAD_STATE);
     return;
   }
   
-  // Check if cycle switch is activated and ready to cycle
   if (readCycleSwitch()) {
-    // If needCycleSwitchToggle is true, we need to see the cycle switch go OFF first
     if (needCycleSwitchToggle) {
-      // Wait until the cycle switch is toggled OFF then ON again
-      needCycleSwitchToggle = false;  // Reset the flag since we've seen it go OFF
-      return;  // Don't start cycle yet
+      needCycleSwitchToggle = false;
+      return;
     }
     
-    // System is ready to start the cutting cycle
     enterState(CUTTING_STATE);
     return;
   }
   
-  // If we needed a toggle and now cycle switch is OFF, clear the flag
   if (needCycleSwitchToggle && !readCycleSwitch()) {
     needCycleSwitchToggle = false;
   }
@@ -430,108 +365,77 @@ void handleReadyState() {
 
 // Handle reload state - allows user to load new wood
 void handleReloadState() {
-  // Ensure clamps are retracted for loading
   retractPositionClamp();
   retractWoodSecureClamp();
-  
-  // Keep blue LED on for reload state
   setBlueLed(true);
   
-  // Check if reload switch is deactivated
   if (!readReloadSwitch()) {
-    // Return to ready state when reload switch is released
     enterState(READY_STATE);
   }
 }
 
 // Handle cutting state - implements a non-blocking cutting sequence
 void handleCuttingState() {
-  // Implementation for the cutting state
-  // This is a state machine within a state machine
-  
   switch (subState) {
     case 0:  // Init cutting cycle
-      // Initialize by ensuring clamps are extended
       extendPositionClamp();
       extendWoodSecureClamp();
-      
-      // Reset control flags
       hasSuctionBeenChecked = false;
       hasTransferArmBeenSignaled = false;
-      
-      // Proceed to next substate
       subState = 1;
       break;
       
     case 1:  // Move to suction check position
-      // Set motor speed
       CutMotor_NORMAL_settings();
       
-      // Start move to suction check position if not already moving
       if (!cutMotor.isRunning()) {
-        // Use 0.3 inches as the wood suction check position
         moveCutMotorToPosition(0.3);
       }
       
-      // Check if position reached
       if (isMotorInPosition(cutMotor, 0.3 * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 2;  // Proceed to suction check
+        subState = 2;
       }
       break;
       
     case 2:  // Check suction
-      // Check if wood is properly suctioned (sensor reads HIGH when proper)
       if (isWoodSuctionProper()) {
-        // Wood suction is proper, continue to next step
         hasSuctionBeenChecked = true;
-        subState = 3;  // Continue cutting
+        subState = 3;
       } else {
-        // Wood suction failed, go to error state
         enterState(WOOD_SUCTION_ERROR_STATE);
         return;
       }
       break;
       
     case 3:  // Continue cutting to transfer arm signal position
-      // Start move to transfer arm signal position
-      // Use 7.2 inches as the transfer arm signal position
       moveCutMotorToPosition(7.2);
       
-      // Check if position reached
       if (isMotorInPosition(cutMotor, 7.2 * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 4;  // Proceed to signal transfer arm
+        subState = 4;
       }
       break;
       
     case 4:  // Signal transfer arm
-      // Signal transfer arm if not already done
       if (!hasTransferArmBeenSignaled) {
         signalTransferArm(HIGH);
         hasTransferArmBeenSignaled = true;
       }
       
-      // Allow 500ms for the signal (handled by signalTransferArm function)
-      // Then continue cutting - non-blocking handled by updateTransferArmSignal in main loop
       subState = 5;
       break;
       
     case 5:  // Complete cut
-      // Move to complete cut position
       moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
       
-      // Check if cut completed
       if (isMotorInPosition(cutMotor, CUT_MOTOR_TRAVEL_DISTANCE * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 6;  // Proceed to check for wood presence
+        subState = 6;
       }
       break;
       
     case 6:  // Check wood presence
-      // Check if wood is present at the end of cut cycle
       if (isWoodPresent()) {
-        // Wood detected - transition to yeswood state
         enterState(YESWOOD_STATE);
       } else {
-        // No wood detected - transition to nowood state
         enterState(NOWOOD_STATE);
       }
       break;
@@ -542,39 +446,29 @@ void handleCuttingState() {
 void handleYesWoodState() {
   switch (subState) {
     case 0:  // Prepare for next position
-      // Keep wood secure clamp extended, retract position clamp
       retractPositionClamp();
-      
-      // Set position motor speed
       PositionMotor_NORMAL_settings();
-      
       subState = 1;
       break;
       
     case 1:  // Move position motor for next cut
-      // Start movement if not already moving
       if (!positionMotor.isRunning()) {
         movePositionMotorToPosition(POSITION_MOTOR_TRAVEL_DISTANCE);
       }
       
-      // Check if position reached
       if (isMotorInPosition(positionMotor, POSITION_MOTOR_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH)) {
         subState = 2;
       }
       break;
       
     case 2:  // Return cut motor to home
-      // Set cut motor speed for return
       CutMotor_RETURN_settings();
       
-      // Start movement if not already moving
       if (!cutMotor.isRunning()) {
         moveCutMotorToPosition(0);
       }
       
-      // Check if position reached
       if (isMotorInPosition(cutMotor, 0)) {
-        // Return to ready state
         enterState(READY_STATE);
       }
       break;
@@ -585,37 +479,28 @@ void handleYesWoodState() {
 void handleNoWoodState() {
   switch (subState) {
     case 0:  // Prepare for return to home
-      // Retract both clamps
       retractPositionClamp();
       retractWoodSecureClamp();
-      
-      // Set motor speeds for return
       Motors_RETURN_settings();
-      
       subState = 1;
       break;
       
     case 1:  // Return cut motor to home
-      // Start movement if not already moving
       if (!cutMotor.isRunning()) {
         moveCutMotorToPosition(0);
       }
       
-      // Check if position reached
       if (isMotorInPosition(cutMotor, 0)) {
         subState = 2;
       }
       break;
       
     case 2:  // Return position motor to home
-      // Start movement if not already moving
       if (!positionMotor.isRunning()) {
         movePositionMotorToPosition(0);
       }
       
-      // Check if position reached
       if (isMotorInPosition(positionMotor, 0)) {
-        // Return to ready state
         enterState(READY_STATE);
       }
       break;
@@ -624,14 +509,11 @@ void handleNoWoodState() {
 
 // Handle error state
 void handleErrorState() {
-  // Update error LED - use a default error pattern
   updateRedLEDErrorPattern(currentError);
   
-  // Keep clamps extended for safety
   extendPositionClamp();
   extendWoodSecureClamp();
   
-  // Return motors to home position if they're not already there
   if (!isMotorInPosition(cutMotor, 0)) {
     moveCutMotorToPosition(0);
   }
@@ -640,31 +522,23 @@ void handleErrorState() {
     movePositionMotorToPosition(0);
   }
   
-  // Monitor cycle switch for toggle (OFF then ON)
   bool currentCycleSwitchState = readCycleSwitch();
   
-  // Check for a complete toggle cycle (OFF then ON)
   if (prevCycleSwitchState == false && currentCycleSwitchState == true) {
-    // Cycle switch has been toggled off and then on again
-    // Reset error and go to homing state
     currentError = NO_ERROR;
     enterState(HOMING_STATE);
   }
   
-  // Update the previous cycle switch state
   prevCycleSwitchState = currentCycleSwitchState;
 }
 
 // Handle wood suction error state
 void handleWoodSuctionErrorState() {
-  // Keep updating the error LED pattern
   updateRedLEDErrorPattern(WOOD_SUCTION_ERROR);
   
-  // Keep clamps extended for safety
   extendPositionClamp();
   extendWoodSecureClamp();
   
-  // Return motors to home position if they're not already there
   if (!isMotorInPosition(cutMotor, 0)) {
     moveCutMotorToPosition(0);
   }
@@ -673,81 +547,61 @@ void handleWoodSuctionErrorState() {
     movePositionMotorToPosition(0);
   }
   
-  // Monitor cycle switch for toggle (OFF then ON)
   bool currentCycleSwitchState = readCycleSwitch();
   
-  // Check for a complete toggle cycle (OFF then ON)
   if (prevCycleSwitchState == false && currentCycleSwitchState == true) {
-    // Cycle switch has been toggled off and then on again
-    // Reset error and go to homing state
     currentError = NO_ERROR;
     enterState(HOMING_STATE);
   }
   
-  // Update the previous cycle switch state
   prevCycleSwitchState = currentCycleSwitchState;
 }
 
 // Handle cut motor home error state
 void handleCutMotorHomeErrorState() {
-  // Keep updating the error LED pattern
   updateRedLEDErrorPattern(CUT_MOTOR_HOME_ERROR);
   
-  // Keep clamps extended for safety
   extendPositionClamp();
   extendWoodSecureClamp();
   
   switch (subState) {
     case 0:  // First recovery attempt
-      // First attempt - move away then try to home the cut motor
       moveAwayThenHomeCutMotor();
       
-      // Check if homing was successful
       if (readCutMotorHomingSwitch()) {
-        // Success, reset error and move to homing state
         homingAttemptCount = 0;
         currentError = NO_ERROR;
         enterState(HOMING_STATE);
         return;
       }
       
-      // First attempt failed, increment counter and move to next state
       homingAttemptCount++;
       subState = 1;
       break;
       
     case 1:  // Second recovery attempt
-      // Second attempt - move away then try to home the cut motor again
       moveAwayThenHomeCutMotor();
       
-      // Check if homing was successful
       if (readCutMotorHomingSwitch()) {
-        // Success, reset error and move to homing state
         homingAttemptCount = 0;
         currentError = NO_ERROR;
         enterState(HOMING_STATE);
         return;
       }
       
-      // Second attempt failed, move to locked state
       homingAttemptCount++;
       subState = 2;
       break;
       
     case 2:  // Locked state - requires cycle switch toggle
-      // Monitor cycle switch for toggle (OFF then ON)
       bool currentCycleSwitchState = readCycleSwitch();
       
-      // Check for a complete toggle cycle (OFF then ON)
       if (prevCycleSwitchState == false && currentCycleSwitchState == true) {
-        // Cycle switch has been toggled off and then on again
-        // Reset error and go to homing state for one more attempt
         homingAttemptCount = 0;
         currentError = NO_ERROR;
         enterState(HOMING_STATE);
       }
       
-      // Update the previous cycle switch state
       prevCycleSwitchState = currentCycleSwitchState;
       break;
   }
@@ -760,10 +614,8 @@ void moveAwayThenHomeCutMotor() {
   
   switch (recoverySubState) {
     case 0:  // Start moving away from home
-      // Set motor speed for moving away
       CutMotor_HOMING_settings();
       
-      // Move motor away from home switch (negative direction)
       if (!cutMotor.isRunning()) {
         cutMotor.move(-500);  // Move 500 steps away
         startTime = millis();
@@ -773,17 +625,14 @@ void moveAwayThenHomeCutMotor() {
       
     case 1:  // Wait for move away to complete or timeout
       if (!cutMotor.isRunning() || (millis() - startTime > 2000)) {
-        // Stop motor explicitly
         cutMotor.stop();
         recoverySubState = 2;
       }
       break;
       
     case 2:  // Start moving toward home
-      // Set motor speed for homing
       CutMotor_HOMING_settings();
       
-      // Move toward home position (positive direction)
       if (!cutMotor.isRunning()) {
         cutMotor.move(2000);  // Move 2000 steps toward home
         recoverySubState = 3;
@@ -792,17 +641,11 @@ void moveAwayThenHomeCutMotor() {
       
     case 3:  // Wait for home position or movement to complete
       if (readCutMotorHomingSwitch()) {
-        // Stop immediately when home position reached
         cutMotor.stop();
-        
-        // Set current position as zero
         cutMotor.setCurrentPosition(0);
-        
-        // Recovery complete
-        recoverySubState = 0;  // Reset for next time
+        recoverySubState = 0;
       } else if (!cutMotor.isRunning()) {
-        // Failed to find home within distance
-        recoverySubState = 0;  // Reset for next attempt
+        recoverySubState = 0;
       }
       break;
   }
@@ -881,7 +724,6 @@ void setCutMotorHomeErrorPattern() {
 }
 
 void setGeneralErrorPattern() {
-  // Solid red for general error
   setRedLed(true);
 }
 
@@ -905,17 +747,14 @@ void updateRedLEDErrorPattern(ErrorType errorType) {
 
 // Update the LEDs based on the current state
 void updateLEDsForState(State currentState) {
-  // Turn all LEDs off first
   allLedsOff();
   
-  // Set appropriate LED based on state
   switch (currentState) {
     case STARTUP_STATE:
       setBlueLed(true);
       break;
       
     case HOMING_STATE:
-      // Blue LED blinks during homing
       updateBlueBlinkPattern();
       break;
       
@@ -950,12 +789,10 @@ void updateLEDsForState(State currentState) {
 // Function to signal the transfer arm (non-blocking 500ms HIGH pulse)
 void signalTransferArm(bool state) {
   if (state == HIGH && !transferArmSignalActive) {
-    // Turn on the signal and mark start time
     digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, HIGH);
     transferArmSignalStartTime = millis();
     transferArmSignalActive = true;
   } else if (state == LOW) {
-    // Immediately turn off the signal
     digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, LOW);
     transferArmSignalActive = false;
   }
@@ -964,7 +801,6 @@ void signalTransferArm(bool state) {
 // Function to update transfer arm signal timing (call this in loop)
 void updateTransferArmSignal() {
   if (transferArmSignalActive && (millis() - transferArmSignalStartTime >= 500)) {
-    // 500ms has elapsed, turn off the signal
     digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, LOW);
     transferArmSignalActive = false;
   }
@@ -1011,7 +847,6 @@ void initializePins() {
 
 // Initialize switch debouncing with 15ms debounce time
 void initializeDebounce() {
-  // Attach and configure each switch with 15ms debounce time
   cutMotorHomingSwitch.attach(CUT_MOTOR_HOMING_SWITCH_PIN, INPUT_PULLUP);
   cutMotorHomingSwitch.interval(DEBOUNCE_TIME);
   
@@ -1101,17 +936,14 @@ bool performStartupSafetyCheck() {
     return false;
   }
   
-  // Cycle switch is OFF at startup, no toggle needed
   needCycleSwitchToggle = false;
   return true;
 }
 
 // Configure motors with their speeds and acceleration
 void configureMotors() {
-  // Use our new configuration functions instead of direct settings
   Motors_NORMAL_settings();
   
-  // Set current position to 0
   cutMotor.setCurrentPosition(0);
   positionMotor.setCurrentPosition(0);
 }
@@ -1133,37 +965,19 @@ float stepsToInches(long steps, float stepsPerInch) {
 }
 
 void loop() {
-  // Update all switch/sensor readings
   updateAllSwitches();
-  
-  // Run motors (non-blocking)
   runMotors();
-  
-  // Update transfer arm signal timing
   updateTransferArmSignal();
-  
-  // Update state machine
   updateStateMachine();
-  
-  // Update LEDs based on current state
   updateLEDsForState(currentState);
 }
 
 // Arduino setup function
 void setup() {
-  // Initialize all pins
   initializePins();
-  
-  // Initialize switch debouncing
   initializeDebounce();
-  
-  // Configure motors
   configureMotors();
-  
-  // Check cycle switch at startup
   performStartupSafetyCheck();
-  
-  // Initial state
   currentState = STARTUP_STATE;
 }
 
