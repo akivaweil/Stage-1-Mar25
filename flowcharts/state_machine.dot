@@ -1,6 +1,6 @@
 digraph StateMachine {
     // Graph styling
-    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=polyline];
+    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=ortho];
     node [fontname="Arial", fontsize=12, shape=box, style="filled", fillcolor="#E0F4FF", color="#0078D7", penwidth=2.0];
     edge [fontname="Arial", fontsize=11, color="#666666", penwidth=1.2, arrowsize=0.9];
 
@@ -31,30 +31,30 @@ digraph StateMachine {
     }
 
     // Transition edges
-    STARTUP -> HOMING [label="Immediate"];
+    STARTUP -> HOMING [xlabel="Immediate"];
     
-    HOMING -> READY [label="Homing complete"];
-    HOMING -> ERROR [label="Position motor error", color="#CC0000"];
-    HOMING -> CUT_MOTOR_HOME_ERROR [label="Cut motor error", color="#CC0000"];
+    HOMING -> READY [xlabel="Homing complete"];
+    HOMING -> ERROR [xlabel="Position motor error", color="#CC0000"];
+    HOMING -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor error", color="#CC0000"];
     
-    READY -> RELOAD [label="Reload switch ON"];
-    READY -> CUTTING [label="Cycle switch ON &\nToggle not needed", color="#006600", penwidth=3.6];
+    READY -> RELOAD [xlabel="Reload switch ON"];
+    READY -> CUTTING [xlabel="Cycle switch ON &\nToggle not needed", color="#006600", penwidth=3.6];
     
-    RELOAD -> READY [label="Reload switch OFF"];
+    RELOAD -> READY [xlabel="Reload switch OFF"];
     
-    CUTTING -> YESWOOD [label="Wood detected", color="#006600", penwidth=3.6];
-    CUTTING -> NOWOOD [label="No wood detected", color="#FFCC00", penwidth=2.4];
-    CUTTING -> WOOD_SUCTION_ERROR [label="Suction failure", color="#CC0000"];
+    CUTTING -> YESWOOD [xlabel="Wood detected", color="#006600", penwidth=3.6];
+    CUTTING -> NOWOOD [xlabel="No wood detected", color="#FFCC00", penwidth=2.4];
+    CUTTING -> WOOD_SUCTION_ERROR [xlabel="Suction failure", color="#CC0000"];
     
-    YESWOOD -> READY [label="Operation complete or\nreload requested"];
-    YESWOOD -> CUTTING [label="Continue cutting while\nwood is available", color="#006600", penwidth=3.6];
-    YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor fails\nto home", color="#CC0000"];
+    YESWOOD -> READY [xlabel="Operation complete or\nreload requested"];
+    YESWOOD -> CUTTING [xlabel="Continue cutting while\nwood is available", color="#006600", penwidth=3.6];
+    YESWOOD -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor fails\nto home", color="#CC0000"];
     
-    NOWOOD -> READY [label="Return complete", color="#FFCC00", penwidth=2.4];
+    NOWOOD -> READY [xlabel="Return complete", color="#FFCC00", penwidth=2.4];
     
-    ERROR -> HOMING [label="Cycle toggle detected", color="#CC0000"];
-    WOOD_SUCTION_ERROR -> HOMING [label="Cycle toggle detected", color="#CC0000"];
-    CUT_MOTOR_HOME_ERROR -> HOMING [label="Successful recovery or\nCycle toggle", color="#CC0000"];
+    ERROR -> HOMING [xlabel="Cycle toggle detected", color="#CC0000"];
+    WOOD_SUCTION_ERROR -> HOMING [xlabel="Cycle toggle detected", color="#CC0000"];
+    CUT_MOTOR_HOME_ERROR -> HOMING [xlabel="Successful recovery or\nCycle toggle", color="#CC0000"];
 
     // Formatting to improve layout
     { rank=same; READY RELOAD }
