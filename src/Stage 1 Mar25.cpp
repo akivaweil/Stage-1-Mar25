@@ -129,6 +129,7 @@ void PositionMotor_NORMAL_settings();
 void Motors_RETURN_settings();
 void CutMotor_RETURN_settings();
 void PositionMotor_RETURN_settings();
+void cutMotor_CUTTING_SPEED();
 void ensureMotorsAtHome();
 bool cycleToggleDetected();
 void resetErrorAndHomeSystem();
@@ -403,7 +404,7 @@ void handleCuttingState() {
       hasPastTransferArmPosition = false;
       
       // Set up for continuous motion to final position
-      CutMotor_NORMAL_settings();
+      cutMotor_CUTTING_SPEED();
       if (!cutMotor.isRunning()) {
         moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
       }
@@ -1158,6 +1159,12 @@ void CutMotor_RETURN_settings() {
 void PositionMotor_RETURN_settings() {
   positionMotor.setMaxSpeed(POSITION_MOTOR_RETURN_SPEED);
   positionMotor.setAcceleration(POSITION_MOTOR_ACCELERATION);
+}
+
+// Configure cut motor for cutting operations (specific speed for cutting)
+void cutMotor_CUTTING_SPEED() {
+  cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
+  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
 }
 
 // Ensures both motors return to home position
