@@ -19,8 +19,7 @@ The cutting cycle follows these specific steps:
 10. **Home Position Check**: Wait 50ms after the cut motor reaches position zero, then verify the cut motor position switch reads HIGH. If not, trigger the CUT_MOTOR_HOME_ERROR_STATE
 11. **Position Clamp Engagement**: Extend position clamp once position zero is reached
 12. **Positioning Operation**: Move position motor to 3.45 inches for next cut, ensuring it first returns to zero
-13. **Wood Clamp Verification**: Confirm wood secure clamp remains extended
-14. **Cycle Complete**: Return to READY_STATE
+13. **Cycle Complete**: Return to READY_STATE
 
 ## No Wood Sequence (NOWOOD_STATE)
 
