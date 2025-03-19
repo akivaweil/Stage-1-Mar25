@@ -28,11 +28,11 @@ digraph StateMachine {
     HOMING -> CUT_MOTOR_HOME_ERROR [label="Cut motor error"];
     
     READY -> RELOAD [label="Reload switch ON"];
-    READY -> CUTTING [label="Cycle switch ON &\nToggle not needed"];
+    READY -> CUTTING [label="Cycle switch ON &\nToggle not needed", color="#006600", penwidth=1.8];
     
     RELOAD -> READY [label="Reload switch OFF"];
     
-    CUTTING -> YESWOOD [label="Wood detected"];
+    CUTTING -> YESWOOD [label="Wood detected", color="#006600", penwidth=1.8];
     CUTTING -> NOWOOD [label="No wood detected"];
     CUTTING -> WOOD_SUCTION_ERROR [label="Suction failure", color="#CC0000"];
     

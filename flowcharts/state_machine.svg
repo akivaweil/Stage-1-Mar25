@@ -97,8 +97,8 @@
 <!-- READY&#45;&gt;CUTTING -->
 <g id="edge6" class="edge">
 <title>READY&#45;&gt;CUTTING</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M462,-405.75C462,-383.45 462,-345.2 462,-318.87"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="465.15,-319.21 462,-310.21 458.85,-319.21 465.15,-319.21"/>
+<path fill="none" stroke="#006600" stroke-width="1.8" d="M462,-405.75C462,-383.75 462,-346.23 462,-319.94"/>
+<polygon fill="#006600" stroke="#006600" stroke-width="1.8" points="465.15,-320.12 462,-311.12 458.85,-320.12 465.15,-320.12"/>
 <text text-anchor="middle" x="507" y="-360.05" font-family="Arial" font-size="11.00">Cycle switch ON &amp;</text>
 <text text-anchor="middle" x="507" y="-346.55" font-family="Arial" font-size="11.00">Toggle not needed</text>
 </g>
@@ -119,8 +119,8 @@
 <!-- CUTTING&#45;&gt;YESWOOD -->
 <g id="edge8" class="edge">
 <title>CUTTING&#45;&gt;YESWOOD</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M449.02,-270.18C435.72,-252.62 413.68,-226.03 390,-208 374.4,-196.12 355.73,-185.76 338.4,-177.41"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="340.06,-174.71 330.57,-173.75 337.39,-180.42 340.06,-174.71"/>
+<path fill="none" stroke="#006600" stroke-width="1.8" d="M449.02,-270.18C435.72,-252.62 413.68,-226.03 390,-208 374.69,-196.34 356.42,-186.14 339.36,-177.87"/>
+<polygon fill="#006600" stroke="#006600" stroke-width="1.8" points="340.88,-175.11 331.39,-174.14 338.2,-180.81 340.88,-175.11"/>
 <text text-anchor="middle" x="454.73" y="-217.8" font-family="Arial" font-size="11.00">Wood detected</text>
 </g>
 <!-- NOWOOD -->
