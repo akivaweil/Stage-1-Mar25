@@ -1,6 +1,6 @@
 digraph StateMachine {
     // Graph styling
-    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=true, concentrate=true];
+    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=polyline];
     node [fontname="Arial", fontsize=12, shape=box, style="filled", fillcolor="#E0F4FF", color="#0078D7", penwidth=2.0];
     edge [fontname="Arial", fontsize=11, color="#666666", penwidth=1.2, arrowsize=0.9];
 
@@ -52,9 +52,9 @@ digraph StateMachine {
     
     NOWOOD -> READY [label="Return complete", color="#FFCC00", penwidth=2.4];
     
-    ERROR -> HOMING [label="Cycle toggle detected"];
-    WOOD_SUCTION_ERROR -> HOMING [label="Cycle toggle detected"];
-    CUT_MOTOR_HOME_ERROR -> HOMING [label="Successful recovery or\nCycle toggle"];
+    ERROR -> HOMING [label="Cycle toggle detected", color="#CC0000"];
+    WOOD_SUCTION_ERROR -> HOMING [label="Cycle toggle detected", color="#CC0000"];
+    CUT_MOTOR_HOME_ERROR -> HOMING [label="Successful recovery or\nCycle toggle", color="#CC0000"];
 
     // Formatting to improve layout
     { rank=same; READY RELOAD }
