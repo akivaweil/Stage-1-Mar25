@@ -13,13 +13,15 @@ enum State {
   NOWOOD_STATE,
   ERROR_STATE,
   WOOD_SUCTION_ERROR_STATE,
-  CUT_MOTOR_HOME_ERROR_STATE
+  CUT_MOTOR_HOME_ERROR_STATE,
+  POSITION_MOTOR_HOME_ERROR_STATE
 };
 
 enum ErrorType {
   NO_ERROR,
   WOOD_SUCTION_ERROR,
-  CUT_MOTOR_HOME_ERROR
+  CUT_MOTOR_HOME_ERROR,
+  POSITION_MOTOR_HOME_ERROR
 };
 
 // Pin definitions
@@ -94,7 +96,7 @@ const float CUT_MOTOR_HOMING_SPEED = 300.0;  // steps/sec
 const float POSITION_MOTOR_HOMING_SPEED = 2000.0;  // steps/sec
 
 // Constants for positions
-const float SUCTION_CHECK_POSITION = 0.3;  // inches
+const float WAS_WOOD_SUCTIONED_POSITION = 0.3;  // inches
 const float TRANSFER_ARM_SIGNAL_POSITION = 7.2;  // inches
 const unsigned long MOTOR_MOVE_TIMEOUT = 10000; // 10 seconds
 
@@ -109,12 +111,14 @@ void handleNoWoodState();
 void handleErrorState();
 void handleWoodSuctionErrorState();
 void handleCutMotorHomeErrorState();
+void handlePositionMotorHomeErrorState();
 void updateRedLEDErrorPattern(ErrorType errorType);
 void updateLEDsForState(State currentState);
 void moveCutMotorToPosition(float positionInches);
 void movePositionMotorToPosition(float positionInches);
 bool isMotorInPosition(AccelStepper& motor, float targetPosition);
 void moveAwayThenHomeCutMotor();
+void moveAwayThenHomePositionMotor();
 void runHomingSequence();
 void Motors_HOMING_settings();
 void CutMotor_HOMING_settings();
@@ -125,9 +129,26 @@ void PositionMotor_NORMAL_settings();
 void Motors_RETURN_settings();
 void CutMotor_RETURN_settings();
 void PositionMotor_RETURN_settings();
+void ensureMotorsAtHome();
 bool cycleToggleDetected();
 void resetErrorAndHomeSystem();
-void ensureMotorsAtHome();
+void signalTransferArm(bool state);
+void updateTransferArmSignal();
+void setRedLed(bool state);
+void setGreenLed(bool state);
+void setYellowLed(bool state);
+void setBlueLed(bool state);
+void allLedsOff();
+bool readCutMotorHomingSwitch();
+bool readPositionMotorHomingSwitch();
+bool readReloadSwitch();
+bool readCycleSwitch();
+bool isWoodPresent();
+bool isWoodSuctionProper();
+void extendPositionClamp();
+void retractPositionClamp();
+void extendWoodSecureClamp();
+void retractWoodSecureClamp();
 
 // State pattern implementation
 typedef void (*StateHandler)();
@@ -143,7 +164,8 @@ StateHandler stateHandlers[] = {
   handleNoWoodState,
   handleErrorState,
   handleWoodSuctionErrorState,
-  handleCutMotorHomeErrorState
+  handleCutMotorHomeErrorState,
+  handlePositionMotorHomeErrorState
 };
 
 // Main state machine update function
@@ -163,6 +185,7 @@ void enterState(State newState) {
     case ERROR_STATE:
     case WOOD_SUCTION_ERROR_STATE:
     case CUT_MOTOR_HOME_ERROR_STATE:
+    case POSITION_MOTOR_HOME_ERROR_STATE:
       setRedLed(false);
       break;
   }
@@ -170,7 +193,8 @@ void enterState(State newState) {
   // Update state
   currentState = newState;
   stateStartTime = millis();
-  subState = 0;
+  subState = 0;  // Always reset subState when entering a new state
+  subStateTimer = 0; // Reset substate timer as well
   
   // Entry actions for new state
   switch (newState) {
@@ -206,6 +230,10 @@ void enterState(State newState) {
       
     case CUT_MOTOR_HOME_ERROR_STATE:
       currentError = CUT_MOTOR_HOME_ERROR;
+      break;
+      
+    case POSITION_MOTOR_HOME_ERROR_STATE:
+      currentError = POSITION_MOTOR_HOME_ERROR;
       break;
   }
 }
@@ -315,7 +343,7 @@ void handleHomingState() {
         homingAttemptCount++;
         
         if (homingAttemptCount >= 3) {
-          enterState(ERROR_STATE);
+          enterState(POSITION_MOTOR_HOME_ERROR_STATE);
           return;
         } else {
           subState = 3;
@@ -362,63 +390,63 @@ void handleReloadState() {
 
 // Handle cutting state - implements a non-blocking cutting sequence
 void handleCuttingState() {
+  static bool hasPastSuctionPosition = false;
+  static bool hasPastTransferArmPosition = false;
+  
   switch (subState) {
     case 0:  // Init cutting cycle
       extendPositionClamp();
       extendWoodSecureClamp();
       hasSuctionBeenChecked = false;
       hasTransferArmBeenSignaled = false;
+      hasPastSuctionPosition = false;
+      hasPastTransferArmPosition = false;
+      
+      // Set up for continuous motion to final position
+      CutMotor_NORMAL_settings();
+      if (!cutMotor.isRunning()) {
+        moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
+      }
+      
       subState = 1;
       break;
       
-    case 1:  // Move to suction check position
-      CutMotor_NORMAL_settings();
-      
-      if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(SUCTION_CHECK_POSITION);
+    case 1:  // Monitor position during continuous movement and trigger actions at specific points
+      // Check if we've passed the suction check position
+      if (!hasSuctionBeenChecked && !hasPastSuctionPosition && 
+          cutMotor.currentPosition() >= WAS_WOOD_SUCTIONED_POSITION * CUT_MOTOR_STEPS_PER_INCH) {
+        
+        hasPastSuctionPosition = true;
+        
+        // Check suction without stopping the motor
+        if (isWoodSuctionProper()) {
+          hasSuctionBeenChecked = true;
+        } else {
+          // Stop the motor and transition to error state if suction fails
+          cutMotor.stop();
+          enterState(WOOD_SUCTION_ERROR_STATE);
+          return;
+        }
       }
       
-      if (isMotorInPosition(cutMotor, SUCTION_CHECK_POSITION * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 2;
-      }
-      break;
-      
-    case 2:  // Check suction
-      if (isWoodSuctionProper()) {
-        hasSuctionBeenChecked = true;
-        subState = 3;
-      } else {
-        enterState(WOOD_SUCTION_ERROR_STATE);
-        return;
-      }
-      break;
-      
-    case 3:  // Continue cutting to transfer arm signal position
-      moveCutMotorToPosition(TRANSFER_ARM_SIGNAL_POSITION);
-      
-      if (isMotorInPosition(cutMotor, TRANSFER_ARM_SIGNAL_POSITION * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 4;
-      }
-      break;
-      
-    case 4:  // Signal transfer arm
-      if (!hasTransferArmBeenSignaled) {
+      // Check if we've passed the transfer arm signal position
+      if (hasSuctionBeenChecked && !hasTransferArmBeenSignaled && !hasPastTransferArmPosition && 
+          cutMotor.currentPosition() >= TRANSFER_ARM_SIGNAL_POSITION * CUT_MOTOR_STEPS_PER_INCH) {
+        
+        hasPastTransferArmPosition = true;
+        
+        // Signal transfer arm without stopping the motor
         signalTransferArm(HIGH);
         hasTransferArmBeenSignaled = true;
       }
       
-      subState = 5;
-      break;
-      
-    case 5:  // Complete cut
-      moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
-      
+      // Check if we've completed the full travel
       if (isMotorInPosition(cutMotor, CUT_MOTOR_TRAVEL_DISTANCE * CUT_MOTOR_STEPS_PER_INCH)) {
-        subState = 6;
+        subState = 2;
       }
       break;
       
-    case 6:  // Check wood presence
+    case 2:  // Check wood presence after completing the cut
       if (isWoodPresent()) {
         enterState(YESWOOD_STATE);
       } else {
@@ -509,7 +537,16 @@ void handleErrorState() {
 
 // Handle wood suction error state
 void handleWoodSuctionErrorState() {
-  handleErrorState();
+  updateRedLEDErrorPattern(WOOD_SUCTION_ERROR);
+  
+  extendPositionClamp();
+  extendWoodSecureClamp();
+  
+  ensureMotorsAtHome();
+  
+  if (cycleToggleDetected()) {
+    resetErrorAndHomeSystem();
+  }
 }
 
 // Handle cut motor home error state
@@ -562,6 +599,52 @@ void handleCutMotorHomeErrorState() {
   }
 }
 
+// Handle position motor home error state
+void handlePositionMotorHomeErrorState() {
+  updateRedLEDErrorPattern(POSITION_MOTOR_HOME_ERROR);
+  
+  extendPositionClamp();
+  extendWoodSecureClamp();
+  
+  switch (subState) {
+    case 0:  // First recovery attempt
+      moveAwayThenHomePositionMotor();
+      
+      if (readPositionMotorHomingSwitch()) {
+        homingAttemptCount = 0;
+        currentError = NO_ERROR;
+        enterState(HOMING_STATE);
+        return;
+      }
+      
+      homingAttemptCount++;
+      subState = 1;
+      break;
+      
+    case 1:  // Second recovery attempt
+      moveAwayThenHomePositionMotor();
+      
+      if (readPositionMotorHomingSwitch()) {
+        homingAttemptCount = 0;
+        currentError = NO_ERROR;
+        enterState(HOMING_STATE);
+        return;
+      }
+      
+      homingAttemptCount++;
+      subState = 2;
+      break;
+      
+    case 2:  // Locked state - requires cycle switch toggle
+      if (cycleToggleDetected()) {
+        homingAttemptCount = 0;
+        currentError = NO_ERROR;
+        enterState(HOMING_STATE);
+      }
+      break;
+  }
+}
+
 // Helper function for cut motor homing recovery attempts
 void moveAwayThenHomeCutMotor() {
   static unsigned long startTime = 0;
@@ -600,6 +683,50 @@ void moveAwayThenHomeCutMotor() {
         cutMotor.setCurrentPosition(0);
         recoverySubState = 0;
       } else if (!cutMotor.isRunning()) {
+        recoverySubState = 0;
+      }
+      break;
+  }
+}
+
+// Helper function for position motor homing recovery attempts
+void moveAwayThenHomePositionMotor() {
+  static unsigned long startTime = 0;
+  static int recoverySubState = 0;
+  
+  switch (recoverySubState) {
+    case 0:  // Start moving away from home
+      PositionMotor_HOMING_settings();
+      
+      if (!positionMotor.isRunning()) {
+        positionMotor.move(-500);  // Move 500 steps away
+        startTime = millis();
+        recoverySubState = 1;
+      }
+      break;
+      
+    case 1:  // Wait for move away to complete or timeout
+      if (!positionMotor.isRunning() || (millis() - startTime > 2000)) {
+        positionMotor.stop();
+        recoverySubState = 2;
+      }
+      break;
+      
+    case 2:  // Start moving toward home
+      PositionMotor_HOMING_settings();
+      
+      if (!positionMotor.isRunning()) {
+        positionMotor.move(2000);  // Move 2000 steps toward home
+        recoverySubState = 3;
+      }
+      break;
+      
+    case 3:  // Wait for home position or movement to complete
+      if (readPositionMotorHomingSwitch()) {
+        positionMotor.stop();
+        positionMotor.setCurrentPosition(0);
+        recoverySubState = 0;
+      } else if (!positionMotor.isRunning()) {
         recoverySubState = 0;
       }
       break;
@@ -678,6 +805,25 @@ void setCutMotorHomeErrorPattern() {
   }
 }
 
+void setPositionMotorHomeErrorPattern() {
+  // Triple pulse pattern for position motor homing error: 200ms on, 200ms off, 200ms on, 200ms off, 200ms on, 400ms off
+  unsigned long cycleTime = millis() % 1400;
+  
+  if (cycleTime < 200) {
+    setRedLed(true);
+  } else if (cycleTime < 400) {
+    setRedLed(false);
+  } else if (cycleTime < 600) {
+    setRedLed(true);
+  } else if (cycleTime < 800) {
+    setRedLed(false);
+  } else if (cycleTime < 1000) {
+    setRedLed(true);
+  } else {
+    setRedLed(false);
+  }
+}
+
 void setGeneralErrorPattern() {
   setRedLed(true);
 }
@@ -691,6 +837,10 @@ void updateRedLEDErrorPattern(ErrorType errorType) {
       
     case CUT_MOTOR_HOME_ERROR:
       setCutMotorHomeErrorPattern();
+      break;
+      
+    case POSITION_MOTOR_HOME_ERROR:
+      setPositionMotorHomeErrorPattern();
       break;
       
     case NO_ERROR:
@@ -736,6 +886,7 @@ void updateLEDsForState(State currentState) {
     case ERROR_STATE:
     case WOOD_SUCTION_ERROR_STATE:
     case CUT_MOTOR_HOME_ERROR_STATE:
+    case POSITION_MOTOR_HOME_ERROR_STATE:
       // Error states LED patterns are handled by updateRedLEDErrorPattern()
       break;
   }
@@ -917,6 +1068,23 @@ float inchesToSteps(float inches, float stepsPerInch) {
 // Convert motor steps to inches
 float stepsToInches(long steps, float stepsPerInch) {
   return (float)steps / stepsPerInch;
+}
+
+// Move cut motor to specified position in inches
+void moveCutMotorToPosition(float positionInches) {
+  long steps = positionInches * CUT_MOTOR_STEPS_PER_INCH;
+  cutMotor.moveTo(steps);
+}
+
+// Move position motor to specified position in inches
+void movePositionMotorToPosition(float positionInches) {
+  long steps = positionInches * POSITION_MOTOR_STEPS_PER_INCH;
+  positionMotor.moveTo(steps);
+}
+
+// Check if motor has reached target position with small tolerance
+bool isMotorInPosition(AccelStepper& motor, float targetPosition) {
+  return (abs(motor.currentPosition() - targetPosition) < 5) && !motor.isRunning();
 }
 
 void loop() {
