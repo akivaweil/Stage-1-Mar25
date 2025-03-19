@@ -367,7 +367,7 @@ void homingSequence() {
       // Move exactly 1 inch away from sensor first to ensure proper homing
       cutMotor.setMaxSpeed(CUT_HOMING_SPEED);
       cutMotor.setAcceleration(CUT_ACCELERATION / 8);
-      cutMotor.moveTo(1 * CUT_MOTOR_STEPS_PER_INCH); // Move 1 inch away from sensor
+      cutMotor.moveTo(2 * CUT_MOTOR_STEPS_PER_INCH); // Move 1 inch away from sensor
       
       // Check if the 1-inch move-away is complete
       if (cutMotor.distanceToGo() == 0) {
@@ -384,6 +384,9 @@ void homingSequence() {
       // Only start moving toward home after move-away is complete
       if (cutMotorMovedAway) {
         // Now move toward sensor to find home
+        // KEEP THE SAME ACCELERATION as the move-away operation to prevent jerky movement
+        cutMotor.setMaxSpeed(CUT_HOMING_SPEED);
+        cutMotor.setAcceleration(CUT_ACCELERATION / 8);
         cutMotor.setSpeed(CUT_HOMING_SPEED * CUT_HOMING_DIRECTION);
         cutMotor.moveTo(-10000); // Large negative value to ensure movement
       }
