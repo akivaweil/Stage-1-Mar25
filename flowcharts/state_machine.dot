@@ -1,0 +1,50 @@
+digraph StateMachine {
+    // Graph styling
+    graph [fontname="Arial", fontsize=16, nodesep=0.8, ranksep=1.0, splines=true];
+    node [fontname="Arial", fontsize=12, shape=box, style="rounded,filled", fillcolor="#E0F4FF", color="#0078D7", penwidth=2.0];
+    edge [fontname="Arial", fontsize=11, color="#666666", penwidth=1.2, arrowsize=0.9];
+
+    // Title
+    labelloc="t";
+    label="ESP32 Stage 1 State Machine";
+
+    // State nodes with descriptive labels
+    STARTUP [label="STARTUP\nInitial state, sets clamps", fillcolor="#D4F4FA"];
+    HOMING [label="HOMING\nCalibrates motors to home positions", fillcolor="#D4F4FA"];
+    READY [label="READY\nWaiting for cycle switch", fillcolor="#CCFFCC"];
+    RELOAD [label="RELOAD\nWaiting for reload switch off", fillcolor="#CCFFFF"];
+    CUTTING [label="CUTTING\nExecuting cutting sequence", fillcolor="#FFFFCC"];
+    YESWOOD [label="YESWOOD\nWood detected after cut", fillcolor="#E6FFE6"];
+    NOWOOD [label="NOWOOD\nNo wood detected after cut", fillcolor="#E6E6FF"];
+    ERROR [label="ERROR\nGeneral error state", fillcolor="#FFD2D2"];
+    WOOD_SUCTION_ERROR [label="WOOD_SUCTION_ERROR\nWood suction failure", fillcolor="#FFCCCB"];
+    CUT_MOTOR_HOME_ERROR [label="CUT_MOTOR_HOME_ERROR\nCut motor homing failure", fillcolor="#FFCCCB"];
+
+    // Transition edges
+    STARTUP -> HOMING [label="Immediate"];
+    
+    HOMING -> READY [label="Homing complete"];
+    HOMING -> ERROR [label="Position motor error"];
+    HOMING -> CUT_MOTOR_HOME_ERROR [label="Cut motor error"];
+    
+    READY -> RELOAD [label="Reload switch ON"];
+    READY -> CUTTING [label="Cycle switch ON &\nToggle not needed"];
+    
+    RELOAD -> READY [label="Reload switch OFF"];
+    
+    CUTTING -> YESWOOD [label="Wood detected"];
+    CUTTING -> NOWOOD [label="No wood detected"];
+    CUTTING -> WOOD_SUCTION_ERROR [label="Suction failure"];
+    
+    YESWOOD -> READY [label="Sequence complete"];
+    NOWOOD -> READY [label="Return complete"];
+    
+    ERROR -> HOMING [label="Cycle toggle detected"];
+    WOOD_SUCTION_ERROR -> HOMING [label="Cycle toggle detected"];
+    CUT_MOTOR_HOME_ERROR -> HOMING [label="Successful recovery or\nCycle toggle"];
+
+    // Formatting to improve layout
+    { rank=same; READY RELOAD }
+    { rank=same; YESWOOD NOWOOD }
+    { rank=same; ERROR WOOD_SUCTION_ERROR CUT_MOTOR_HOME_ERROR }
+} 
