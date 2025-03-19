@@ -1,33 +1,26 @@
 #include "../include/NoWoodOperations.h"
+#include "../include/Utilities.h"
 
-// Handle no wood state - no wood was detected after cutting
+// Global variables for this module
+static unsigned long noWoodWaitTime = 0;
+
+// Handle no wood state - indicates wood is not present after cutting
 void handleNoWoodState() {
   switch (subState) {
-    case 0:  // Prepare for return to home
-      retractPositionClamp();
-      retractWoodSecureClamp();
-      Motors_RETURN_settings();
-      subState = 1;
-      break;
+    case 0:  // Show "No Wood" indicator
+      showNoWoodIndicator();
       
-    case 1:  // Return cut motor to home
-      if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(0);
-      }
-      
-      if (isMotorInPosition(cutMotor, 0)) {
-        subState = 2;
-      }
-      break;
-      
-    case 2:  // Return position motor to home
-      if (!positionMotor.isRunning()) {
-        movePositionMotorToPosition(0);
-      }
-      
-      if (isMotorInPosition(positionMotor, 0)) {
-        enterState(READY_STATE);
+      // Wait for 5 seconds to ensure operator sees the indication
+      if (Wait(5000, &noWoodWaitTime)) {
+        // Return to reload state to load new wood
+        enterState(RELOAD_STATE);
       }
       break;
   }
+}
+
+// Show no wood indicator (Green + Blue LEDs)
+void showNoWoodIndicator() {
+  setGreenLed(true);
+  setBlueLed(true);
 } 

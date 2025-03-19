@@ -1,10 +1,14 @@
-#ifndef NOWOOD_OPERATIONS_H
-#define NOWOOD_OPERATIONS_H
+#ifndef NO_WOOD_OPERATIONS_H
+#define NO_WOOD_OPERATIONS_H
 
 #include "CommonDefinitions.h"
+#include "LEDControl.h"
+#include "SwitchSensor.h"
+#include "PeripheralControl.h"
+#include "StateMachine.h"
 
-// Function declarations
+// Function prototypes for no wood operations
 void handleNoWoodState();
-void Motors_RETURN_settings();
+void showNoWoodIndicator();
 
-#endif // NOWOOD_OPERATIONS_H 
+#endif // NO_WOOD_OPERATIONS_H 

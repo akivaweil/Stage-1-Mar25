@@ -1,11 +1,15 @@
-#ifndef YESWOOD_OPERATIONS_H
-#define YESWOOD_OPERATIONS_H
+#ifndef YES_WOOD_OPERATIONS_H
+#define YES_WOOD_OPERATIONS_H
 
 #include "CommonDefinitions.h"
+#include "LEDControl.h"
+#include "SwitchSensor.h"
+#include "PeripheralControl.h"
+#include "StateMachine.h"
 
-// Function declarations
+// Function prototypes for yes wood operations
 void handleYesWoodState();
-void PositionMotor_NORMAL_settings();
-void CutMotor_RETURN_settings();
+void waitForCycleSwitch();
+void showYesWoodIndicator();
 
-#endif // YESWOOD_OPERATIONS_H 
+#endif // YES_WOOD_OPERATIONS_H 

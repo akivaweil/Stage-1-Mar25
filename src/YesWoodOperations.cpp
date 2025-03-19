@@ -1,34 +1,37 @@
 #include "../include/YesWoodOperations.h"
+#include "../include/Utilities.h"
 
-// Handle yes wood state - wood was detected after cutting
+// Global variables for this module
+static unsigned long yesWoodWaitTime = 0;
+
+// Handle yes wood state - indicates wood is present after cutting
 void handleYesWoodState() {
   switch (subState) {
-    case 0:  // Prepare for next position
-      retractPositionClamp();
-      PositionMotor_NORMAL_settings();
-      subState = 1;
-      break;
+    case 0:  // Show "Yes Wood" indicator and start timer
+      showYesWoodIndicator();
       
-    case 1:  // Move position motor for next cut
-      if (!positionMotor.isRunning()) {
-        movePositionMotorToPosition(POSITION_MOTOR_TRAVEL_DISTANCE);
-      }
-      
-      if (isMotorInPosition(positionMotor, POSITION_MOTOR_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH)) {
-        subState = 2;
+      // Wait for 2 seconds to ensure operator sees the indication
+      if (Wait(2000, &yesWoodWaitTime)) {
+        subState = 1;
       }
       break;
       
-    case 2:  // Return cut motor to home
-      CutMotor_RETURN_settings();
-      
-      if (!cutMotor.isRunning()) {
-        moveCutMotorToPosition(0);
-      }
-      
-      if (isMotorInPosition(cutMotor, 0)) {
-        enterState(READY_STATE);
-      }
+    case 1:  // Wait for cycle switch to be toggled
+      waitForCycleSwitch();
       break;
+  }
+}
+
+// Show yes wood indicator (Green + Yellow LEDs)
+void showYesWoodIndicator() {
+  setGreenLed(true);
+  setYellowLed(true);
+}
+
+// Wait for cycle switch to be toggled to continue
+void waitForCycleSwitch() {
+  if (cycleToggleDetected()) {
+    // Return to ready state when cycle switch is toggled
+    enterState(READY_STATE);
   }
 } 

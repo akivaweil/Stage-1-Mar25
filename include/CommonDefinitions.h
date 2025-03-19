@@ -40,6 +40,11 @@ extern const float POSITION_MOTOR_ACCELERATION;
 extern const float CUT_MOTOR_HOMING_SPEED;
 extern const float POSITION_MOTOR_HOMING_SPEED;
 
+// Constants for cutting operations
+extern const float CUT_MOTOR_CUTTING_SPEED;
+extern const float WAS_WOOD_SUCTIONED_POSITION;
+extern const float TRANSFER_ARM_SIGNAL_POSITION;
+
 // External references to shared variables
 extern State currentState;
 extern ErrorType currentError;
@@ -61,5 +66,8 @@ void retractWoodSecureClamp();
 bool isWoodSuctionProper();
 bool isWoodPresent();
 void signalTransferArm(bool state);
+
+// Non-blocking delay function
+bool Wait(unsigned long delayTime, unsigned long* startTimePtr);
 
 #endif // COMMON_DEFINITIONS_H 
