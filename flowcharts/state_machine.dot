@@ -8,7 +8,8 @@ digraph StateMachine {
         ranksep = 1.2,
         splines = ortho,      // Force orthogonal lines with clean 90-degree turns
         margin = 0.5,         // Add some margin to prevent cutoff
-        compound = true       // Allow edges between clusters
+        compound = true,      // Allow edges between clusters
+        pad = "0.5,0.5"       // Add padding to the entire graph
     ];
     
     // Node styling
@@ -30,7 +31,11 @@ digraph StateMachine {
         fontsize = 11,
         color = "#666666",
         penwidth = 1.2,
-        arrowsize = 0.9
+        arrowsize = 0.9,
+        labeldistance = 2.0,   // Increase distance for external labels
+        labelangle = 0,        // Keep labels horizontal
+        decorate = false,      // Don't decorate the line
+        labelfloat = true      // Makes labels float away from lines
     ];
     
     // Title
@@ -59,31 +64,31 @@ digraph StateMachine {
         START_UP; HOMING;
     }
     
-    // Transition edges
-    START_UP -> HOMING [xlabel="Immediate"];
+    // Transition edges with styled labels
+    START_UP -> HOMING [xlabel="Immediate", fontcolor="#333333", minlen=2];
     
-    HOMING -> READY [xlabel="Homing complete"];
-    HOMING -> ERROR [xlabel="Position motor error", color="#CC0000"];
-    HOMING -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor error", color="#CC0000"];
+    HOMING -> READY [xlabel="Homing complete", fontcolor="#333333", minlen=2];
+    HOMING -> ERROR [xlabel="Position motor error", color="#CC0000", fontcolor="#CC0000", minlen=2];
+    HOMING -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor error", color="#CC0000", fontcolor="#CC0000", minlen=2];
     
-    READY -> RELOAD [xlabel="Reload switch ON"];
-    READY -> CUTTING [xlabel="Cycle switch ON &\nToggle not needed", color="#006600", penwidth=3.6];
+    READY -> RELOAD [xlabel="Reload switch ON", fontcolor="#333333", minlen=2];
+    READY -> CUTTING [xlabel="Cycle switch ON &\nToggle not needed", color="#006600", penwidth=3.6, fontcolor="#006600", minlen=2];
     
-    RELOAD -> READY [xlabel="Reload switch OFF"];
+    RELOAD -> READY [xlabel="Reload switch OFF", fontcolor="#333333", minlen=2];
     
-    CUTTING -> YESWOOD [xlabel="Wood detected", color="#006600", penwidth=3.6];
-    CUTTING -> NOWOOD [xlabel="No wood detected", color="#FFCC00", penwidth=2.4];
-    CUTTING -> WOOD_SUCTION_ERROR [xlabel="Suction failure", color="#CC0000"];
+    CUTTING -> YESWOOD [xlabel="Wood detected", color="#006600", penwidth=3.6, fontcolor="#006600", minlen=2];
+    CUTTING -> NOWOOD [xlabel="No wood detected", color="#FFCC00", penwidth=2.4, fontcolor="#996600", minlen=2];
+    CUTTING -> WOOD_SUCTION_ERROR [xlabel="Suction failure", color="#CC0000", fontcolor="#CC0000", minlen=2];
     
-    YESWOOD -> READY [xlabel="Operation complete or\nreload requested"];
-    YESWOOD -> CUTTING [xlabel="Continue cutting while\nwood is available", color="#006600", penwidth=3.6];
-    YESWOOD -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor fails\nto home", color="#CC0000"];
+    YESWOOD -> READY [xlabel="Operation complete or\nreload requested", fontcolor="#333333", minlen=2];
+    YESWOOD -> CUTTING [xlabel="Continue cutting while\nwood is available", color="#006600", penwidth=3.6, fontcolor="#006600", minlen=2];
+    YESWOOD -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor fails\nto home", color="#CC0000", fontcolor="#CC0000", minlen=2];
     
-    NOWOOD -> READY [xlabel="Return complete", color="#FFCC00", penwidth=2.4];
+    NOWOOD -> READY [xlabel="Return complete", color="#FFCC00", penwidth=2.4, fontcolor="#996600", minlen=2];
     
-    ERROR -> HOMING [xlabel="Cycle toggle detected", color="#CC0000"];
-    WOOD_SUCTION_ERROR -> HOMING [xlabel="Cycle toggle detected", color="#CC0000"];
-    CUT_MOTOR_HOME_ERROR -> HOMING [xlabel="Successful recovery or\nCycle toggle", color="#CC0000"];
+    ERROR -> HOMING [xlabel="Cycle toggle detected", color="#CC0000", fontcolor="#CC0000", minlen=2];
+    WOOD_SUCTION_ERROR -> HOMING [xlabel="Cycle toggle detected", color="#CC0000", fontcolor="#CC0000", minlen=2];
+    CUT_MOTOR_HOME_ERROR -> HOMING [xlabel="Successful recovery or\nCycle toggle", color="#CC0000", fontcolor="#CC0000", minlen=2];
     
     // Layout constraints
     { rank=same; READY RELOAD }
