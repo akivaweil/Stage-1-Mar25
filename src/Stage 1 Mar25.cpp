@@ -88,6 +88,7 @@ const float CUT_MOTOR_TRAVEL_DISTANCE = 8.5;  // inches
 const float POSITION_MOTOR_TRAVEL_DISTANCE = 3.45;  // inches
 const float CUT_MOTOR_NORMAL_SPEED = 80.0;  // steps/sec
 const float CUT_MOTOR_RETURN_SPEED = 2000.0;  // steps/sec
+const float CUT_MOTOR_CUTTING_SPEED = 50.0;  // steps/sec - slower speed for precise cutting
 const float POSITION_MOTOR_NORMAL_SPEED = 30000.0;  // steps/sec
 const float POSITION_MOTOR_RETURN_SPEED = 30000.0;  // steps/sec
 const float CUT_MOTOR_ACCELERATION = 2200.0;  // steps/sec²
@@ -129,7 +130,7 @@ void PositionMotor_NORMAL_settings();
 void Motors_RETURN_settings();
 void CutMotor_RETURN_settings();
 void PositionMotor_RETURN_settings();
-void cutMotor_CUTTING_SPEED();
+void CutMotor_CUTTING_settings();
 void ensureMotorsAtHome();
 bool cycleToggleDetected();
 void resetErrorAndHomeSystem();
@@ -404,7 +405,7 @@ void handleCuttingState() {
       hasPastTransferArmPosition = false;
       
       // Set up for continuous motion to final position
-      cutMotor_CUTTING_SPEED();
+      CutMotor_CUTTING_settings();
       if (!cutMotor.isRunning()) {
         moveCutMotorToPosition(CUT_MOTOR_TRAVEL_DISTANCE);
       }
@@ -1162,8 +1163,8 @@ void PositionMotor_RETURN_settings() {
 }
 
 // Configure cut motor for cutting operations (specific speed for cutting)
-void cutMotor_CUTTING_SPEED() {
-  cutMotor.setMaxSpeed(CUT_MOTOR_NORMAL_SPEED);
+void CutMotor_CUTTING_settings() {
+  cutMotor.setMaxSpeed(CUT_MOTOR_CUTTING_SPEED);
   cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
 }
 
