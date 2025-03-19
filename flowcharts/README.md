@@ -33,6 +33,32 @@ This flowchart visualizes the state machine implemented in the ESP32-S3 Stage 1 
 - **NOWOOD → READY**: Motors return to home, ready for next operation
 - **Error states → HOMING**: Cycle switch is toggled, resetting the system
 
+## Transition Color Coding
+
+The flowchart uses color to indicate different types of transitions:
+
+- **Thick Green Arrows** - Primary production path (optimal cycle):
+  - READY → CUTTING
+  - CUTTING → YESWOOD
+  - YESWOOD → CUTTING (continuous operation)
+
+- **Medium Yellow Arrows** - Secondary production path (acceptable but non-optimal):
+  - CUTTING → NOWOOD (when no more wood is detected)
+  - NOWOOD → READY (returning to ready after no wood)
+
+- **Red Arrows** - Error transitions:
+  - HOMING → ERROR
+  - HOMING → CUT_MOTOR_HOME_ERROR
+  - CUTTING → WOOD_SUCTION_ERROR
+  - YESWOOD → CUT_MOTOR_HOME_ERROR
+
+- **Gray Arrows** - Standard transitions between states
+
+The thickness of arrows indicates the relative importance of the transition path:
+- Green paths are thickest (3x normal) - highest priority production path
+- Yellow paths are medium thick (2x normal) - secondary production paths
+- Error and standard paths are normal thickness
+
 ## LED Patterns
 
 - **READY**: Green LED on

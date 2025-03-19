@@ -55,8 +55,8 @@
 <!-- HOMING&#45;&gt;ERROR -->
 <g id="edge3" class="edge">
 <title>HOMING&#45;&gt;ERROR</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M1148.02,-544.15C1308.21,-538.82 1597,-516.62 1597,-425.75 1597,-425.75 1597,-425.75 1597,-152.75 1597,-106.36 1556.95,-67.34 1525.18,-43.7"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="1527.1,-41.2 1517.95,-38.5 1523.42,-46.31 1527.1,-41.2"/>
+<path fill="none" stroke="#cc0000" stroke-width="1.2" d="M1148.02,-544.15C1308.21,-538.82 1597,-516.62 1597,-425.75 1597,-425.75 1597,-425.75 1597,-152.75 1597,-106.36 1556.95,-67.34 1525.18,-43.7"/>
+<polygon fill="#cc0000" stroke="#cc0000" stroke-width="1.2" points="1527.1,-41.2 1517.95,-38.5 1523.42,-46.31 1527.1,-41.2"/>
 <text text-anchor="middle" x="1644.62" y="-285.55" font-family="Arial" font-size="11.00">Position motor error</text>
 </g>
 <!-- CUT_MOTOR_HOME_ERROR -->
@@ -69,8 +69,8 @@
 <!-- HOMING&#45;&gt;CUT_MOTOR_HOME_ERROR -->
 <g id="edge4" class="edge">
 <title>HOMING&#45;&gt;CUT_MOTOR_HOME_ERROR</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M940.08,-544.56C676.01,-540.16 0,-519.71 0,-425.75 0,-425.75 0,-425.75 0,-152.75 0,-70.7 98.51,-39 179.29,-26.79"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="179.29,-29.98 187.75,-25.59 178.4,-23.74 179.29,-29.98"/>
+<path fill="none" stroke="#cc0000" stroke-width="1.2" d="M940.08,-544.56C676.01,-540.16 0,-519.71 0,-425.75 0,-425.75 0,-425.75 0,-152.75 0,-70.7 98.51,-39 179.29,-26.79"/>
+<polygon fill="#cc0000" stroke="#cc0000" stroke-width="1.2" points="179.29,-29.98 187.75,-25.59 178.4,-23.74 179.29,-29.98"/>
 <text text-anchor="middle" x="37.12" y="-285.55" font-family="Arial" font-size="11.00">Cut motor error</text>
 </g>
 <!-- RELOAD -->
@@ -97,8 +97,8 @@
 <!-- READY&#45;&gt;CUTTING -->
 <g id="edge6" class="edge">
 <title>READY&#45;&gt;CUTTING</title>
-<path fill="none" stroke="#006600" stroke-width="1.8" d="M462,-405.75C462,-383.75 462,-346.23 462,-319.94"/>
-<polygon fill="#006600" stroke="#006600" stroke-width="1.8" points="465.15,-320.12 462,-311.12 458.85,-320.12 465.15,-320.12"/>
+<path fill="none" stroke="#006600" stroke-width="3.6" d="M462,-405.75C462,-384.55 462,-348.92 462,-322.83"/>
+<polygon fill="#006600" stroke="#006600" stroke-width="3.6" points="465.15,-322.84 462,-313.84 458.85,-322.84 465.15,-322.84"/>
 <text text-anchor="middle" x="507" y="-360.05" font-family="Arial" font-size="11.00">Cycle switch ON &amp;</text>
 <text text-anchor="middle" x="507" y="-346.55" font-family="Arial" font-size="11.00">Toggle not needed</text>
 </g>
@@ -119,8 +119,8 @@
 <!-- CUTTING&#45;&gt;YESWOOD -->
 <g id="edge8" class="edge">
 <title>CUTTING&#45;&gt;YESWOOD</title>
-<path fill="none" stroke="#006600" stroke-width="1.8" d="M449.02,-270.18C435.72,-252.62 413.68,-226.03 390,-208 374.69,-196.34 356.42,-186.14 339.36,-177.87"/>
-<polygon fill="#006600" stroke="#006600" stroke-width="1.8" points="340.88,-175.11 331.39,-174.14 338.2,-180.81 340.88,-175.11"/>
+<path fill="none" stroke="#006600" stroke-width="3.6" d="M449.02,-270.18C435.72,-252.62 413.68,-226.03 390,-208 375.41,-196.89 358.14,-187.11 341.78,-179.06"/>
+<polygon fill="#006600" stroke="#006600" stroke-width="3.6" points="343.34,-176.31 333.85,-175.31 340.64,-182 343.34,-176.31"/>
 <text text-anchor="middle" x="454.73" y="-217.8" font-family="Arial" font-size="11.00">Wood detected</text>
 </g>
 <!-- NOWOOD -->
@@ -133,8 +133,8 @@
 <!-- CUTTING&#45;&gt;NOWOOD -->
 <g id="edge9" class="edge">
 <title>CUTTING&#45;&gt;NOWOOD</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M486.8,-270.23C499.28,-260.53 514.22,-247.93 526,-235 540.93,-218.61 555.01,-197.94 565.18,-181.68"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="567.73,-183.54 569.75,-174.23 562.36,-180.25 567.73,-183.54"/>
+<path fill="none" stroke="#ffcc00" stroke-width="2.4" d="M486.8,-270.23C499.28,-260.53 514.22,-247.93 526,-235 540.51,-219.07 554.22,-199.09 564.32,-183.05"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" stroke-width="2.4" points="566.76,-185.09 568.79,-175.77 561.4,-181.79 566.76,-185.09"/>
 <text text-anchor="middle" x="589.97" y="-217.8" font-family="Arial" font-size="11.00">No wood detected</text>
 </g>
 <!-- WOOD_SUCTION_ERROR -->
@@ -162,8 +162,8 @@
 <!-- YESWOOD&#45;&gt;CUTTING -->
 <g id="edge12" class="edge">
 <title>YESWOOD&#45;&gt;CUTTING</title>
-<path fill="none" stroke="#006600" stroke-width="1.8" d="M273.05,-172.89C264.88,-190.51 256.68,-217.14 270.25,-235 282.85,-251.57 326.06,-264.34 368.28,-273.21"/>
-<polygon fill="#006600" stroke="#006600" stroke-width="1.8" points="367.43,-276.25 376.88,-274.96 368.69,-270.08 367.43,-276.25"/>
+<path fill="none" stroke="#006600" stroke-width="3.6" d="M273.05,-172.89C264.88,-190.51 256.68,-217.14 270.25,-235 282.58,-251.22 324.23,-263.79 365.58,-272.64"/>
+<polygon fill="#006600" stroke="#006600" stroke-width="3.6" points="364.76,-275.69 374.21,-274.41 366.03,-269.52 364.76,-275.69"/>
 <text text-anchor="middle" x="323.12" y="-224.55" font-family="Arial" font-size="11.00">Continue cutting while</text>
 <text text-anchor="middle" x="323.12" y="-211.05" font-family="Arial" font-size="11.00">wood is available</text>
 </g>
@@ -178,8 +178,8 @@
 <!-- NOWOOD&#45;&gt;READY -->
 <g id="edge14" class="edge">
 <title>NOWOOD&#45;&gt;READY</title>
-<path fill="none" stroke="#666666" stroke-width="1.2" d="M614.94,-172.83C627.77,-181.6 640.96,-193.41 648,-208 653.22,-218.81 651.23,-223.44 648,-235 629.08,-302.8 617.51,-322.52 566,-370.5 552.79,-382.81 536.18,-393 520.15,-401.05"/>
-<polygon fill="#666666" stroke="#666666" stroke-width="1.2" points="519.19,-398.02 512.44,-404.76 521.92,-403.69 519.19,-398.02"/>
+<path fill="none" stroke="#ffcc00" stroke-width="2.4" d="M614.94,-172.83C627.77,-181.6 640.96,-193.41 648,-208 653.22,-218.81 651.23,-223.44 648,-235 629.08,-302.8 617.51,-322.52 566,-370.5 553.28,-382.35 537.42,-392.23 521.95,-400.14"/>
+<polygon fill="#ffcc00" stroke="#ffcc00" stroke-width="2.4" points="520.8,-397.2 514.07,-403.96 523.55,-402.86 520.8,-397.2"/>
 <text text-anchor="middle" x="676.31" y="-285.55" font-family="Arial" font-size="11.00">Return complete</text>
 </g>
 <!-- ERROR&#45;&gt;HOMING -->
