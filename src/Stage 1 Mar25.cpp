@@ -5,31 +5,31 @@
 // ===== PIN DEFINITIONS =====
 
 // Motor Pin Definitions
-#define CUT_MOTOR_PULSE_PIN 22       // Controls the pulse signal to the cut motor driver - moves the sliding table saw carriage
-#define CUT_MOTOR_DIR_PIN 23         // Controls the direction of the cut motor (forward/backward movement)
+#define CUT_MOTOR_PULSE_PIN 48       // Controls the pulse signal to the cut motor driver - moves the sliding table saw carriage
+#define CUT_MOTOR_DIR_PIN 47         // Controls the direction of the cut motor (forward/backward movement)
 
-#define POSITION_MOTOR_PULSE_PIN 18  // Controls the pulse signal to the position motor driver - feeds wood forward for next cut or retrieves the wood during the NOwood operation.
-#define POSITION_MOTOR_DIR_PIN 19    // Controls the direction of the position motor (forward/backward movement)
+#define POSITION_MOTOR_PULSE_PIN 21  // Controls the pulse signal to the position motor driver - feeds wood forward for next cut or retrieves the wood during the NOwood operation.
+#define POSITION_MOTOR_DIR_PIN 20    // Controls the direction of the position motor (forward/backward movement)
 
 // Switch and Sensor Pin Definitions (Left side inputs)
-#define CUT_MOTOR_POSITION_SWITCH 25      // Limit switch that detects when cut motor is at home position
-#define POSITION_MOTOR_POSITION_SWITCH 27 // Limit switch that detects when position motor is at home position
-#define RELOAD_SWITCH 26                  // Manual switch to enter reload mode - disengages clamps for material loading
-#define WOOD_SENSOR 35                    // Sensor that detects if wood is present (LOW when wood is detected)
+#define CUT_MOTOR_HOMING_SWITCH 10      // Limit switch that detects when cut motor is at home position
+#define POSITION_MOTOR_HOMING_SWITCH 9 // Limit switch that detects when position motor is at home position
+#define RELOAD_SWITCH 14                  // Manual switch to enter reload mode - disengages clamps for material loading
+#define WOOD_SENSOR 11                    // Sensor that detects if wood is present (LOW when wood is detected)
 
 // Switch and Sensor Pin Definitions (Right side)
-#define CYCLE_SWITCH 14          // Switch that initiates the cutting cycle when activated. This can be left on for continuous operation. The system will cut the wood until no wood is detecteed.
-#define WAS_WOOD_SUCTIONED_SENSOR 5    // Sensor that checks if wood was properly suctioned during cutting (error detection)
+#define CYCLE_SWITCH 13          // Switch that initiates the cutting cycle when activated. This can be left on for continuous operation. The system will cut the wood until no wood is detecteed.
+#define WAS_WOOD_SUCTIONED_SENSOR 8    // Sensor that checks if wood was properly suctioned during cutting (error detection)
 
 // Clamp Pin Definitions
-#define POSITION_CLAMP 32           // Controls the pneumatic clamp that holds the positioning mechanism (LOW = extended)
-#define WOOD_SECURE_CLAMP 33        // Controls the pneumatic clamp that secures the wood piece (LOW = extended)
+#define POSITION_CLAMP 18           // Controls the pneumatic clamp that holds the positioning mechanism (LOW = extended)
+#define WOOD_SECURE_CLAMP 17        // Controls the pneumatic clamp that secures the wood piece (LOW = extended)
 
 // LED Pin Definitions
-#define RED_LED 26    // Error indicator LED - blinks during error conditions
-#define YELLOW_LED 21 // Operation in progress indicator - on during cutting or when in reload mode
-#define GREEN_LED 4   // Ready indicator - on when system is ready to begin a cutting cycle
-#define BLUE_LED 2    // Setup/special mode indicator - on during startup or when no wood present
+#define RED_LED 7    // Error indicator LED - blinks during error conditions
+#define YELLOW_LED 6 // Operation in progress indicator - on during cutting or when in reload mode
+#define GREEN_LED 16   // Ready indicator - on when system is ready to begin a cutting cycle
+#define BLUE_LED 15    // Setup/special mode indicator - on during startup or when no wood present
 
 // Signal Output
 #define SIGNAL_TO_STAGE_1TO2 19    // Output signal to the next stage in the process (Stage 2) when cutting is complete
@@ -167,8 +167,8 @@ void initializeSystem() {
   pinMode(POSITION_MOTOR_DIR_PIN, OUTPUT);
   
   // Initialize switch and sensor pins
-  pinMode(CUT_MOTOR_POSITION_SWITCH, INPUT_PULLUP);
-  pinMode(POSITION_MOTOR_POSITION_SWITCH, INPUT_PULLUP);
+  pinMode(CUT_MOTOR_HOMING_SWITCH, INPUT_PULLUP);
+  pinMode(POSITION_MOTOR_HOMING_SWITCH, INPUT_PULLUP);
   pinMode(RELOAD_SWITCH, INPUT);                       // External pull-down
   pinMode(CYCLE_SWITCH, INPUT);                  // External pull-down
   pinMode(WOOD_SENSOR, INPUT_PULLUP);                  // Active LOW (LOW = wood present)
@@ -203,9 +203,9 @@ void initializeSystem() {
   positionMotor.setAcceleration(POSITION_ACCELERATION);
   
   // Initialize bounce objects for debouncing switches
-  cutHomingSensor.attach(CUT_MOTOR_POSITION_SWITCH);
+  cutHomingSensor.attach(CUT_MOTOR_HOMING_SWITCH);
   cutHomingSensor.interval(SIGNAL_DEBOUNCE_INTERVAL);
-  positionHomingSensor.attach(POSITION_MOTOR_POSITION_SWITCH);
+  positionHomingSensor.attach(POSITION_MOTOR_HOMING_SWITCH);
   positionHomingSensor.interval(SIGNAL_DEBOUNCE_INTERVAL);
   reloadSwitch.attach(RELOAD_SWITCH);
   reloadSwitch.interval(SIGNAL_DEBOUNCE_INTERVAL);
@@ -219,9 +219,9 @@ void initializeSystem() {
   // Test and report homing sensor states
   // Serial.println("Initial sensor states:");
   // Serial.print("Cut homing sensor: ");
-  // Serial.println(digitalRead(CUT_MOTOR_POSITION_SWITCH) == HIGH ? "HIGH (active)" : "LOW (inactive)");
+  // Serial.println(digitalRead(CUT_MOTOR_HOMING_SWITCH) == HIGH ? "HIGH (active)" : "LOW (inactive)");
   // Serial.print("Position homing sensor: ");
-  // Serial.println(digitalRead(POSITION_MOTOR_POSITION_SWITCH) == HIGH ? "HIGH (active)" : "LOW (inactive)");
+  // Serial.println(digitalRead(POSITION_MOTOR_HOMING_SWITCH) == HIGH ? "HIGH (active)" : "LOW (inactive)");
   
   // Set system as not homed
   isHomed = false;
