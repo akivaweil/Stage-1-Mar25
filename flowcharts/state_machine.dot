@@ -9,7 +9,7 @@ digraph StateMachine {
     label="ESP32-S3 Stage 1 State Machine";
 
     // State nodes with descriptive labels
-    STARTUP [label="STARTUP\nInitial state, sets clamps", fillcolor="#D4F4FA", group=init];
+    STARTUP [label="START UP\nInitial state, sets clamps", fillcolor="#D4F4FA", group=init, width=2.2];
     HOMING [label="HOMING\nCalibrates motors to home positions", fillcolor="#D4F4FA", group=init];
     READY [label="READY\nWaiting for cycle switch", fillcolor="#CCFFCC", fontsize=16, width=1.8, height=1.2, penwidth=3.0];
     RELOAD [label="RELOAD\nWaiting for reload switch off", fillcolor="#CCFFFF"];
