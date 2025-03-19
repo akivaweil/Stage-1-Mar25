@@ -1,8 +1,8 @@
 #ifndef LED_CONTROL_H
 #define LED_CONTROL_H
 
-#include "CommonDefinitions.h"
-#include "PinDefinitions.h"
+#include "../core/01_CommonDefinitions.h"
+#include "../core/02_PinDefinitions.h"
 
 // LED control functions
 void allLedsOff();
@@ -19,5 +19,6 @@ void setPositionMotorHomeErrorPattern();
 void setGeneralErrorPattern();
 void updateRedLEDErrorPattern(ErrorType errorType);
 void updateLEDsForState(State currentState);
+void updateAllLEDs(); // Main function called from loop
 
 #endif // LED_CONTROL_H 

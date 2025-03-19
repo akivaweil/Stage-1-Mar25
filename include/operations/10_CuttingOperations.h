@@ -1,10 +1,10 @@
 #ifndef CUTTING_OPERATIONS_H
 #define CUTTING_OPERATIONS_H
 
-#include "CommonDefinitions.h"
-#include "MotorControl.h"
-#include "SwitchSensor.h"
-#include "PeripheralControl.h"
+#include "../core/01_CommonDefinitions.h"
+#include "../hardware/05_MotorControl.h"
+#include "../hardware/07_SwitchSensor.h"
+#include "../hardware/08_PeripheralControl.h"
 
 // Constants for cutting operations
 extern const float CUT_MOTOR_CUTTING_SPEED;

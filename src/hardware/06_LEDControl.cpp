@@ -1,6 +1,5 @@
-#include "../include/LEDControl.h"
-#include "../include/CommonDefinitions.h"
-#include "../include/Utilities.h"
+#include "../../include/hardware/06_LEDControl.h"
+#include "../../include/core/03_Utilities.h"
 
 // LED Pattern Functions
 void allLedsOff() {
@@ -156,5 +155,22 @@ void updateLEDsForState(State currentState) {
     case POSITION_MOTOR_HOME_ERROR_STATE:
       // Error states LED patterns are handled by updateRedLEDErrorPattern()
       break;
+  }
+}
+
+/**
+ * Update all LEDs based on current state and error condition
+ * Called from the main loop
+ */
+void updateAllLEDs() {
+  // First update the state-based LEDs
+  updateLEDsForState(currentState);
+  
+  // If we're in an error state, also update the error LED pattern
+  if (currentState == ERROR_STATE || 
+      currentState == WOOD_SUCTION_ERROR_STATE || 
+      currentState == CUT_MOTOR_HOME_ERROR_STATE || 
+      currentState == POSITION_MOTOR_HOME_ERROR_STATE) {
+    updateRedLEDErrorPattern(currentError);
   }
 } 

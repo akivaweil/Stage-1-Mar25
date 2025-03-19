@@ -1,8 +1,8 @@
 #ifndef PERIPHERAL_CONTROL_H
 #define PERIPHERAL_CONTROL_H
 
-#include "CommonDefinitions.h"
-#include "PinDefinitions.h"
+#include "../core/01_CommonDefinitions.h"
+#include "../core/02_PinDefinitions.h"
 
 // Peripheral control functions
 void extendPositionClamp();

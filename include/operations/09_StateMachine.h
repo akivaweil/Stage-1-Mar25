@@ -1,14 +1,14 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
-#include "CommonDefinitions.h"
-#include "LEDControl.h"
-#include "SwitchSensor.h"
-#include "MotorControl.h"
-#include "PeripheralControl.h"
-#include "CuttingOperations.h"
-#include "YesWoodOperations.h"
-#include "NoWoodOperations.h"
+#include "../core/01_CommonDefinitions.h"
+#include "../hardware/06_LEDControl.h"
+#include "../hardware/07_SwitchSensor.h"
+#include "../hardware/05_MotorControl.h"
+#include "../hardware/08_PeripheralControl.h"
+#include "10_CuttingOperations.h"
+#include "11_YesWoodOperations.h"
+#include "12_NoWoodOperations.h"
 
 // State machine declarations
 extern unsigned long stateStartTime;

@@ -1,5 +1,5 @@
-#include "../include/NoWoodOperations.h"
-#include "../include/Utilities.h"
+#include "../../include/operations/12_NoWoodOperations.h"
+#include "../../include/core/03_Utilities.h"
 
 // Global variables for this module
 static unsigned long noWoodWaitTime = 0;

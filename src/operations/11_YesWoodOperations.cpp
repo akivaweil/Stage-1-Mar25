@@ -1,5 +1,5 @@
-#include "../include/YesWoodOperations.h"
-#include "../include/Utilities.h"
+#include "../../include/operations/11_YesWoodOperations.h"
+#include "../../include/core/03_Utilities.h"
 
 // Global variables for this module
 static unsigned long yesWoodWaitTime = 0;

@@ -1,4 +1,4 @@
-#include "../include/MotorControl.h"
+#include "../../include/hardware/05_MotorControl.h"
 
 // Motor instances
 AccelStepper cutMotor(AccelStepper::DRIVER, CUT_MOTOR_PULSE_PIN, CUT_MOTOR_DIR_PIN);

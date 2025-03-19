@@ -1,13 +1,6 @@
-#include "../include/CuttingOperations.h"
-#include "../include/StateMachine.h"
-#include "../include/Utilities.h"
-#include <Arduino.h>
-
-// Configure cut motor for cutting operations (specific speed for cutting)
-void CutMotor_CUTTING_settings() {
-  cutMotor.setMaxSpeed(CUT_MOTOR_CUTTING_SPEED);
-  cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
-}
+#include "../../include/operations/10_CuttingOperations.h"
+#include "../../include/operations/09_StateMachine.h"
+#include "../../include/core/03_Utilities.h"
 
 // Handle cutting state - main cutting cycle
 void handleCuttingState() {
@@ -122,15 +115,4 @@ void transitionToWoodDetectionState() {
   } else {
     enterState(NOWOOD_STATE);
   }
-}
-
-// Move cut motor to specified position in inches
-void moveCutMotorToPosition(float positionInches) {
-  long steps = positionInches * CUT_MOTOR_STEPS_PER_INCH;
-  cutMotor.moveTo(steps);
-}
-
-// Check if motor has reached target position with small tolerance
-bool isMotorInPosition(AccelStepper& motor, float targetPosition) {
-  return (abs(motor.currentPosition() - targetPosition) < 5) && !motor.isRunning();
 } 

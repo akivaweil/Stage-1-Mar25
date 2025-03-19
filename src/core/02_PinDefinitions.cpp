@@ -1,4 +1,4 @@
-#include "../include/PinDefinitions.h"
+#include "../../include/core/02_PinDefinitions.h"
 
 // Motor pins
 const int CUT_MOTOR_PULSE_PIN = 48;

@@ -1,29 +1,9 @@
-#include "../include/PeripheralControl.h"
+#include "../../include/hardware/08_PeripheralControl.h"
+#include "../../include/core/03_Utilities.h"
 
 // Global variable for transfer arm signal timing
 unsigned long transferArmSignalStartTime = 0;
 bool transferArmSignalActive = false;
-
-// Clamp control functions - all operations are immediate with no delays
-void extendPositionClamp() {
-  // LOW signal = Clamp Extended/Engaged
-  digitalWrite(POSITION_CLAMP_PIN, LOW);
-}
-
-void retractPositionClamp() {
-  // HIGH signal = Clamp Retracted
-  digitalWrite(POSITION_CLAMP_PIN, HIGH);
-}
-
-void extendWoodSecureClamp() {
-  // LOW signal = Clamp Extended/Engaged
-  digitalWrite(WOOD_SECURE_CLAMP_PIN, LOW);
-}
-
-void retractWoodSecureClamp() {
-  // HIGH signal = Clamp Retracted
-  digitalWrite(WOOD_SECURE_CLAMP_PIN, HIGH);
-}
 
 // Function to signal the transfer arm (non-blocking 500ms HIGH pulse)
 void signalTransferArm(bool state) {
@@ -45,6 +25,27 @@ void updateTransferArmSignal() {
       transferArmSignalActive = false;
     }
   }
+}
+
+// Clamp control functions - all operations are immediate with no delays
+void extendPositionClamp() {
+  // LOW signal = Clamp Extended/Engaged
+  digitalWrite(POSITION_CLAMP_PIN, LOW);
+}
+
+void retractPositionClamp() {
+  // HIGH signal = Clamp Retracted
+  digitalWrite(POSITION_CLAMP_PIN, HIGH);
+}
+
+void extendWoodSecureClamp() {
+  // LOW signal = Clamp Extended/Engaged
+  digitalWrite(WOOD_SECURE_CLAMP_PIN, LOW);
+}
+
+void retractWoodSecureClamp() {
+  // HIGH signal = Clamp Retracted
+  digitalWrite(WOOD_SECURE_CLAMP_PIN, HIGH);
 }
 
 // Function to initialize all pins

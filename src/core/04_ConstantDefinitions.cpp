@@ -1,4 +1,4 @@
-#include "../include/CommonDefinitions.h"
+#include "../../include/core/01_CommonDefinitions.h"
 
 // Motor constants
 const float CUT_MOTOR_STEPS_PER_INCH = 63.5;

@@ -1,4 +1,4 @@
-#include "../include/SwitchSensor.h"
+#include "../../include/hardware/07_SwitchSensor.h"
 
 // Constants
 const unsigned long DEBOUNCE_TIME = 15; // ms for switch debouncing

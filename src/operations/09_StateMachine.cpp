@@ -1,5 +1,5 @@
-#include "../include/StateMachine.h"
-#include "../include/Utilities.h"
+#include "../../include/operations/09_StateMachine.h"
+#include "../../include/core/03_Utilities.h"
 
 // State machine variables
 unsigned long stateStartTime = 0;

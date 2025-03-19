@@ -1,63 +1,40 @@
-# Stage 1 Cutting System
+# Stage 1 Cutter
 
-## Overview
-This project is a control system for a Stage 1 cutting device using an ESP32-S3 microcontroller. The system controls two stepper motors, monitors various sensors, and provides visual feedback through LEDs.
+This project controls a modular cutting system using an ESP32-S3 microcontroller. It manages stepper motors, sensors, and LEDs to perform automated cutting cycles.
 
-## Hardware
-- ESP32-S3 microcontroller
-- Two stepper motors with drivers (cutting motor and positioning motor)
-- Limit switches for homing
-- Reload and cycle switches for user interaction
-- Wood presence and suction sensors
-- Position and wood secure clamps
-- Signal output to transfer arm
-- Four status LEDs (red, yellow, green, blue)
+## Project Structure
 
-## Software Structure
-The codebase has been modularized into the following components:
+The codebase is organized into modular components:
 
-- **CommonDefinitions.h**: Common enums, constants, and globals
-- **PinDefinitions**: Pin assignments for all hardware components
-- **MotorControl**: Stepper motor configuration and movement
-- **LEDControl**: LED status indicators and patterns
-- **SwitchSensor**: Switch and sensor input handling
-- **PeripheralControl**: Clamp and transfer arm signaling
-- **StateMachine**: State transition logic and handling
-- **CuttingOperations**: Cutting cycle functionality
-- **YesWoodOperations**: Logic for when wood is detected
-- **NoWoodOperations**: Logic for when no wood is detected
-- **Utilities**: Helper functions like non-blocking delay
+### Core
+- `01_CommonDefinitions.h` - Enumerations, constants, and global variable declarations
+- `02_PinDefinitions.h` - Pin definitions for all hardware components
+- `03_Utilities.h` - Utility functions like non-blocking delays
 
-## State Machine
-The system operates based on a state machine with the following states:
-1. STARTUP_STATE
-2. HOMING_STATE
-3. READY_STATE
-4. RELOAD_STATE
-5. CUTTING_STATE
-6. YESWOOD_STATE
-7. NOWOOD_STATE
-8. ERROR_STATE
-9. WOOD_SUCTION_ERROR_STATE
-10. CUT_MOTOR_HOME_ERROR_STATE
-11. POSITION_MOTOR_HOME_ERROR_STATE
+### Hardware
+- `05_MotorControl.h/cpp` - Motor control functions
+- `06_LEDControl.h/cpp` - LED control and patterns
+- `07_SwitchSensor.h/cpp` - Switch and sensor handling
+- `08_PeripheralControl.h/cpp` - Peripheral control (clamps, transfer arm)
 
-## Operation Flow
-1. System starts up and enters homing state
-2. After successful homing, system enters ready state
-3. When cycle switch is toggled, cutting cycle begins
-4. After cutting, system checks for wood presence
-5. System indicates wood presence or absence with LEDs
-6. System returns to ready state or reload state
+### Operations
+- `09_StateMachine.h/cpp` - Main state machine implementation
+- `10_CuttingOperations.h/cpp` - Cutting cycle operations
+- `11_YesWoodOperations.h/cpp` - Wood present operations
+- `12_NoWoodOperations.h/cpp` - No wood operations
 
-## Error Handling
-The system has built-in error detection and recovery for:
-- Wood suction problems
-- Cut motor homing failures
-- Position motor homing failures
+## Main Application
+- `13_Stage1Cutter.cpp` - Main application file (setup and loop)
 
-Error states are indicated with specific LED patterns and can be recovered by toggling the cycle switch.
+## Hardware Details
 
-## Dependencies
-- AccelStepper library for stepper motor control
-- Bounce2 library for switch debouncing 
+- ESP32-S3 Development Board
+- Stepper Motors (position and cut)
+- Multiple sensors and switches
+- LEDs for status indication
+
+## Development Environment
+
+- PlatformIO IDE
+- Arduino Framework
+- Libraries: AccelStepper, Bounce2 

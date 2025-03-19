@@ -2,8 +2,8 @@
 #define SWITCH_SENSOR_H
 
 #include <Bounce2.h>
-#include "CommonDefinitions.h"
-#include "PinDefinitions.h"
+#include "../core/01_CommonDefinitions.h"
+#include "../core/02_PinDefinitions.h"
 
 // Switch debouncing instances
 extern Bounce cutMotorHomingSwitch;
