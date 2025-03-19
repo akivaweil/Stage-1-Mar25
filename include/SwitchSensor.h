@@ -1,22 +1,26 @@
 #ifndef SWITCH_SENSOR_H
 #define SWITCH_SENSOR_H
 
+#include <Bounce2.h>
 #include "CommonDefinitions.h"
 #include "PinDefinitions.h"
-#include <Bounce2.h>
 
-// Switch and sensor declarations
+// Switch debouncing instances
 extern Bounce cutMotorHomingSwitch;
 extern Bounce positionMotorHomingSwitch;
 extern Bounce reloadSwitch;
 extern Bounce cycleSwitch;
 extern Bounce yesOrNoWoodSensor;
 extern Bounce wasWoodSuctionedSensor;
+
+// Constants
+extern const unsigned long DEBOUNCE_TIME;
+
+// Boolean flags
 extern bool prevCycleSwitchState;
 extern bool needCycleSwitchToggle;
-extern unsigned long DEBOUNCE_TIME;
 
-// Switch and sensor functions
+// Function prototypes
 void initializeDebounce();
 void updateAllSwitches();
 bool readCutMotorHomingSwitch();
@@ -25,7 +29,7 @@ bool readReloadSwitch();
 bool readCycleSwitch();
 bool isWoodPresent();
 bool isWoodSuctionProper();
-bool cycleToggleDetected();
 bool performStartupSafetyCheck();
+bool cycleToggleDetected();
 
 #endif // SWITCH_SENSOR_H 
