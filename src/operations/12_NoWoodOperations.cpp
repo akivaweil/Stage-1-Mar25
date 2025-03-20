@@ -40,8 +40,8 @@ void handleNoWoodState() {
       // Show the NoWood indicator
       showNoWoodIndicator();
       
-      // Wait for 5 seconds to ensure operator sees the indication
-      if (Wait(5000, &noWoodWaitTime)) {
+      // Wait for 1 second to ensure operator sees the indication
+      if (Wait(1000, &noWoodWaitTime)) {
         // Reset flags for next cutting cycle
         hasTransferArmBeenSignaled = false;
         hasSuctionBeenChecked = false;
