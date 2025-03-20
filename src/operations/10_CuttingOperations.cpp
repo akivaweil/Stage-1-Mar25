@@ -35,30 +35,7 @@ void handleCuttingState() {
       performCut();
       
       if (isCutComplete()) {
-        subState = 3;  // Proceed to signaling
-      }
-      break;
-      
-    case 3:  // Signal transfer arm when cut is done
-      if (!hasTransferArmBeenSignaled) {
-        // Move to position where we want to signal transfer arm
-        movePositionMotorToPosition(TRANSFER_ARM_SIGNAL_POSITION);
-        
-        if (isMotorInPosition(positionMotor, TRANSFER_ARM_SIGNAL_POSITION * POSITION_MOTOR_STEPS_PER_INCH)) {
-          signalTransferArm(HIGH);
-          hasTransferArmBeenSignaled = true;
-          subState = 4;  // Proceed to check wood
-        }
-      } else {
-        subState = 4;  // Skip signaling if already done
-      }
-      break;
-      
-    case 4:  // Return to home after cut & check wood
-      returnToHomeAfterCut();
-      
-      // Transition when motors are back at home
-      if (isMotorInPosition(cutMotor, 0) && isMotorInPosition(positionMotor, 0)) {
+        // Once cut is complete, check wood presence and transition to appropriate state
         transitionToWoodDetectionState();
       }
       break;

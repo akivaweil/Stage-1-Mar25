@@ -7,6 +7,10 @@
 #include "../hardware/08_PeripheralControl.h"
 #include "09_StateMachine.h"
 
+// External references to shared variables
+extern bool hasSuctionBeenChecked;
+extern bool hasTransferArmBeenSignaled;
+
 // Function prototypes for yes wood operations
 void handleYesWoodState();
 void waitForCycleSwitch();
