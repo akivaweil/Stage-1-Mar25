@@ -13,6 +13,7 @@ const int RELOAD_SWITCH_PIN = 14;
 const int CYCLE_SWITCH_PIN = 13;
 const int YES_OR_NO_WOOD_SENSOR_PIN = 11;
 const int WAS_WOOD_SUCTIONED_SENSOR_PIN = 8;
+const int CUT_MOTOR_EMERGENCY_SWITCH_PIN = 12;
 
 // Output control pins
 const int POSITION_CLAMP_PIN = 18;

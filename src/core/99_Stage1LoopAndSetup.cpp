@@ -1,16 +1,17 @@
-#include "core/01_CommonDefinitions.h"
-#include "core/02_PinDefinitions.h"
-#include "core/03_Utilities.h"
+#include "../../include/core/01_CommonDefinitions.h"
+#include "../../include/core/02_PinDefinitions.h"
+#include "../../include/core/03_Utilities.h"
+#include "../../include/core/00_WifiAndOTA.h"
 
-#include "hardware/05_MotorControl.h"
-#include "hardware/06_LEDControl.h"
-#include "hardware/07_SwitchSensor.h"
-#include "hardware/08_PeripheralControl.h"
+#include "../../include/hardware/05_MotorControl.h"
+#include "../../include/hardware/06_LEDControl.h"
+#include "../../include/hardware/07_SwitchSensor.h"
+#include "../../include/hardware/08_PeripheralControl.h"
 
-#include "operations/09_StateMachine.h"
-#include "operations/11_CuttingOperations.h"
-#include "operations/11_YesWoodOperations.h"
-#include "operations/12_NoWoodOperations.h"
+#include "../../include/operations/09_StateMachine.h"
+#include "../../include/operations/11_CuttingOperations.h"
+#include "../../include/operations/11_YesWoodOperations.h"
+#include "../../include/operations/12_NoWoodOperations.h"
 
 // Global state variables
 State currentState = STARTUP_STATE;
@@ -37,6 +38,9 @@ void loop() {
   
   // Update LEDs based on current state
   updateAllLEDs();
+  
+  // Update WiFi and OTA only in READY_STATE
+  updateWiFiAndOTA();
 }
 
 /**
@@ -54,6 +58,9 @@ void setup() {
   
   // Configure motors
   configureMotors();
+  
+  // Initialize WiFi settings (but don't connect yet)
+  initializeWiFi();
   
   // Perform startup safety check
   performStartupSafetyCheck();

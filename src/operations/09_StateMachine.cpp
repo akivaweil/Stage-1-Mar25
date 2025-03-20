@@ -1,4 +1,5 @@
 #include "../../include/operations/09_StateMachine.h"
+#include "../../include/operations/10_HomingOperations.h"
 #include "../../include/core/03_Utilities.h"
 
 // State machine variables
@@ -58,10 +59,7 @@ void enterState(State newState) {
   // Entry actions for new state
   switch (newState) {
     case HOMING_STATE:
-      homingAttemptCount = 0;
-      isHomingComplete = false;
-      isCutMotorHomed = false;
-      isPositionMotorHomed = false;
+      initializeHomingVariables();
       break;
       
     case READY_STATE:
@@ -105,110 +103,27 @@ void handleStartupState() {
   enterState(HOMING_STATE);
 }
 
-// Handle homing state - implements a non-blocking homing sequence
+// Handle homing state - delegates to the HomingOperations module
 void handleHomingState() {
-  switch (subState) {
-    case 0:  // Check if motors are already at home
-      if (readCutMotorHomingSwitch()) {
-        subState = 1;  // Need to move cut motor away from home
-      } else {
-        subState = 2;  // Cut motor already away from home, check position motor
-      }
-      
-      if (readPositionMotorHomingSwitch()) {
-        if (subState == 2) {
-          subState = 3;  // Need to move position motor away from home
-        }
-      } else {
-        if (subState == 2) {
-          subState = 4;  // Both motors away from home, proceed to homing cut motor
-        }
-      }
-      break;
-      
-    case 1:  // Move cut motor away from home switch
-      CutMotor_HOMING_settings();
-      
-      if (!cutMotor.isRunning()) {
-        cutMotor.move(-300);  // Move 300 steps away
-      }
-      
-      if (!readCutMotorHomingSwitch() || cutMotor.distanceToGo() == 0) {
-        cutMotor.stop();
-        
-        if (readPositionMotorHomingSwitch()) {
-          subState = 3;
-        } else {
-          subState = 4;
-        }
-      }
-      break;
-      
-    case 2:  // Intermediate case - should never reach here
-      subState = (readPositionMotorHomingSwitch()) ? 3 : 4;
-      break;
-      
-    case 3:  // Move position motor away from home switch
-      PositionMotor_HOMING_settings();
-      
-      if (!positionMotor.isRunning()) {
-        positionMotor.move(-300);  // Move 300 steps away
-      }
-      
-      if (!readPositionMotorHomingSwitch() || positionMotor.distanceToGo() == 0) {
-        positionMotor.stop();
-        subState = 4;
-      }
-      break;
-      
-    case 4:  // Home cut motor
-      CutMotor_HOMING_settings();
-      
-      if (!cutMotor.isRunning() && !readCutMotorHomingSwitch()) {
-        cutMotor.move(15000);  // Move enough steps to reach home
-      }
-      
-      if (readCutMotorHomingSwitch()) {
-        cutMotor.stop();
-        cutMotor.setCurrentPosition(0);
-        isCutMotorHomed = true;
-        subState = 5;
-      } else if (cutMotor.distanceToGo() == 0) {
-        homingAttemptCount++;
-        
-        if (homingAttemptCount >= 3) {
-          enterState(CUT_MOTOR_HOME_ERROR_STATE);
-          return;
-        } else {
-          subState = 1;
-        }
-      }
-      break;
-      
-    case 5:  // Home position motor
-      PositionMotor_HOMING_settings();
-      
-      if (!positionMotor.isRunning() && !readPositionMotorHomingSwitch()) {
-        positionMotor.move(10000);  // Move enough steps to reach home
-      }
-      
-      if (readPositionMotorHomingSwitch()) {
-        positionMotor.stop();
-        positionMotor.setCurrentPosition(0);
-        isPositionMotorHomed = true;
-        isHomingComplete = true;
-        enterState(READY_STATE);
-      } else if (positionMotor.distanceToGo() == 0) {
-        homingAttemptCount++;
-        
-        if (homingAttemptCount >= 3) {
-          enterState(POSITION_MOTOR_HOME_ERROR_STATE);
-          return;
-        } else {
-          subState = 3;
-        }
-      }
-      break;
+  int nextSubState = subState;
+  
+  // Call the homing operations module to perform the current homing step
+  bool stepComplete = performHomingStep(subState, nextSubState);
+  
+  // Update substate if changed
+  if (nextSubState != subState) {
+    subState = nextSubState;
+  }
+  
+  // Check for completion or errors
+  if (stepComplete) {
+    if (isHomingComplete) {
+      enterState(READY_STATE);
+    } else if (currentError == CUT_MOTOR_HOME_ERROR) {
+      enterState(CUT_MOTOR_HOME_ERROR_STATE);
+    } else if (currentError == POSITION_MOTOR_HOME_ERROR) {
+      enterState(POSITION_MOTOR_HOME_ERROR_STATE);
+    }
   }
 }
 

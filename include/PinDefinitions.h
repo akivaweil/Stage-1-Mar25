@@ -16,7 +16,6 @@ extern const int RELOAD_SWITCH_PIN;
 extern const int CYCLE_SWITCH_PIN;
 extern const int YES_OR_NO_WOOD_SENSOR_PIN;
 extern const int WAS_WOOD_SUCTIONED_SENSOR_PIN;
-extern const int CUT_MOTOR_EMERGENCY_SWITCH_PIN;
 
 // Output control pins
 extern const int POSITION_CLAMP_PIN;

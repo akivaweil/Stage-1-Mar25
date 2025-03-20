@@ -10,6 +10,7 @@ Bounce reloadSwitch = Bounce();
 Bounce cycleSwitch = Bounce();
 Bounce yesOrNoWoodSensor = Bounce();
 Bounce wasWoodSuctionedSensor = Bounce();
+Bounce cutMotorEmergencySwitch = Bounce();
 
 // Global variables
 bool prevCycleSwitchState = false;
@@ -34,6 +35,9 @@ void initializeDebounce() {
   
   wasWoodSuctionedSensor.attach(WAS_WOOD_SUCTIONED_SENSOR_PIN, INPUT_PULLUP);
   wasWoodSuctionedSensor.interval(DEBOUNCE_TIME);
+  
+  cutMotorEmergencySwitch.attach(CUT_MOTOR_EMERGENCY_SWITCH_PIN, INPUT_PULLUP);
+  cutMotorEmergencySwitch.interval(DEBOUNCE_TIME);
 }
 
 // Update all switch readings
@@ -44,6 +48,7 @@ void updateAllSwitches() {
   cycleSwitch.update();
   yesOrNoWoodSensor.update();
   wasWoodSuctionedSensor.update();
+  cutMotorEmergencySwitch.update();
 }
 
 // Sensor reading functions 
@@ -65,6 +70,11 @@ bool readReloadSwitch() {
 bool readCycleSwitch() {
   // Active HIGH
   return cycleSwitch.read() == HIGH;
+}
+
+bool readCutMotorEmergencySwitch() {
+  // Active LOW - emergency detected when sensor reads LOW
+  return cutMotorEmergencySwitch.read() == LOW;
 }
 
 bool isWoodPresent() {
