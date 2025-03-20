@@ -10,8 +10,8 @@
 
 #include "../../include/operations/09_StateMachine.h"
 #include "../../include/operations/11_CuttingOperations.h"
-#include "../../include/operations/11_YesWoodOperations.h"
-#include "../../include/operations/12_NoWoodOperations.h"
+#include "../../include/operations/12_YesWoodOperations.h"
+#include "../../include/operations/13_NoWoodOperations.h"
 
 // Global state variables
 State currentState = STARTUP_STATE;

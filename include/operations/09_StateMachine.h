@@ -8,8 +8,8 @@
 #include "../hardware/08_PeripheralControl.h"
 #include "10_HomingOperations.h"
 #include "11_CuttingOperations.h"
-#include "11_YesWoodOperations.h"
-#include "12_NoWoodOperations.h"
+#include "12_YesWoodOperations.h"
+#include "13_NoWoodOperations.h"
 
 // State machine declarations
 extern unsigned long stateStartTime;
