@@ -8,16 +8,36 @@ static unsigned long noWoodWaitTime = 0;
 // Handle no wood state - indicates wood is not present after cutting
 void handleNoWoodState() {
   switch (subState) {
-    case 0:  // Return motors to home
-      returnToHomeAfterCut();
+    case 0: // Step 1: Release secure wood clamp and keep position clamp extended
+      retractWoodSecureClamp();
+      subState = 1;
+      break;
       
-      // Proceed to showing indicator when motors are back home
+    case 1: // Step 2: Return both motors home
+      // Set motors to return settings for faster return
+      Motors_RETURN_settings();
+      
+      // Move motors back to home position
+      moveCutMotorToPosition(0);
+      movePositionMotorToPosition(0);
+      
+      // When both motors are at home position, proceed to next step
       if (isMotorInPosition(cutMotor, 0) && isMotorInPosition(positionMotor, 0)) {
-        subState = 1;
+        subState = 2;
       }
       break;
       
-    case 1:  // Show "No Wood" indicator
+    case 2: // Step 3: Release both clamps
+      retractPositionClamp();
+      retractWoodSecureClamp(); // Redundant but ensures it's retracted
+      subState = 3;
+      break;
+      
+    case 3: // Step 4: Set flag for cycle switch toggle requirement
+      // Set the flag that requires cycle switch to be toggled
+      needCycleSwitchToggle = true;
+      
+      // Show the NoWood indicator
       showNoWoodIndicator();
       
       // Wait for 5 seconds to ensure operator sees the indication
