@@ -33,7 +33,7 @@ void handleNoWoodState() {
       subState = 3;
       break;
       
-    case 3: // Step 4: Set flag for cycle switch toggle requirement
+    case 3: // Step 4: Set flag for cycle switch toggle requirement and show indicator
       // Set the flag that requires cycle switch to be toggled
       needCycleSwitchToggle = true;
       
@@ -46,8 +46,8 @@ void handleNoWoodState() {
         hasTransferArmBeenSignaled = false;
         hasSuctionBeenChecked = false;
         
-        // Return to reload state to load new wood
-        enterState(RELOAD_STATE);
+        // Return to ready state instead of reload
+        enterState(READY_STATE);
       }
       break;
   }
