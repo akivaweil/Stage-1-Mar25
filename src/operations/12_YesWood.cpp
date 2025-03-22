@@ -93,6 +93,9 @@ void handleYesWoodState() {
         hasTransferArmBeenSignaled = false;
         hasSuctionBeenChecked = false;
         
+        // Ensure cycle switch toggle is not needed - allows continuous cycling
+        needCycleSwitchToggle = false;
+        
         // Return to ready state automatically with no delay
         enterState(READY_STATE);
       }
