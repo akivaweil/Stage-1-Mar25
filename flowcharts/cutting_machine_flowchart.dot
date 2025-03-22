@@ -1,0 +1,44 @@
+digraph StateMachine { graph [rankdir=TB, fontname="Arial", splines=true, nodesep=0.8, ranksep=1.0]; node [shape=rect, style=rounded, fontname="Arial", fontsize=12, style="filled,rounded", margin="0.3,0.2"]; edge [fontname="Arial", fontsize=10, color="#333333"]; subgraph cluster_legend { label="Legend"; style=filled; color="#DDDDDD"; fontname="Arial"; fontsize=12; legend_main [label="Main Flow", fillcolor="#FFFF00", style="filled,rounded"]; legend_alt [label="Alternative Path", fillcolor="#0000FF", style="filled,rounded"]; legend_error [label="Error Condition", fillcolor="#FF0000", style="filled,rounded"]; } START [label="1. STARTUP
+• Initialize hardware
+• Prepare for homing", fillcolor="#0000FF", fontcolor="white"]; HOMING [label="2. HOMING
+• Home both motors
+• Move to operating positions
+• Extend clamps", fillcolor="#0000FF", fontcolor="white"]; READY [label="3. READY
+• Green LED on
+• Waiting for cycle start
+• Motors at home", fillcolor="#00FF00"]; RELOAD [label="4. RELOAD
+• Blue LED on
+• Retract clamps
+• Wait for reload complete", fillcolor="#0000FF", fontcolor="white"]; CUTTING [label="5. CUTTING
+• Yellow LED on
+• Extend clamps
+• Move cut motor forward
+• Signal transfer arm", fillcolor="#FFFF00"]; YESWOOD [label="6. YES WOOD
+• Yellow LED on
+• Retract cut motor
+• Move position motor
+• Adjust clamps", style="filled", fillcolor="#FFFF00:#00FF00", gradientangle=270]; NOWOOD [label="7. NO WOOD
+• Blue LED on
+• Return motors home
+• Retract clamps", style="filled", fillcolor="#0000FF:#00FF00", fontcolor="white", gradientangle=270]; ERROR [label="8. ERROR
+• Red LED blinking
+• Motors forced to home
+• Clamps extended
+• Wait for reset", fillcolor="#FF0000", fontcolor="white"]; WOOD_SUCTION_ERROR [label="9. WOOD SUCTION ERROR
+• Red LED pattern
+• Motors at home
+• Clamps extended
+• Wait for reset", fillcolor="#FF0000", fontcolor="white"]; CUT_MOTOR_HOME_ERROR [label="10. CUT MOTOR HOME ERROR
+• Red LED pattern
+• Recovery attempts
+• Clamps extended", fillcolor="#FF0000", fontcolor="white"]; POSITION_MOTOR_HOME_ERROR [label="11. POSITION MOTOR HOME ERROR
+• Alternating Red/Blue LEDs
+• Recovery attempts
+• Clamps extended", style="filled", fillcolor="#FF0000:#0000FF", fontcolor="white", gradientangle=0]; START -> HOMING [label="Auto"]; HOMING -> READY [label="Homing complete"]; HOMING -> CUT_MOTOR_HOME_ERROR [label="Cut motor
+homing failure"]; HOMING -> POSITION_MOTOR_HOME_ERROR [label="Position motor
+homing failure"]; READY -> CUTTING [label="Cycle switch pressed"]; READY -> RELOAD [label="Reload switch pressed"]; RELOAD -> READY [label="Reload switch released"]; CUTTING -> YESWOOD [label="Wood detected"]; CUTTING -> NOWOOD [label="No wood detected"]; YESWOOD -> READY [label="Cycle complete
+Cycle switch toggled"]; YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor
+not at home"]; NOWOOD -> READY [label="Wait complete
+(1 second)"]; WOOD_SUCTION_ERROR -> HOMING [label="Cycle switch toggled"]; CUT_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful
+or cycle switch toggled"]; POSITION_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful
+or cycle switch toggled"]; ERROR -> HOMING [label="Cycle switch toggled"]; }

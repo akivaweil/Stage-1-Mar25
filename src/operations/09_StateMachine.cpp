@@ -217,7 +217,9 @@ void handleCutMotorHomeErrorState() {
 
 // Handle position motor home error state
 void handlePositionMotorHomeErrorState() {
-  updateRedLEDErrorPattern(POSITION_MOTOR_HOME_ERROR);
+  // Don't use the regular error pattern - the LED control will handle alternating red and blue
+  // Instead of: updateRedLEDErrorPattern(POSITION_MOTOR_HOME_ERROR);
+  setPositionMotorHomeErrorPattern();
   
   extendPositionClamp();
   extendWoodSecureClamp();

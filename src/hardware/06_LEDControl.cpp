@@ -72,21 +72,15 @@ void setCutMotorHomeErrorPattern() {
 }
 
 void setPositionMotorHomeErrorPattern() {
-  // Triple pulse pattern for position motor homing error: 200ms on, 200ms off, 200ms on, 200ms off, 200ms on, 400ms off
-  unsigned long cycleTime = millis() % 1400;
+  // Alternating red and blue LED pattern for position motor homing error
+  unsigned long cycleTime = millis() % 1000;
   
-  if (cycleTime < 200) {
+  if (cycleTime < 500) {
     setRedLed(true);
-  } else if (cycleTime < 400) {
-    setRedLed(false);
-  } else if (cycleTime < 600) {
-    setRedLed(true);
-  } else if (cycleTime < 800) {
-    setRedLed(false);
-  } else if (cycleTime < 1000) {
-    setRedLed(true);
+    setBlueLed(false);
   } else {
     setRedLed(false);
+    setBlueLed(true);
   }
 }
 
@@ -172,5 +166,52 @@ void updateAllLEDs() {
       currentState == CUT_MOTOR_HOME_ERROR_STATE || 
       currentState == POSITION_MOTOR_HOME_ERROR_STATE) {
     updateRedLEDErrorPattern(currentError);
+  }
+}
+
+// Blinking functions - use these for temporary indication, they don't keep state
+// and only blink once when called
+
+// Blink red LED
+void blinkRedLed() {
+  static unsigned long lastToggleTime = 0;
+  static bool ledState = false;
+  
+  if (Wait(250, &lastToggleTime)) {
+    ledState = !ledState;
+    digitalWrite(RED_LED_PIN, ledState);
+  }
+}
+
+// Blink yellow LED
+void blinkYellowLed() {
+  static unsigned long lastToggleTime = 0;
+  static bool ledState = false;
+  
+  if (Wait(250, &lastToggleTime)) {
+    ledState = !ledState;
+    digitalWrite(YELLOW_LED_PIN, ledState);
+  }
+}
+
+// Blink green LED
+void blinkGreenLed() {
+  static unsigned long lastToggleTime = 0;
+  static bool ledState = false;
+  
+  if (Wait(250, &lastToggleTime)) {
+    ledState = !ledState;
+    digitalWrite(GREEN_LED_PIN, ledState);
+  }
+}
+
+// Blink blue LED
+void blinkBlueLed() {
+  static unsigned long lastToggleTime = 0;
+  static bool ledState = false;
+  
+  if (Wait(250, &lastToggleTime)) {
+    ledState = !ledState;
+    digitalWrite(BLUE_LED_PIN, ledState);
   }
 } 
