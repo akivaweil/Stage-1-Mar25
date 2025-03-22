@@ -17,8 +17,8 @@ digraph cutting_process {
         legend_node [shape=none, label=<<table border="0" cellborder="0" cellspacing="3">
             <tr><td port="main" bgcolor="#D6EAF8" width="20" height="12"></td><td align="left">Main Flow</td></tr>
             <tr><td port="yes" bgcolor="#D5F5E3" width="20" height="12"></td><td align="left">YESWOOD Path</td></tr>
-            <tr><td port="no" bgcolor="#FADBD8" width="20" height="12"></td><td align="left">NOWOOD Path</td></tr>
-            <tr><td port="error" bgcolor="#FCF3CF" width="20" height="12"></td><td align="left">Error Condition</td></tr>
+            <tr><td port="no" bgcolor="#D4E6F1" width="20" height="12"></td><td align="left">NOWOOD Path</td></tr>
+            <tr><td port="error" bgcolor="#F5B7B1" width="20" height="12"></td><td align="left">Error Condition</td></tr>
         </table>>];
     }
 
@@ -42,11 +42,11 @@ digraph cutting_process {
     
     // Result states  
     yeswood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6A</b></font></td></tr><tr><td align="left">YESWOOD_STATE<br/>- Wood detected<br/>- Prepare for next cut cycle</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449", penwidth=1.2];
-    nowood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 6B</b></font></td></tr><tr><td align="left">NOWOOD_STATE<br/>- No wood detected<br/>- End cutting sequence</td></tr></table>>, fillcolor="#FADBD8", color="#922B21", penwidth=1.2];
+    nowood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 6B</b></font></td></tr><tr><td align="left">NOWOOD_STATE<br/>- No wood detected<br/>- End cutting sequence</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3", penwidth=1.2];
     
     // Error conditions
-    error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#B7950B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">Error Conditions</td></tr></table>>, shape="note", fillcolor="#FCF3CF", color="#B7950B", penwidth=1.2];
-    errorwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#B7950B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">WOOD_SUCTION_ERROR<br/>- Suction failure at 0.3 inches</td></tr></table>>, shape="octagon", fillcolor="#FEF9E7", color="#B7950B", penwidth=1.2];
+    error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">Error Conditions</td></tr></table>>, shape="note", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
+    errorwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">WOOD_SUCTION_ERROR<br/>- Suction failure at 0.3 inches</td></tr></table>>, shape="octagon", fillcolor="#FADBD8", color="#C0392B", penwidth=1.2];
     
     // Flow connections
     start -> init [color="#1E8449", penwidth=1.2];
@@ -55,11 +55,11 @@ digraph cutting_process {
     signal -> retract [color="#2874A6", penwidth=1.2];
     retract -> check [color="#2874A6", penwidth=1.2];
     check -> yeswood [label="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)", color="#1E8449", penwidth=1.2];
-    check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)", color="#922B21", penwidth=1.2];
+    check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)", color="#2471A3", penwidth=1.2];
     
     // Error path
-    error -> errorwood [color="#B7950B", penwidth=1.2, style="dotted"];
-    extend -> errorwood [style="dashed", label="if suction failure", color="#B7950B", penwidth=1.2];
+    error -> errorwood [color="#C0392B", penwidth=1.2, style="dotted"];
+    extend -> errorwood [style="dashed", label="if suction failure", color="#C0392B", penwidth=1.2];
     
     // Subgraph for YESWOOD flow
     subgraph cluster_yeswood {
@@ -95,27 +95,27 @@ digraph cutting_process {
     subgraph cluster_nowood {
         label="NOWOOD Flow";
         style="rounded,filled";
-        color="#922B21";
+        color="#2471A3";
         penwidth=1.2;
-        bgcolor="#FDEDEC";
+        bgcolor="#EBF5FB";
         fontsize=16;
         margin=16;
         
-        nw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 7B</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#FADBD8", color="#922B21"];
-        nw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 8B</b></font></td></tr><tr><td align="left">Return both motors home</td></tr></table>>, fillcolor="#FADBD8", color="#922B21"];
-        nw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 9B</b></font></td></tr><tr><td align="left">Release both clamps</td></tr></table>>, fillcolor="#FADBD8", color="#922B21"];
-        nw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 10B</b></font></td></tr><tr><td align="left">Set cycle switch toggle flag</td></tr></table>>, fillcolor="#FADBD8", color="#922B21"];
-        nw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 11B</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Blue LEDs)</td></tr></table>>, fillcolor="#FADBD8", color="#922B21"];
-        nw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#922B21" point-size="14"><b>Step 12B</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#FADBD8", color="#922B21"];
+        nw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7B</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 8B</b></font></td></tr><tr><td align="left">Return both motors home</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 9B</b></font></td></tr><tr><td align="left">Release both clamps</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 10B</b></font></td></tr><tr><td align="left">Set cycle switch toggle flag</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 11B</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Blue LEDs)</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 12B</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         
-        nw1 -> nw2 [color="#922B21"];
-        nw2 -> nw3 [color="#922B21"];
-        nw3 -> nw4 [color="#922B21"];
-        nw4 -> nw5 [color="#922B21"];
-        nw5 -> nw6 [color="#922B21"];
+        nw1 -> nw2 [color="#2471A3"];
+        nw2 -> nw3 [color="#2471A3"];
+        nw3 -> nw4 [color="#2471A3"];
+        nw4 -> nw5 [color="#2471A3"];
+        nw5 -> nw6 [color="#2471A3"];
     }
     
     // Connect main flow to subgraphs
     yeswood -> yw1 [style="dashed", color="#1E8449", penwidth=1.2];
-    nowood -> nw1 [style="dashed", color="#922B21", penwidth=1.2];
+    nowood -> nw1 [style="dashed", color="#2471A3", penwidth=1.2];
 } 
