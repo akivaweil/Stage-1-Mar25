@@ -87,20 +87,13 @@ void handleYesWoodState() {
     case 7: // Step A14: Move position motor to 3.45 inches position
       movePositionMotorToPosition(POSITION_MOTOR_TRAVEL_DISTANCE); // 3.45 inches
       
-      // Once position reached, proceed to next step
+      // Once position reached, immediately transition to READY
       if (isMotorInPosition(positionMotor, POSITION_MOTOR_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH)) {
-        subState = 8;
-      }
-      break;
-      
-    case 8: // Step A15: Wait briefly and return to READY_STATE
-      // Wait for 2 seconds to ensure operator sees the indication
-      if (Wait(2000, &yesWoodWaitTime)) {
         // Reset flags for next cutting cycle
         hasTransferArmBeenSignaled = false;
         hasSuctionBeenChecked = false;
         
-        // Return to ready state automatically
+        // Return to ready state automatically with no delay
         enterState(READY_STATE);
       }
       break;
