@@ -9,7 +9,7 @@ digraph StateMachine {
     color="#DDDDDD"; 
     fontname="Arial"; 
     fontsize=12; 
-    legend_main [label="Normal Cycle", fillcolor="#FFFF00", style="filled,rounded"]; 
+    legend_main [label="Stage 1 Cutting Cycle", fillcolor="#FFFF00", style="filled,rounded"]; 
     legend_alt [label="Alternative Path", fillcolor="#0000FF", style="filled,rounded"]; 
     legend_error [label="Error Condition", fillcolor="#FF0000", style="filled,rounded"]; 
   } 
