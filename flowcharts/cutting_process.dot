@@ -52,7 +52,7 @@ digraph cutting_process {
     init -> extend [color="#2874A6", penwidth=1.2];
     extend -> signal [color="#2874A6", penwidth=1.2];
     signal -> check [color="#2874A6", penwidth=1.2];
-    check -> yeswood [headlabel="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)", labeldistance=2.5, labelangle=-30, color="#1E8449", penwidth=1.2];
+    check -> yeswood [xlabel="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)", xlp="-50,0", color="#1E8449", penwidth=1.2];
     check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)", color="#2471A3", penwidth=1.2];
     
     // Error path
