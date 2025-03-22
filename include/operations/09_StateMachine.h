@@ -1,46 +1,43 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
+// Include core definitions
 #include "../core/01_CommonDefinitions.h"
-#include "../hardware/06_LEDControl.h"
-#include "../hardware/07_SwitchSensor.h"
-#include "../hardware/05_MotorControl.h"
-#include "../hardware/08_PeripheralControl.h"
-#include "10_HomingOperations.h"
-#include "11_CuttingOperations.h"
-#include "12_YesWoodOperations.h"
-#include "13_NoWoodOperations.h"
+#include "../core/02_PinDefinitions.h"
+#include "../core/03_Utilities.h"
 
-// State machine declarations
+// Include modular state handlers
+#include "10_Homing.h"
+#include "11_Cutting.h"
+#include "12_YesWood.h"
+#include "13_NoWood.h"
+#include "15_Error.h"
+
+// External variables declarations
+extern State currentState;
+extern ErrorType currentError;
+extern int subState;
 extern unsigned long stateStartTime;
 extern unsigned long subStateTimer;
-extern int homingAttemptCount;
-extern bool isHomingComplete;
-extern bool isCutMotorHomed;
-extern bool isPositionMotorHomed;
+extern bool hasSuctionBeenChecked;
+extern bool hasTransferArmBeenSignaled;
+extern bool needCycleSwitchToggle;
 
-// Error handling function
-void resetErrorAndHomeSystem();
+// State machine functions
+void updateStateMachine();
+void enterState(State newState);
 
-// State handlers
+// State handler functions
 void handleStartupState();
-void handleHomingState();
+// handleHomingState() now defined in 10_Homing.h
 void handleReadyState();
 void handleReloadState();
-void handleCuttingState();
-void handleYesWoodState();
-void handleNoWoodState();
-void handleErrorState();
+// executeCutting() defined in 11_Cutting.h
+// handleYesWoodState() defined in 12_YesWood.h 
+// handleNoWoodState() defined in 13_NoWood.h
+// handleErrorState() defined in 15_Error.h
 void handleWoodSuctionErrorState();
 void handleCutMotorHomeErrorState();
 void handlePositionMotorHomeErrorState();
-
-// State machine functions
-void enterState(State newState);
-void updateStateMachine();
-
-// Helpers for recovery/error handling
-void moveAwayThenHomeCutMotor();
-void moveAwayThenHomePositionMotor();
 
 #endif // STATE_MACHINE_H 

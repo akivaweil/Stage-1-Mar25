@@ -1,6 +1,6 @@
-#include "../../include/operations/12_YesWoodOperations.h"
+#include "../../include/operations/12_YesWood.h"
 #include "../../include/core/03_Utilities.h"
-#include "../../include/operations/11_CuttingOperations.h"
+#include "../../include/operations/11_Cutting.h"
 
 // Global variables for this module
 static unsigned long yesWoodWaitTime = 0;
@@ -19,7 +19,7 @@ void handleYesWoodState() {
       Motors_RETURN_settings();
       
       // Move motors back to home position
-      moveCutMotorToPosition(0);
+      moveCutMotorToPosition(0); // Move cut motor backward to home
       movePositionMotorToPosition(0);
       
       subState = 2;

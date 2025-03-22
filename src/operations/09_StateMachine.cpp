@@ -1,25 +1,22 @@
 #include "../../include/operations/09_StateMachine.h"
-#include "../../include/operations/10_HomingOperations.h"
+#include "../../include/operations/10_Homing.h"
 #include "../../include/core/03_Utilities.h"
 
 // State machine variables
 unsigned long stateStartTime = 0;
 unsigned long subStateTimer = 0;
-int homingAttemptCount = 0;
-bool isHomingComplete = false;
-bool isCutMotorHomed = false;
-bool isPositionMotorHomed = false;
+// Homing variables moved to 10_Homing.cpp
 
 // State pattern implementation
-typedef void (*StateHandler)();
+typedef void (*StateHandlerFunction)();
 
-// Array of function pointers - indexes match State enum values
-StateHandler stateHandlers[] = {
+// Array of state handler functions for direct lookup
+StateHandlerFunction stateHandlers[] = {
   handleStartupState,
-  handleHomingState,
+  handleHomingState, // This now comes from 10_Homing.cpp
   handleReadyState,
   handleReloadState,
-  handleCuttingState,
+  executeCutting,
   handleYesWoodState,
   handleNoWoodState,
   handleErrorState,
@@ -59,7 +56,7 @@ void enterState(State newState) {
   // Entry actions for new state
   switch (newState) {
     case HOMING_STATE:
-      initializeHomingVariables();
+      initializeHomingVariables(); // This calls the function from 10_Homing.cpp
       break;
       
     case READY_STATE:
@@ -103,29 +100,7 @@ void handleStartupState() {
   enterState(HOMING_STATE);
 }
 
-// Handle homing state - delegates to the HomingOperations module
-void handleHomingState() {
-  int nextSubState = subState;
-  
-  // Call the homing operations module to perform the current homing step
-  bool stepComplete = performHomingStep(subState, nextSubState);
-  
-  // Update substate if changed
-  if (nextSubState != subState) {
-    subState = nextSubState;
-  }
-  
-  // Check for completion or errors
-  if (stepComplete) {
-    if (isHomingComplete) {
-      enterState(READY_STATE);
-    } else if (currentError == CUT_MOTOR_HOME_ERROR) {
-      enterState(CUT_MOTOR_HOME_ERROR_STATE);
-    } else if (currentError == POSITION_MOTOR_HOME_ERROR) {
-      enterState(POSITION_MOTOR_HOME_ERROR_STATE);
-    }
-  }
-}
+// Handle homing state moved to 10_Homing.cpp
 
 // Handle ready state - checks cycle switch toggle requirement
 void handleReadyState() {
@@ -296,7 +271,7 @@ void moveAwayThenHomeCutMotor() {
       CutMotor_HOMING_settings();
       
       if (!cutMotor.isRunning()) {
-        cutMotor.move(-500);  // Move 500 steps away
+        cutMotor.move(-500);  // Move forward away from home switch
         startTime = millis();
         recoverySubState = 1;
       }
@@ -313,7 +288,7 @@ void moveAwayThenHomeCutMotor() {
       CutMotor_HOMING_settings();
       
       if (!cutMotor.isRunning()) {
-        cutMotor.move(2000);  // Move 2000 steps toward home
+        cutMotor.move(2000);  // Move backward toward home switch
         recoverySubState = 3;
       }
       break;

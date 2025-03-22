@@ -1,5 +1,5 @@
-#ifndef NO_WOOD_OPERATIONS_H
-#define NO_WOOD_OPERATIONS_H
+#ifndef YES_WOOD_H
+#define YES_WOOD_H
 
 #include "../core/01_CommonDefinitions.h"
 #include "../hardware/06_LEDControl.h"
@@ -11,10 +11,10 @@
 // External references to shared variables
 extern bool hasSuctionBeenChecked;
 extern bool hasTransferArmBeenSignaled;
-extern bool needCycleSwitchToggle;
 
-// Function prototypes for no wood operations
-void handleNoWoodState();
-void showNoWoodIndicator();
+// Function prototypes for yes wood operations
+void handleYesWoodState();
+void waitForCycleSwitch();
+void showYesWoodIndicator();
 
-#endif // NO_WOOD_OPERATIONS_H 
+#endif // YES_WOOD_H 

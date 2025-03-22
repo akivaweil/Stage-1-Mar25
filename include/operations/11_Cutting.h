@@ -1,5 +1,5 @@
-#ifndef CUTTING_OPERATIONS_H
-#define CUTTING_OPERATIONS_H
+#ifndef CUTTING_H
+#define CUTTING_H
 
 #include "../core/01_CommonDefinitions.h"
 #include "../hardware/05_MotorControl.h"
@@ -22,9 +22,14 @@ enum CutPosition {
 bool retractCutter(int& nextSubState);
 bool extendCutter(int& nextSubState);
 void configureForCutPosition(int position, bool& skipCutting);
+void signalTransferArm();
+void executeCutting();
 
 // Extern variable declarations
 extern long cutRetractSteps;
 extern long cutExtendSteps;
+extern bool hasSuctionBeenChecked;
+extern bool hasTransferArmBeenSignaled;
+extern bool needCycleSwitchToggle;
 
 #endif 

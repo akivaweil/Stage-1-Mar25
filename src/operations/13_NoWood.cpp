@@ -1,6 +1,6 @@
-#include "../../include/operations/13_NoWoodOperations.h"
+#include "../../include/operations/13_NoWood.h"
 #include "../../include/core/03_Utilities.h"
-#include "../../include/operations/11_CuttingOperations.h"
+#include "../../include/operations/11_Cutting.h"
 
 // Global variables for this module
 static unsigned long noWoodWaitTime = 0;
@@ -18,7 +18,7 @@ void handleNoWoodState() {
       Motors_RETURN_settings();
       
       // Move motors back to home position
-      moveCutMotorToPosition(0);
+      moveCutMotorToPosition(0); // Move cut motor backward to home
       movePositionMotorToPosition(0);
       
       // When both motors are at home position, proceed to next step

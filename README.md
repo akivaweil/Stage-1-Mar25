@@ -1,52 +1,76 @@
-# ESP32-S3 IP Address Finder
+# Stage 1 - CNC Cutting System
 
-This project sets up an ESP32-S3 to connect to WiFi and display its IP address over Serial. This enables Over-The-Air (OTA) updates for future programming.
+This project controls the Stage 1 cutting system using an ESP32 microcontroller. The system manages stepper motors, sensors, and peripheral devices to perform automated wood cutting operations.
 
 ## Hardware Requirements
 
-- Freenove ESP32-S3 Breakout Board
-- USB-C cable for initial programming
+- Freenove ESP32 Breakout Board
+- Stepper motors for cutting and positioning
+- Limit switches for homing
+- Suction system for wood handling
+- Transfer arm signaling system
+- LED indicators (Red, Green, Blue)
 
-## Pin Layout Reference (ESP32-S3)
+## Pin Layout Reference (ESP32)
 
 **Left side (top to bottom):**
-4, 5, 6, 7, 15, 16, 17, 18, 8, 3, 46, 9, 10, 11, 12, 13, 14
+34, 35, 32, 33, 25, 26, 27, 14, 12, 13
 
 **Right side (top to bottom):**
-1, 2, 42, 41, 40, 39, 38, 37, 36, 35, 0, 45, 48, 47, 21, 20, 19
+23, 22, 21, 19, 18, 5, 4, 0, 2, 15
+
+## Project Structure
+
+- **src/core/** - Core system files and definitions
+- **src/hardware/** - Hardware control modules (motors, LEDs, sensors)
+- **src/operations/** - Operation logic and state machine
+- **include/** - Header files for all modules
+
+## Key Components
+
+1. **State Machine** - Controls the operational flow through different states
+2. **Motor Control** - Manages stepper motors for cutting and positioning
+3. **Switch Sensors** - Monitors limit switches and user input switches
+4. **LED Control** - Provides visual feedback of system state
+5. **Peripheral Control** - Manages external systems like suction and transfer arm
+
+## Operation Flow
+
+1. **Startup** - Initialize systems and perform safety checks
+2. **Homing** - Home the motors to their reference positions
+3. **Ready** - Wait for user cycle input
+4. **Cutting** - Perform the cutting operation
+5. **Yes Wood / No Wood** - Handle wood detection outcomes
+6. **Error Handling** - Manage error conditions
+
+## WiFi and OTA Configuration
+
+The system supports Over-The-Air (OTA) updates via WiFi:
+- SSID: Everwood
+- Password: Everwood-Staff
+- OTA Password: esp32s3admin
 
 ## Setup Instructions
 
-1. Connect the ESP32-S3 to your computer via USB-C
+1. Connect the ESP32 to your computer via USB
 2. Open the project in PlatformIO
-3. Build and upload the code using USB (Serial)
-4. Open the Serial Monitor (115200 baud)
-5. The device will connect to WiFi and display its IP address
+3. Modify any configuration settings as needed in the Config.h file
+4. Build and upload the code
 
-## OTA Updates
+## Safety Features
 
-Once you have the IP address, you can enable OTA updates:
-
-1. In `platformio.ini`, uncomment the OTA upload settings section
-2. Replace `IP_ADDRESS_WILL_BE_SHOWN` with your device's actual IP (shown in Serial Monitor)
-3. Set the OTA password to match the one in your code (default: `esp32s3admin`)
-4. For future uploads, PlatformIO will use OTA instead of USB
-
-## WiFi Configuration
-
-The code is pre-configured with the following WiFi credentials:
-- SSID: Everwood
-- Password: Everwood-Staff
-
-To change these credentials, modify the corresponding variables in `src/main.cpp`.
-
-## Security Notes
-
-- Change the default OTA password (`esp32s3admin`) to something more secure
-- Update both the code and `platformio.ini` with your new password
+- Startup safety check ensures all systems are in safe positions
+- Homing routine with timeouts prevents motor damage
+- Error state handling for various fault conditions
 
 ## Troubleshooting
 
-- If WiFi connection fails, the device will enter an infinite loop. Check your credentials.
-- For OTA upload issues, ensure you're on the same network as the ESP32-S3
-- Verify the IP address hasn't changed (DHCP may assign a new IP after power cycling) 
+- If motors don't home correctly, check limit switch connections
+- If suction fails, verify the vacuum system is operational
+- For communication issues with the transfer arm, check signal connections
+
+## Recent Improvements
+
+- Added class-based architecture for hardware components
+- Centralized configuration parameters in Config.h
+- Improved state machine modularity and readability 

@@ -1,5 +1,5 @@
-#ifndef ERROR_OPERATIONS_H
-#define ERROR_OPERATIONS_H
+#ifndef ERROR_H
+#define ERROR_H
 
 #include "../core/01_CommonDefinitions.h"
 #include "../hardware/06_LEDControl.h"
@@ -11,4 +11,4 @@
 void updateErrorLED(ErrorType errorType);
 void resetErrorState();
 
-#endif // ERROR_OPERATIONS_H 
+#endif // ERROR_H 

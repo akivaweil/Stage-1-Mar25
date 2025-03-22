@@ -1,4 +1,4 @@
-#include "../../include/operations/15_ErrorOperations.h"
+#include "../../include/operations/15_Error.h"
 #include "../../include/core/03_Utilities.h"
 
 // Update error LED pattern based on error type
