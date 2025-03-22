@@ -1,0 +1,73 @@
+digraph ModularStateMachine {
+    // Graph settings
+    graph [rankdir=TB, splines=true, nodesep=0.8, ranksep=1.0];
+    node [shape=box, style="rounded,filled", fillcolor="#FFFFCC", fontname=Arial, fontsize=12, margin="0.3,0.1"];
+    edge [fontname=Arial, fontsize=10, color="#555555", arrowsize=0.8];
+    
+    // Create a legend
+    subgraph cluster_legend {
+        label="Legend";
+        style="rounded,filled";
+        fillcolor=white;
+        fontname=Arial;
+        fontsize=12;
+        
+        legend_state [label="State", fillcolor="#FFFFCC", margin="0.1,0.05"];
+        legend_module [label="Module", fillcolor="#D6EAF8", margin="0.1,0.05"];
+        legend_class [label="Class", fillcolor="#D5F5E3", margin="0.1,0.05"];
+    }
+    
+    // State Machine Controller
+    StateMachine [label="StateMachine\n(09_StateMachine.cpp)", fillcolor="#D6EAF8", penwidth=2];
+    
+    // State handlers
+    StartupState [label="Startup State\nhandleStartupState()"];
+    HomingState [label="Homing State\nhandleHomingState()", fillcolor="#D6EAF8"];
+    ReadyState [label="Ready State\nhandleReadyState()"];
+    ReloadState [label="Reload State\nhandleReloadState()"];
+    CuttingState [label="Cutting State\nexecuteCutting()", fillcolor="#D6EAF8"];
+    YesWoodState [label="Yes Wood State\nhandleYesWoodState()", fillcolor="#D6EAF8"];
+    NoWoodState [label="No Wood State\nhandleNoWoodState()", fillcolor="#D6EAF8"];
+    ErrorState [label="Error State\nhandleErrorState()", fillcolor="#D6EAF8"];
+    
+    // Class components
+    MotorClass [label="StepperMotor Class\n(05_MotorControlClass.cpp)", fillcolor="#D5F5E3"];
+    
+    // Modular components (extracted from main state machine)
+    HomingModule [label="Homing Module\n(10_HomingState.cpp)", fillcolor="#D6EAF8"];
+    CuttingModule [label="Cutting Module\n(11_Cutting.cpp)", fillcolor="#D6EAF8"];
+    YesWoodModule [label="Yes Wood Module\n(12_YesWood.cpp)", fillcolor="#D6EAF8"];
+    NoWoodModule [label="No Wood Module\n(13_NoWood.cpp)", fillcolor="#D6EAF8"];
+    ErrorModule [label="Error Module\n(15_Error.cpp)", fillcolor="#D6EAF8"];
+    
+    // Core relationships
+    StateMachine -> StartupState [label="calls"];
+    StateMachine -> HomingState [label="calls"];
+    StateMachine -> ReadyState [label="calls"];
+    StateMachine -> ReloadState [label="calls"];
+    StateMachine -> CuttingState [label="calls"];
+    StateMachine -> YesWoodState [label="calls"];
+    StateMachine -> NoWoodState [label="calls"];
+    StateMachine -> ErrorState [label="calls"];
+    
+    // Module implementation relationships
+    HomingState -> HomingModule [label="implemented in"];
+    CuttingState -> CuttingModule [label="implemented in"];
+    YesWoodState -> YesWoodModule [label="implemented in"];
+    NoWoodState -> NoWoodModule [label="implemented in"];
+    ErrorState -> ErrorModule [label="implemented in"];
+    
+    // Class usage
+    HomingModule -> MotorClass [label="uses"];
+    CuttingModule -> MotorClass [label="uses"];
+    
+    // State transitions (simplified representation)
+    StartupState -> HomingState [style=dashed];
+    HomingState -> ReadyState [style=dashed];
+    ReadyState -> CuttingState [style=dashed];
+    ReadyState -> ReloadState [style=dashed];
+    CuttingState -> YesWoodState [style=dashed];
+    CuttingState -> NoWoodState [style=dashed];
+    HomingState -> ErrorState [style=dashed];
+    CuttingState -> ErrorState [style=dashed];
+} 
