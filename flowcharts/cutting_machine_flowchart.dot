@@ -17,7 +17,7 @@ digraph StateMachine { graph [rankdir=TB, fontname="Arial", splines=true, nodese
 • Yellow LED on
 • Retract cut motor
 • Move position motor
-• Adjust clamps", style="filled", fillcolor="#FFFF00;0.8:#00FF00;0.2", gradientangle=270]; NOWOOD [label="7. NO WOOD
+• Adjust clamps", style="filled", fillcolor="#FFFF00:#99FF99", gradientangle=270]; NOWOOD [label="7. NO WOOD
 • Blue LED on
 • Return motors home
 • Retract clamps
