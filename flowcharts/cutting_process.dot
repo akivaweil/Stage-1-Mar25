@@ -1,0 +1,84 @@
+digraph cutting_process {
+    // Graph styling
+    graph [fontname="Arial", rankdir="TB", splines=true, overlap=false, nodesep=0.8, ranksep=0.8];
+    node [shape="box", style="rounded,filled", fillcolor="lightblue", fontname="Arial", margin="0.2,0.1"];
+    edge [fontname="Arial", fontsize=10];
+
+    // States and transitions for cutting process
+    start [label="Start Cutting Process", shape="oval", fillcolor="lightgreen"];
+    
+    // Initialize cutting state
+    init [label="Initialize Cutting Cycle\n- Extend position clamp\n- Extend wood secure clamp\n- Reset control flags"];
+    
+    // Extend cutter
+    extend [label="Move Cut Motor Forward\n- Cut motor moves away from home\n- Performs cutting operation"];
+    
+    // Signal transfer arm
+    signal [label="Signal Transfer Arm\n- Send 500ms HIGH pulse\n- Signal completed"];
+    
+    // Retract cutter
+    retract [label="Move Cut Motor Backward\n- Cut motor returns to home\n- Cutting operation complete"];
+    
+    // Check wood presence
+    check [label="Check Wood Presence\n- Read wood sensor", shape="diamond", fillcolor="lightyellow"];
+    
+    // Result states  
+    yeswood [label="YESWOOD_STATE\n- Wood detected\n- Prepare for next cut cycle", fillcolor="palegreen"];
+    nowood [label="NOWOOD_STATE\n- No wood detected\n- End cutting sequence", fillcolor="lightcoral"];
+    
+    // Error conditions
+    error [label="Error Conditions", shape="note", fillcolor="pink"];
+    errorwood [label="WOOD_SUCTION_ERROR\n- Suction failure at 0.3 inches", fillcolor="pink"];
+    
+    // Flow connections
+    start -> init;
+    init -> extend;
+    extend -> signal;
+    signal -> retract;
+    retract -> check;
+    check -> yeswood [label="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)"];
+    check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)"];
+    
+    // Error path
+    error -> errorwood;
+    extend -> errorwood [style="dashed", label="if suction failure"];
+    
+    // Subgraph for YESWOOD flow
+    subgraph cluster_yeswood {
+        label="YESWOOD Flow";
+        style="dashed";
+        bgcolor="palegreen";
+        
+        yw1 [label="Retract secure wood clamp"];
+        yw2 [label="Move motors to home"];
+        yw3 [label="Adjust clamps at 3.35\""];
+        yw4 [label="Extend position clamp\nat home position"];
+        yw5 [label="Check cut motor at home"];
+        yw6 [label="Move position motor\nto 3.45\" position"];
+        yw7 [label="Show indicator\n(Green + Yellow LEDs)"];
+        yw8 [label="Wait for cycle switch toggle"];
+        yw9 [label="Return to READY_STATE"];
+        
+        yw1 -> yw2 -> yw3 -> yw4 -> yw5 -> yw6 -> yw7 -> yw8 -> yw9;
+    }
+    
+    // Subgraph for NOWOOD flow  
+    subgraph cluster_nowood {
+        label="NOWOOD Flow";
+        style="dashed";
+        bgcolor="lightcoral";
+        
+        nw1 [label="Retract secure wood clamp"];
+        nw2 [label="Return both motors home"];
+        nw3 [label="Release both clamps"];
+        nw4 [label="Set cycle switch toggle flag"];
+        nw5 [label="Show indicator\n(Green + Blue LEDs)"];
+        nw6 [label="Return to READY_STATE"];
+        
+        nw1 -> nw2 -> nw3 -> nw4 -> nw5 -> nw6;
+    }
+    
+    // Connect main flow to subgraphs
+    yeswood -> yw1 [style="dashed"];
+    nowood -> nw1 [style="dashed"];
+} 
