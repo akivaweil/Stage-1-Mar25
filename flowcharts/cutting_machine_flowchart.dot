@@ -1,5 +1,5 @@
 digraph StateMachine { 
-  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=1.0, splines=true, margin="0.5,0.5", pad="0.5"]; 
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=1.0, splines=true]; 
   node [shape=rect, style=rounded, fontname="Arial", fontsize=12, style="filled,rounded", margin="0.3,0.2", penwidth=2.0]; 
   edge [fontname="Arial", fontsize=10, color="#333333", penwidth=2.0]; 
   
@@ -39,7 +39,7 @@ digraph StateMachine {
   READY -> RELOAD [label="Reload switch ON"]; 
   RELOAD -> READY [label="Reload switch OFF"]; 
   CUTTING -> NOWOOD [label="No wood detected"]; 
-  YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor\nnot at home"]; 
+  YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor\nnot at home", color="red", penwidth=2.0]; 
   NOWOOD -> READY [label="Cycle switch\nflipped off"]; 
   WOOD_SUCTION_ERROR -> HOMING [label="Cycle switch toggled"]; 
   CUT_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful\nor cycle switch toggled"]; 
