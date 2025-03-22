@@ -20,7 +20,8 @@ digraph StateMachine { graph [rankdir=TB, fontname="Arial", splines=true, nodese
 • Adjust clamps", style="filled", fillcolor="#FFFF00:#00FF00", gradientangle=270]; NOWOOD [label="7. NO WOOD
 • Blue LED on
 • Return motors home
-• Retract clamps", style="filled", fillcolor="#0000FF:#00FF00", fontcolor="white", gradientangle=270]; ERROR [label="8. ERROR
+• Retract clamps
+• Wait for cycle switch off", style="filled", fillcolor="#0000FF:#00FF00", fontcolor="white", gradientangle=270]; ERROR [label="8. ERROR
 • Red LED blinking
 • Motors forced to home
 • Clamps extended
@@ -38,7 +39,7 @@ digraph StateMachine { graph [rankdir=TB, fontname="Arial", splines=true, nodese
 homing failure"]; HOMING -> POSITION_MOTOR_HOME_ERROR [label="Position motor
 homing failure"]; READY -> CUTTING [label="Cycle switch pressed"]; READY -> RELOAD [label="Reload switch pressed"]; RELOAD -> READY [label="Reload switch released"]; CUTTING -> YESWOOD [label="Wood detected"]; CUTTING -> NOWOOD [label="No wood detected"]; YESWOOD -> READY [label="Cycle complete
 Cycle switch toggled"]; YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor
-not at home"]; NOWOOD -> READY [label="Wait complete
-(1 second)"]; WOOD_SUCTION_ERROR -> HOMING [label="Cycle switch toggled"]; CUT_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful
+not at home"]; NOWOOD -> READY [label="Cycle switch
+flipped off"]; WOOD_SUCTION_ERROR -> HOMING [label="Cycle switch toggled"]; CUT_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful
 or cycle switch toggled"]; POSITION_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful
 or cycle switch toggled"]; ERROR -> HOMING [label="Cycle switch toggled"]; }
