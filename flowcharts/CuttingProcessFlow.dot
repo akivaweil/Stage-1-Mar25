@@ -1,0 +1,77 @@
+digraph CuttingProcessFlow {
+    // Graph settings
+    graph [rankdir=TB, splines=true, nodesep=0.7, ranksep=0.9, fontname="Arial", bgcolor="white"];
+    node [shape=box, style="rounded,filled", fontname="Arial", fontsize=12, fontcolor="#333333", margin="0.4,0.2", penwidth=1.5];
+    edge [fontname="Arial", fontsize=11, color="#555555", arrowsize=0.9, penwidth=1.5];
+    
+    // Title
+    Title [label="Cutting Operation Process Flow", shape=plaintext, fontsize=18, fontname="Arial Bold"];
+    
+    // Create a legend
+    subgraph cluster_legend {
+        label="Legend";
+        labeljust="l";
+        style="rounded,filled";
+        fillcolor="#F8F8F8";
+        fontname="Arial Bold";
+        fontsize=14;
+        color="#888888";
+        margin=10;
+        
+        legend_main [label="Main Flow", fillcolor="#A8DADC", margin="0.1,0.05"];
+        legend_yes [label="YESWOOD Path", fillcolor="#8FD694", margin="0.1,0.05"];
+        legend_no [label="NOWOOD Path", fillcolor="#8EB8E5", margin="0.1,0.05"];
+        legend_error [label="Error Condition", fillcolor="#F4A7A7", margin="0.1,0.05"];
+    }
+    
+    // Main flow nodes with motor position indicators
+    Start [label="Step 0\nStart Cutting Process", shape=ellipse, fillcolor="#BBE5C0", style="filled"];
+    
+    Step1 [label="Step 1\nInitialize Cutting Cycle\n- Extend position clamp\n- Extend wood secure clamp\n- Reset control flags\n\nMotor Positions:\n• Cut motor: HOME (0)\n• Position motor: HOME (0)", fillcolor="#A8DADC"];
+    
+    Step2 [label="Step 2\nCut Motor Forward\n- Cut motor moves away from home\n- Performs cutting operation\n\nMotor Positions:\n• Cut motor: FORWARD (4000)\n• Position motor: CUTTING (1500)", fillcolor="#A8DADC"];
+    
+    Step3 [label="Step 3\nSignal Transfer Arm\n- Send 500ms HIGH pulse\n- Signal completed\n\nMotor Positions:\n• Cut motor: HOME (0) - returned\n• Position motor: CUTTING (1500)", fillcolor="#A8DADC"];
+    
+    Step4 [label="Step 4\nMove Cut Motor Backward\n- Cut motor returns to home\n- Cutting operation complete\n\nMotor Positions:\n• Cut motor: HOME (0)\n• Position motor: CUTTING (1500)", fillcolor="#A8DADC"];
+    
+    Step5 [label="Step 5\nCheck Wood Presence\n- Read wood sensor\n\nMotor Positions:\n• Cut motor: HOME (0)\n• Position motor: CUTTING (1500)", shape=diamond, fillcolor="#A8E1F4"];
+    
+    // Error node
+    ErrorNode [label="Error\nWOOD_SUCTION_ERROR\n- Suction failure at 0.1 inches\n\nMotor Positions:\n• Cut motor: HOME (0)\n• Position motor: CUTTING (1500)", fillcolor="#F4A7A7", shape=ellipse];
+    
+    // YESWOOD path
+    YesWood [label="Step 6A\nYESWOOD STATE\n- Wood detected\n- Wood suction ON\n- Prepare for next cut cycle\n\nMotor Positions:\n• Cut motor: HOME (0)\n• Position motor: CUTTING (1500)", fillcolor="#8FD694"];
+    
+    // NOWOOD path
+    NoWood [label="Step 6B\nNOWOOD STATE\n- No wood detected\n- End cutting sequence\n\nMotor Positions:\n• Cut motor: HOME (0)\n• Position motor: CUTTING (1500)", fillcolor="#8EB8E5"];
+    
+    // Connections
+    Title -> Start [style=invis];
+    Start -> Step1 [color="#80A082", penwidth=2];
+    Step1 -> Step2 [color="#80A082", penwidth=2];
+    Step2 -> Step3 [color="#80A082", penwidth=2];
+    Step3 -> Step4 [color="#80A082", penwidth=2];
+    Step4 -> Step5 [color="#80A082", penwidth=2];
+    
+    // Error path
+    Step2 -> ErrorNode [label="if suction fails", style=dashed, color="#E57373", constraint=false];
+    
+    // Branching paths based on wood detection
+    Step5 -> YesWood [label="Wood Present", color="#4DA167", penwidth=2];
+    Step5 -> NoWood [label="No Wood", color="#4B79BB", penwidth=2];
+    
+    // Notes about motor positions at key steps
+    node [shape=note, fillcolor="#FFFFCC", style="filled", fontsize=10];
+    note1 [label="Before Step 2:\nPosition motor moves to\ncutting position (1500)"];
+    note2 [label="During Step 2:\nCut motor moves to\nforward position (4000)"];
+    note3 [label="After Step 2:\nCut motor returns to\nhome position (0)"];
+    note4 [label="Step 3 (Signal Transfer):\nCut motor is at home,\nPosition motor at cutting position"];
+    
+    // Connect notes
+    edge [style=dashed, color="#999999"];
+    note1 -> Step1;
+    note2 -> Step2;
+    note3 -> Step3;
+    note4 -> Step3 [constraint=false];
+} 
