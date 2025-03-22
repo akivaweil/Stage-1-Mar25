@@ -9,95 +9,110 @@ static unsigned long cutMotorHomeCheckTimer = 0;
 // Handle yes wood state - indicates wood is present after cutting
 void handleYesWoodState() {
   switch (subState) {
-    case 0: // Step 1: Retract secure wood clamp (while keeping position clamp extended)
-      retractWoodSecureClamp();
+    case 0: // Step A7: Set LED Indicators - yellow LED ON, others OFF
+      // Set LED indicators for YesWood path
+      setYellowLed(true);
+      setGreenLed(false);
+      setBlueLed(false);
+      setRedLed(false);
+      
       subState = 1;
       break;
       
-    case 1: // Step 2: Tell both motors to home
+    case 1: // Step A8: Retract cut motor to home
       // Set motors to return settings for faster return
       Motors_RETURN_settings();
       
-      // Move motors back to home position
-      moveCutMotorToPosition(0); // Move cut motor backward to home
-      movePositionMotorToPosition(0);
+      // Move cut motor back to home position
+      moveCutMotorToPosition(0);
       
-      subState = 2;
-      break;
-      
-    case 2: // Step 3: Track position motor and when it reaches 3.35 inches, adjust clamps
-      if (stepsToInches(positionMotor.currentPosition(), POSITION_MOTOR_STEPS_PER_INCH) <= 3.35) {
-        // Retract position clamp
-        retractPositionClamp();
-        
-        // Extend secure wood clamp
-        extendWoodSecureClamp();
-        
-        subState = 3;
+      if (isMotorInPosition(cutMotor, 0)) {
+        subState = 2;
       }
       break;
       
-    case 3: // Step 4: When position motor reaches home, extend position clamp
+    case 2: // Step A9: Retract secure wood clamp (while keeping position clamp extended)
+      retractWoodSecureClamp();
+      extendPositionClamp(); // Ensure position clamp stays extended
+      subState = 3;
+      break;
+      
+    case 3: // Step A10: Position motor moves to home
+      movePositionMotorToPosition(0);
+      
       if (isMotorInPosition(positionMotor, 0)) {
-        // Immediately extend position clamp
-        extendPositionClamp();
-        
         subState = 4;
       }
       break;
       
-    case 4: // Step 5: Wait for cut motor to reach home, then check homing sensor
-      if (isMotorInPosition(cutMotor, 0)) {
-        // Start timer for 50ms check
-        if (cutMotorHomeCheckTimer == 0) {
-          cutMotorHomeCheckTimer = millis();
+    case 4: // Step A11: Adjust clamps at home position
+      // Retract position clamp
+      retractPositionClamp();
+      
+      // Extend secure wood clamp
+      extendWoodSecureClamp();
+      
+      subState = 5;
+      break;
+      
+    case 5: // Step A12: Extend position clamp
+      // Immediately extend position clamp
+      extendPositionClamp();
+      
+      subState = 6;
+      break;
+      
+    case 6: // Step A13: Verify cut motor at home
+      // Start timer for 50ms check
+      if (cutMotorHomeCheckTimer == 0) {
+        cutMotorHomeCheckTimer = millis();
+      }
+      
+      // Check cut motor homing sensor after 50ms
+      if (millis() - cutMotorHomeCheckTimer >= 50) {
+        // If homing sensor is not active, enter error state
+        if (!readCutMotorHomingSwitch()) {
+          enterState(CUT_MOTOR_HOME_ERROR_STATE);
+          return;
         }
         
-        // Check cut motor homing sensor after 50ms
-        if (millis() - cutMotorHomeCheckTimer >= 50) {
-          // If homing sensor is not active, enter error state
-          if (!readCutMotorHomingSwitch()) {
-            enterState(CUT_MOTOR_HOME_ERROR_STATE);
-            return;
-          }
-          
-          // Reset timer
-          cutMotorHomeCheckTimer = 0;
-          
-          // Proceed to next step
-          subState = 5;
-        }
-      }
-      break;
-      
-    case 5: // Step 6: Move position motor to 3.45 inches position
-      movePositionMotorToPosition(POSITION_MOTOR_TRAVEL_DISTANCE); // 3.45 inches
-      
-      // Once position reached, proceed to showing indicator
-      if (isMotorInPosition(positionMotor, POSITION_MOTOR_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH)) {
-        subState = 6;
-      }
-      break;
-      
-    case 6: // Show "Yes Wood" indicator and start timer
-      showYesWoodIndicator();
-      
-      // Wait for 2 seconds to ensure operator sees the indication
-      if (Wait(2000, &yesWoodWaitTime)) {
+        // Reset timer
+        cutMotorHomeCheckTimer = 0;
+        
+        // Proceed to next step
         subState = 7;
       }
       break;
       
-    case 7: // Wait for cycle switch to be toggled
-      waitForCycleSwitch();
+    case 7: // Step A14: Move position motor to 3.45 inches position
+      movePositionMotorToPosition(POSITION_MOTOR_TRAVEL_DISTANCE); // 3.45 inches
+      
+      // Once position reached, proceed to next step
+      if (isMotorInPosition(positionMotor, POSITION_MOTOR_TRAVEL_DISTANCE * POSITION_MOTOR_STEPS_PER_INCH)) {
+        subState = 8;
+      }
+      break;
+      
+    case 8: // Step A15: Wait briefly and return to READY_STATE
+      // Wait for 2 seconds to ensure operator sees the indication
+      if (Wait(2000, &yesWoodWaitTime)) {
+        // Reset flags for next cutting cycle
+        hasTransferArmBeenSignaled = false;
+        hasSuctionBeenChecked = false;
+        
+        // Return to ready state automatically
+        enterState(READY_STATE);
+      }
       break;
   }
 }
 
-// Show yes wood indicator (Green + Yellow LEDs)
+// Show yes wood indicator (Yellow LED only)
 void showYesWoodIndicator() {
-  setGreenLed(true);
   setYellowLed(true);
+  setGreenLed(false);
+  setBlueLed(false);
+  setRedLed(false);
 }
 
 // Wait for cycle switch to be toggled to continue
