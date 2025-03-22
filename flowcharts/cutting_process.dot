@@ -31,31 +31,27 @@ digraph cutting_process {
     // Extend cutter with motor positions
     extend [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2</b></font></td></tr><tr><td align="left">Move Cut Motor Forward<br/>- Cut motor moves away from home<br/>- Performs cutting operation</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
-    // Signal transfer arm with motor positions
-    signal [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 3</b></font></td></tr><tr><td align="left">Signal Transfer Arm<br/>- Send 500ms HIGH pulse<br/>- Signal completed</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0) - returned<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    // Signal transfer arm with motor positions - UPDATED to keep cut motor at FORWARD position
+    signal [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 3</b></font></td></tr><tr><td align="left">Signal Transfer Arm<br/>- Send 500ms HIGH pulse<br/>- Signal completed</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
-    // Retract cutter with motor positions
-    retract [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 4</b></font></td></tr><tr><td align="left">Move Cut Motor Backward<br/>- Cut motor returns to home<br/>- Cutting operation complete</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    // Check wood presence with motor positions - UPDATED to connect directly from Step 3
+    check [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 4</b></font></td></tr><tr><td align="left">Check Wood Presence<br/>- Read wood sensor</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, shape="diamond", fillcolor="#EBF5FB", color="#2E86C1", penwidth=1.2];
     
-    // Check wood presence with motor positions
-    check [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5</b></font></td></tr><tr><td align="left">Check Wood Presence<br/>- Read wood sensor</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, shape="diamond", fillcolor="#EBF5FB", color="#2E86C1", penwidth=1.2];
+    // Result states with motor positions - UPDATED to maintain forward position
+    yeswood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 5A</b></font></td></tr><tr><td align="left">YESWOOD_STATE<br/>- Wood detected<br/>- Prepare for next cut cycle</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449", penwidth=1.2];
     
-    // Result states with motor positions
-    yeswood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6A</b></font></td></tr><tr><td align="left">YESWOOD_STATE<br/>- Wood detected<br/>- Prepare for next cut cycle</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449", penwidth=1.2];
-    
-    nowood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 6B</b></font></td></tr><tr><td align="left">NOWOOD_STATE<br/>- No wood detected<br/>- End cutting sequence</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3", penwidth=1.2];
+    nowood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 5B</b></font></td></tr><tr><td align="left">NOWOOD_STATE<br/>- No wood detected<br/>- End cutting sequence</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3", penwidth=1.2];
     
     // Error conditions with motor positions
     error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">Error Conditions</td></tr></table>>, shape="note", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
     
-    errorwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">WOOD_SUCTION_ERROR<br/>- Suction failure at 0.3 inches</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, shape="oval", fillcolor="#FADBD8", color="#C0392B", penwidth=1.2];
+    errorwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">WOOD_SUCTION_ERROR<br/>- Suction failure at 0.3 inches</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, shape="oval", fillcolor="#FADBD8", color="#C0392B", penwidth=1.2];
     
-    // Flow connections
+    // Flow connections - UPDATED to skip step 4
     start -> init [color="#1E8449", penwidth=1.2];
     init -> extend [color="#2874A6", penwidth=1.2];
     extend -> signal [color="#2874A6", penwidth=1.2];
-    signal -> retract [color="#2874A6", penwidth=1.2];
-    retract -> check [color="#2874A6", penwidth=1.2];
+    signal -> check [color="#2874A6", penwidth=1.2];
     check -> yeswood [label="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)", color="#1E8449", penwidth=1.2];
     check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)", color="#2471A3", penwidth=1.2];
     
@@ -63,17 +59,17 @@ digraph cutting_process {
     error -> errorwood [color="#C0392B", penwidth=1.2, style="dotted"];
     extend -> errorwood [style="dashed", label="if suction failure", color="#C0392B", penwidth=1.2];
     
-    // Add information notes for process understanding
+    // Add information notes for process understanding - UPDATED to remove note about cut motor returning home
     note_before2 [label="Before Step 2:\nPosition motor moves to\ncutting position (1500)", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     note_during2 [label="During Step 2:\nCut motor moves to\nforward position (4000)", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
-    note_step3 [label="Step 3 (Signal Transfer):\nCut motor is at home,\nPosition motor at cutting position", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    note_step3 [label="Step 3 (Signal Transfer):\nCut motor stays at forward position,\nPosition motor at cutting position", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     
     // Connect notes
     note_before2 -> init [style="dashed", color="#999999"];
     note_during2 -> extend [style="dashed", color="#999999"];
     note_step3 -> signal [style="dashed", color="#999999"];
     
-    // Subgraph for YESWOOD flow
+    // Subgraph for YESWOOD flow - UPDATED step numbering
     subgraph cluster_yeswood {
         label="YESWOOD Flow";
         style="rounded,filled";
@@ -83,15 +79,15 @@ digraph cutting_process {
         fontsize=16;
         margin=16;
         
-        yw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 7A</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 8A</b></font></td></tr><tr><td align="left">Move motors to home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 9A</b></font></td></tr><tr><td align="left">Adjust clamps at 3.35"</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 10A</b></font></td></tr><tr><td align="left">Extend position clamp<br/>at home position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 11A</b></font></td></tr><tr><td align="left">Check cut motor at home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 12A</b></font></td></tr><tr><td align="left">Move position motor<br/>to 3.45" position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw7 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 13A</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Yellow LEDs)</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw8 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 14A</b></font></td></tr><tr><td align="left">Wait for cycle switch toggle</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw9 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 15A</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6A</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 7A</b></font></td></tr><tr><td align="left">Move motors to home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 8A</b></font></td></tr><tr><td align="left">Adjust clamps at 3.35"</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 9A</b></font></td></tr><tr><td align="left">Extend position clamp<br/>at home position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 10A</b></font></td></tr><tr><td align="left">Check cut motor at home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 11A</b></font></td></tr><tr><td align="left">Move position motor<br/>to 3.45" position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw7 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 12A</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Yellow LEDs)</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw8 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 13A</b></font></td></tr><tr><td align="left">Wait for cycle switch toggle</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw9 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 14A</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         
         yw1 -> yw2 [color="#1E8449"];
         yw2 -> yw3 [color="#1E8449"];
@@ -103,7 +99,7 @@ digraph cutting_process {
         yw8 -> yw9 [color="#1E8449"];
     }
     
-    // Subgraph for NOWOOD flow  
+    // Subgraph for NOWOOD flow - UPDATED step numbering
     subgraph cluster_nowood {
         label="NOWOOD Flow";
         style="rounded,filled";
@@ -113,12 +109,12 @@ digraph cutting_process {
         fontsize=16;
         margin=16;
         
-        nw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7B</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 8B</b></font></td></tr><tr><td align="left">Return both motors home</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 9B</b></font></td></tr><tr><td align="left">Release both clamps</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 10B</b></font></td></tr><tr><td align="left">Set cycle switch toggle flag</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 11B</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Blue LEDs)</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 12B</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 6B</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7B</b></font></td></tr><tr><td align="left">Return both motors home</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 8B</b></font></td></tr><tr><td align="left">Release both clamps</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 9B</b></font></td></tr><tr><td align="left">Set cycle switch toggle flag</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 10B</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Blue LEDs)</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 11B</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         
         nw1 -> nw2 [color="#2471A3"];
         nw2 -> nw3 [color="#2471A3"];
