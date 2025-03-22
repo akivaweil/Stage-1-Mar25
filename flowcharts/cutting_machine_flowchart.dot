@@ -1,5 +1,5 @@
 digraph StateMachine { 
-  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=1.0, splines=true]; 
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=1.0, splines=true, margin="0.5,0.5", pad="0.5"]; 
   node [shape=rect, style=rounded, fontname="Arial", fontsize=12, style="filled,rounded", margin="0.3,0.2", penwidth=2.0]; 
   edge [fontname="Arial", fontsize=10, color="#333333", penwidth=2.0]; 
   
