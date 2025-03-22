@@ -39,7 +39,7 @@ digraph StateMachine {
   READY -> RELOAD [label="Reload switch ON"]; 
   RELOAD -> READY [label="Reload switch OFF"]; 
   CUTTING -> NOWOOD [label="No wood detected"]; 
-  YESWOOD -> CUT_MOTOR_HOME_ERROR [label="Cut motor\nnot at home", tailport="e", headport="w", minlen=2, labelangle=10, labeldistance=4.0]; 
+  YESWOOD -> CUT_MOTOR_HOME_ERROR [xlabel="Cut motor\nnot at home", label=""]; 
   NOWOOD -> READY [label="Cycle switch\nflipped off"]; 
   WOOD_SUCTION_ERROR -> HOMING [label="Cycle switch toggled"]; 
   CUT_MOTOR_HOME_ERROR -> HOMING [label="Recovery successful\nor cycle switch toggled"]; 
