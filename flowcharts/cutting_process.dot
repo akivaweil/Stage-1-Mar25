@@ -25,28 +25,30 @@ digraph cutting_process {
     // States and transitions for cutting process
     start [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 0</b></font></td></tr><tr><td>Start Cutting Process</td></tr></table>>, shape="oval", fillcolor="#D5F5E3", color="#1E8449", penwidth=1.8];
     
-    // Initialize cutting state
-    init [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 1</b></font></td></tr><tr><td align="left">Initialize Cutting Cycle<br/>- Extend position clamp<br/>- Extend wood secure clamp<br/>- Reset control flags</td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    // Initialize cutting state with motor positions
+    init [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 1</b></font></td></tr><tr><td align="left">Initialize Cutting Cycle<br/>- Extend position clamp<br/>- Extend wood secure clamp<br/>- Reset control flags</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: HOME (0)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
-    // Extend cutter
-    extend [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2</b></font></td></tr><tr><td align="left">Move Cut Motor Forward<br/>- Cut motor moves away from home<br/>- Performs cutting operation</td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    // Extend cutter with motor positions
+    extend [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2</b></font></td></tr><tr><td align="left">Move Cut Motor Forward<br/>- Cut motor moves away from home<br/>- Performs cutting operation</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: FORWARD (4000)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
-    // Signal transfer arm
-    signal [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 3</b></font></td></tr><tr><td align="left">Signal Transfer Arm<br/>- Send 500ms HIGH pulse<br/>- Signal completed</td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    // Signal transfer arm with motor positions
+    signal [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 3</b></font></td></tr><tr><td align="left">Signal Transfer Arm<br/>- Send 500ms HIGH pulse<br/>- Signal completed</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0) - returned<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
-    // Retract cutter
-    retract [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 4</b></font></td></tr><tr><td align="left">Move Cut Motor Backward<br/>- Cut motor returns to home<br/>- Cutting operation complete</td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    // Retract cutter with motor positions
+    retract [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 4</b></font></td></tr><tr><td align="left">Move Cut Motor Backward<br/>- Cut motor returns to home<br/>- Cutting operation complete</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
-    // Check wood presence
-    check [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5</b></font></td></tr><tr><td align="left">Check Wood Presence<br/>- Read wood sensor</td></tr></table>>, shape="diamond", fillcolor="#EBF5FB", color="#2E86C1", penwidth=1.2];
+    // Check wood presence with motor positions
+    check [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5</b></font></td></tr><tr><td align="left">Check Wood Presence<br/>- Read wood sensor</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, shape="diamond", fillcolor="#EBF5FB", color="#2E86C1", penwidth=1.2];
     
-    // Result states  
-    yeswood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6A</b></font></td></tr><tr><td align="left">YESWOOD_STATE<br/>- Wood detected<br/>- Prepare for next cut cycle</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449", penwidth=1.2];
-    nowood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 6B</b></font></td></tr><tr><td align="left">NOWOOD_STATE<br/>- No wood detected<br/>- End cutting sequence</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3", penwidth=1.2];
+    // Result states with motor positions
+    yeswood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6A</b></font></td></tr><tr><td align="left">YESWOOD_STATE<br/>- Wood detected<br/>- Prepare for next cut cycle</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449", penwidth=1.2];
     
-    // Error conditions
+    nowood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 6B</b></font></td></tr><tr><td align="left">NOWOOD_STATE<br/>- No wood detected<br/>- End cutting sequence</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3", penwidth=1.2];
+    
+    // Error conditions with motor positions
     error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">Error Conditions</td></tr></table>>, shape="note", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
-    errorwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">WOOD_SUCTION_ERROR<br/>- Suction failure at 0.3 inches</td></tr></table>>, shape="octagon", fillcolor="#FADBD8", color="#C0392B", penwidth=1.2];
+    
+    errorwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Error</b></font></td></tr><tr><td align="left">WOOD_SUCTION_ERROR<br/>- Suction failure at 0.3 inches</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: HOME (0)<br/>• Position motor: CUTTING (1500)</i></font></td></tr></table>>, shape="oval", fillcolor="#FADBD8", color="#C0392B", penwidth=1.2];
     
     // Flow connections
     start -> init [color="#1E8449", penwidth=1.2];
@@ -60,6 +62,16 @@ digraph cutting_process {
     // Error path
     error -> errorwood [color="#C0392B", penwidth=1.2, style="dotted"];
     extend -> errorwood [style="dashed", label="if suction failure", color="#C0392B", penwidth=1.2];
+    
+    // Add information notes for process understanding
+    note_before2 [label="Before Step 2:\nPosition motor moves to\ncutting position (1500)", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    note_during2 [label="During Step 2:\nCut motor moves to\nforward position (4000)", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    note_step3 [label="Step 3 (Signal Transfer):\nCut motor is at home,\nPosition motor at cutting position", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    
+    // Connect notes
+    note_before2 -> init [style="dashed", color="#999999"];
+    note_during2 -> extend [style="dashed", color="#999999"];
+    note_step3 -> signal [style="dashed", color="#999999"];
     
     // Subgraph for YESWOOD flow
     subgraph cluster_yeswood {
