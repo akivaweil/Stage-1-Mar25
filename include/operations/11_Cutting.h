@@ -22,7 +22,7 @@ enum CutPosition {
 bool retractCutter(int& nextSubState);
 bool extendCutter(int& nextSubState);
 void configureForCutPosition(int position, bool& skipCutting);
-void signalTransferArm();
+void signalTransferArm(int state);
 void executeCutting();
 
 // Extern variable declarations

@@ -5,7 +5,7 @@
 #include "../../include/operations/09_StateMachine.h"
 
 // Variables for cutting operations
-long cutRetractSteps = DEFAULT_CUT_RETRACT_STEPS;
+long cutRetractSteps = DEFAULT_CUT_EXTEND_STEPS;
 long cutExtendSteps = DEFAULT_CUT_EXTEND_STEPS;
 
 // Global variables for cutting state
@@ -13,6 +13,7 @@ bool hasSuctionBeenChecked = false;
 bool hasTransferArmBeenSignaled = false;
 bool needCycleSwitchToggle = false;
 static unsigned long transferArmSignalTimer = 0;
+static unsigned long woodCheckTimer = 0;
 
 // Function to move the cutting mechanism backward (toward homing switch)
 bool retractCutter(int& nextSubState) {
@@ -49,42 +50,24 @@ void configureForCutPosition(int position, bool& skipCutting) {
   // Set appropriate cut distance based on position
   switch (position) {
     case 0: // First position
-      cutExtendSteps = 5000;
-      cutRetractSteps = 5000;
+      cutExtendSteps = DEFAULT_CUT_EXTEND_STEPS; // 7.2 inches * steps per inch
       skipCutting = false;
       break;
-    
-    case 1: // Second position
-      cutExtendSteps = 4800;
-      cutRetractSteps = 4800;
-      skipCutting = false;
-      break;
-      
-    // Add more positions as needed
-    
     default:
-      // Default values
+      // Default case - use standard settings
       cutExtendSteps = DEFAULT_CUT_EXTEND_STEPS;
-      cutRetractSteps = DEFAULT_CUT_RETRACT_STEPS;
       skipCutting = false;
       break;
   }
+  
+  // Also configure retract steps to match extend steps
+  cutRetractSteps = cutExtendSteps;
 }
 
-// Function to signal the transfer arm
-void signalTransferArm() {
-  static unsigned long startTime = 0;
-  
-  if (!hasTransferArmBeenSignaled) {
-    signalTransferArm(HIGH);
-    hasTransferArmBeenSignaled = true;
-    startTime = millis();
-  }
-  
-  // Auto turn off after 500ms
-  if (hasTransferArmBeenSignaled && (millis() - startTime >= 500)) {
-    signalTransferArm(LOW);
-  }
+// Signal transfer arm to retrieve the wood piece
+void signalTransferArm(int state) {
+  digitalWrite(TRANSFER_ARM_SIGNAL_PIN, state);
+  hasTransferArmBeenSignaled = (state == HIGH) ? true : hasTransferArmBeenSignaled;
 }
 
 // Handle the complete cutting state operation
@@ -95,7 +78,7 @@ void executeCutting() {
   CutMotor_CUTTING_settings();
   
   switch (subState) {
-    case 0: // Initialize cutting cycle
+    case 0: // Step 5.1: Initialize cutting cycle
       // Ensure clamps are extended
       extendPositionClamp();
       extendWoodSecureClamp();
@@ -103,21 +86,28 @@ void executeCutting() {
       // Reset control flags
       hasSuctionBeenChecked = false;
       hasTransferArmBeenSignaled = false;
+      woodCheckTimer = 0;
       
       // Configure for current position
       bool skipCutting;
       configureForCutPosition(0, skipCutting);
       
+      // Set cutting indicator LED
+      setYellowLed(true);
+      setBlueLed(false);
+      setGreenLed(false);
+      setRedLed(false);
+      
       subState = 1;
       break;
       
-    case 1: // Move to cutting position (forward away from home)
+    case 1: // Step 5.2: Move to cutting position (forward away from home)
       if (extendCutter(subState)) {
         // Extension completed, subState already updated
       }
       break;
       
-    case 2: // Signal transfer arm
+    case 2: // Step 5.3: Signal transfer arm
       signalTransferArm(HIGH);
       if (Wait(500, &startTime)) {
         signalTransferArm(LOW);
@@ -125,18 +115,21 @@ void executeCutting() {
       }
       break;
       
-    case 3: // Return cut motor home (backward toward homing switch)
-      if (retractCutter(subState)) {
-        // Retraction completed, subState already updated
+    case 3: // Step 5.4: Check if wood is present while cut motor is still at forward position
+      // Wait a moment for the wood sensor to stabilize after transfer arm operation
+      if (Wait(500, &woodCheckTimer)) {
+        // Check wood presence while cut motor is still at forward position (7.2")
+        if (isWoodPresent()) {
+          enterState(YESWOOD_STATE);
+        } else {
+          enterState(NOWOOD_STATE);
+        }
       }
       break;
       
-    case 4: // Check if wood is present
-      if (isWoodPresent()) {
-        enterState(YESWOOD_STATE);
-      } else {
-        enterState(NOWOOD_STATE);
-      }
+    default:
+      // Reset to initial substate if we get an invalid state
+      subState = 0;
       break;
   }
 } 
