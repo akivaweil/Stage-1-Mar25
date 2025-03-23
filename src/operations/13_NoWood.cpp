@@ -45,7 +45,7 @@ void handleNoWoodState() {
       break;
       
     case 4: // Step 7.5: Set cycle switch toggle flag
-      // Set the flag that requires cycle switch to be toggled
+      // UNLIKE YESWOOD, this state REQUIRES cycle switch to be toggled
       needCycleSwitchToggle = true;
       prevCycleSwitchState = readCycleSwitch();
       subState = 5;

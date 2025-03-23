@@ -3,7 +3,6 @@
 #include "../../include/operations/11_Cutting.h"
 
 // Global variables for this module
-static unsigned long yesWoodWaitTime = 0;
 static unsigned long cutMotorHomeCheckTimer = 0;
 
 // Handle yes wood state - indicates wood is present after cutting
@@ -83,7 +82,7 @@ void handleYesWoodState() {
         hasTransferArmBeenSignaled = false;
         hasSuctionBeenChecked = false;
         
-        // Ensure cycle switch toggle is not needed - allows continuous cycling
+        // Ensure cycle switch toggle is NOT needed - allows continuous cycling
         needCycleSwitchToggle = false;
         
         // Return to ready state automatically with no delay
@@ -91,6 +90,14 @@ void handleYesWoodState() {
       }
       break;
   }
+}
+
+// Function to set LEDs for the YESWOOD state - used by LED control module
+void setYesWoodPattern() {
+  setYellowLed(true);
+  setGreenLed(true);
+  setBlueLed(false);
+  setRedLed(false);
 }
 
 // Show yes wood indicator (Yellow LED only)

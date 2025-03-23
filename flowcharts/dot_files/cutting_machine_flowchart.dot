@@ -19,8 +19,8 @@ digraph StateMachine {
   READY [label="3. READY\n• Green LED on\n• Waiting for cycle start\n• Motors at home", fillcolor="#00FF00"]; 
   RELOAD [label="4. RELOAD\n• Blue LED on\n• Retract clamps\n• Wait for reload complete", fillcolor="#0000FF", fontcolor="white"]; 
   CUTTING [label="5. CUTTING\n• Yellow LED on\n• Extend clamps\n• Move cut motor forward (7.2\")\n• Signal transfer arm", fillcolor="#FFFF00"]; 
-  YESWOOD [label="6. YES WOOD\n• First: Yellow + Green LEDs on\n• Retract secure wood clamp\n• Return motors home\n• Check cut motor for slippage after 100ms", style="filled", fillcolor="#FFFF00:#99FF99", gradientangle=270]; 
-  NOWOOD [label="7. NO WOOD\n• First: Blue + Green LEDs on\n• Retract secure wood clamp\n• Return motors home\n• Release both clamps", style="filled", fillcolor="#0000FF:#00FF00", fontcolor="white", gradientangle=270]; 
+  YESWOOD [label="6. YES WOOD\n• First: Yellow + Green LEDs on\n• Retract secure wood clamp\n• Return motors home\n• Check cut motor for slippage after 100ms\n• Return to READY automatically", style="filled", fillcolor="#FFFF00:#99FF99", gradientangle=270]; 
+  NOWOOD [label="7. NO WOOD\n• First: Blue + Green LEDs on\n• Retract secure wood clamp\n• Return motors home\n• Release both clamps\n• Wait for cycle switch OFF", style="filled", fillcolor="#0000FF:#00FF00", fontcolor="white", gradientangle=270]; 
   ERROR [label="8. ERROR\n• Red LED blinking\n• Motors forced to home\n• Clamps extended\n• Wait for reset", fillcolor="#FF0000", fontcolor="white"]; 
   WOOD_SUCTION_ERROR [label="9. WOOD SUCTION ERROR\n• Red LED pattern\n• Motors at home\n• Clamps extended\n• Wait for reset", fillcolor="#FF0000", fontcolor="white"]; 
   CUT_MOTOR_HOME_ERROR [label="10. CUT MOTOR HOME ERROR\n• Red LED pattern\n• Recovery attempts\n• Clamps extended", fillcolor="#FF0000", fontcolor="white"]; 
