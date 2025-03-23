@@ -52,31 +52,24 @@ digraph cutting_process {
     init -> extend [color="#2874A6", penwidth=1.2];
     extend -> signal [color="#2874A6", penwidth=1.2];
     signal -> check [color="#2874A6", penwidth=1.2];
-    check -> yeswood [xlabel="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)", xlp="-50,0", color="#1E8449", penwidth=1.2];
-    check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)", color="#2471A3", penwidth=1.2];
     
     // Error path
     error -> errorwood [color="#C0392B", penwidth=1.2, style="dotted"];
     extend -> errorwood [style="dashed", label="if suction failure", color="#C0392B", penwidth=1.2];
     
-    // End of cutting process with motor positions
-    checkwood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5.4</b></font></td></tr><tr><td align="left">Check if Wood Is Present<br/>- Done while cut motor is at forward position<br/>- Determines whether wood is still present</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: 7.2"<br/>• Position motor: 3.45"</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
-    
     // Add information notes for process understanding
     note_before2 [label="Position motor stays at\n3.45\" throughout cutting process", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     note_during2 [label="ONLY the cut motor moves\nduring cutting (to 7.2\")", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     note_step3 [label="Step 5.3 (Signal Transfer):\nCut motor stays at forward position,\nPosition motor at cutting position", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
-    note_transition [label="IMPORTANT:\nBoth motors are at extended positions\n(cut: 7.2\", position: 3.45\")\nwhen entering YESWOOD or NOWOOD states,\nwhich handle the return to home", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     
     // Connect notes
     note_before2 -> init [style="dashed", color="#999999"];
     note_during2 -> extend [style="dashed", color="#999999"];
     note_step3 -> signal [style="dashed", color="#999999"];
-    note_transition -> checkwood [style="dashed", color="#999999"];
     
-    // Connect the main path to YESWOOD or NOWOOD paths
-    checkwood -> yw1 [label="wood detected", color="#1E8449", penwidth=1.2];
-    checkwood -> nw1 [label="no wood detected", color="#2471A3", penwidth=1.2];
+    // Connect the main path to YESWOOD or NOWOOD paths from the check node
+    check -> yeswood [xlabel="Wood Present\n(YES_OR_NO_WOOD_SENSOR = LOW)", xlp="-50,0", color="#1E8449", penwidth=1.2];
+    check -> nowood [label="No Wood\n(YES_OR_NO_WOOD_SENSOR = HIGH)", color="#2471A3", penwidth=1.2];
     
     // Subgraph for YESWOOD flow
     subgraph cluster_yeswood {
