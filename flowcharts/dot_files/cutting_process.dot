@@ -79,7 +79,7 @@ digraph cutting_process {
         fontsize=16;
         margin=16;
         
-        yw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.1</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Yellow LEDs)</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.1</b></font></td></tr><tr><td align="left">Show indicator<br/>(Yellow LED only)</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.2</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.3</b></font></td></tr><tr><td align="left">Move motors to home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.4</b></font></td></tr><tr><td align="left">Retract position clamp<br/>when position motor is at home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
@@ -107,7 +107,7 @@ digraph cutting_process {
         fontsize=16;
         margin=16;
         
-        nw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.1</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Blue LEDs)</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.1</b></font></td></tr><tr><td align="left">Show indicator<br/>(Blue LED only)</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         nw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.2</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         nw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.3</b></font></td></tr><tr><td align="left">Return both motors home</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         nw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.4</b></font></td></tr><tr><td align="left">Release both clamps</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];

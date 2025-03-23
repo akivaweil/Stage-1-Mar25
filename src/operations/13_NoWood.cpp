@@ -9,7 +9,7 @@ static bool prevCycleSwitchState = false;
 // Handle no wood state - indicates wood is no longer present after cutting
 void handleNoWoodState() {
   switch (subState) {
-    case 0: // Step 7.1: Show NOWOOD indicator LEDs (Green + Blue)
+    case 0: // Step 7.1: Show NOWOOD indicator LEDs (Blue only)
       // Set LED indicators for NoWood path at the beginning of the state
       showNoWoodIndicator();
       
@@ -68,10 +68,10 @@ void handleNoWoodState() {
   }
 }
 
-// Show the NoWood state indicator (Green + Blue LEDs)
+// Show the NoWood state indicator (Blue LED only)
 void showNoWoodIndicator() {
-  setGreenLed(true);
   setBlueLed(true);
+  setGreenLed(false);
   setYellowLed(false);
   setRedLed(false);
 } 

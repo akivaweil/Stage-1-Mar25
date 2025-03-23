@@ -8,12 +8,9 @@ static unsigned long cutMotorHomeCheckTimer = 0;
 // Handle yes wood state - indicates wood is present after cutting
 void handleYesWoodState() {
   switch (subState) {
-    case 0: // Step 6.1: Show indicator LEDs first - Green + Yellow
+    case 0: // Step 6.1: Show indicator LEDs first - Yellow only
       // Set LED indicators for YesWood path at the beginning of the state
-      setYellowLed(true);
-      setGreenLed(true);
-      setBlueLed(false);
-      setRedLed(false);
+      setYesWoodIndicator();
       
       subState = 1;
       break;
@@ -37,7 +34,8 @@ void handleYesWoodState() {
       }
       break;
       
-    case 3: // Step 6.4: Retract position clamp at 3.35 inches
+    case 3: // Step 6.4: Retract position clamp when motors are at home
+      // The position motor is now at home position (0 inches), not at 3.35 inches
       // Retract position clamp
       retractPositionClamp();
       
@@ -100,8 +98,8 @@ void setYesWoodPattern() {
   setRedLed(false);
 }
 
-// Show yes wood indicator (Yellow LED only)
-void showYesWoodIndicator() {
+// Show the YesWood state indicator (Yellow LED only)
+void setYesWoodIndicator() {
   setYellowLed(true);
   setGreenLed(false);
   setBlueLed(false);
