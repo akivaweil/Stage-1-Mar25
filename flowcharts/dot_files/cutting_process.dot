@@ -81,12 +81,11 @@ digraph cutting_process {
         
         yw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.1</b></font></td></tr><tr><td align="left">Show indicator<br/>(Yellow LED only)</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.2</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.3</b></font></td></tr><tr><td align="left">Move motors to home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.4</b></font></td></tr><tr><td align="left">Retract position clamp<br/>when position motor is at home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.5</b></font></td></tr><tr><td align="left">Extend position clamp<br/>immediately when position<br/>motor reaches home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.6</b></font></td></tr><tr><td align="left">Check CUT motor homing sensor<br/>100ms after CUT motor reaches home<br/>to detect any slippage</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw7 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.7</b></font></td></tr><tr><td align="left">Move position motor<br/>to 3.45" position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw8 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.8</b></font></td></tr><tr><td align="left">Return to READY_STATE<br/>to continue cycling</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.3</b></font></td></tr><tr><td align="left">Move motors to home<br/>Retract position clamp when<br/>position motor reaches home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.4</b></font></td></tr><tr><td align="left">Extend position clamp<br/>immediately after retraction</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.5</b></font></td></tr><tr><td align="left">Check CUT motor homing sensor<br/>100ms after CUT motor reaches home<br/>to detect any slippage</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.6</b></font></td></tr><tr><td align="left">Move position motor<br/>to 3.45" position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw7 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.7</b></font></td></tr><tr><td align="left">Return to READY_STATE<br/>to continue cycling</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         
         yw1 -> yw2 [color="#1E8449"];
         yw2 -> yw3 [color="#1E8449"];
@@ -94,7 +93,6 @@ digraph cutting_process {
         yw4 -> yw5 [color="#1E8449"];
         yw5 -> yw6 [color="#1E8449"];
         yw6 -> yw7 [color="#1E8449"];
-        yw7 -> yw8 [color="#1E8449"];
     }
     
     // Subgraph for NOWOOD flow
