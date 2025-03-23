@@ -26,10 +26,10 @@ digraph cutting_process {
     start [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 5.0</b></font></td></tr><tr><td>Start Cutting Process</td></tr></table>>, shape="oval", fillcolor="#D5F5E3", color="#1E8449", penwidth=1.8];
     
     // Initialize cutting state with motor positions
-    init [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5.1</b></font></td></tr><tr><td align="left">Initialize Cutting Cycle<br/>- Extend position clamp<br/>- Extend wood secure clamp<br/>- Reset control flags</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: 0"<br/>• Position motor: 0"</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    init [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5.1</b></font></td></tr><tr><td align="left">Initialize Cutting Cycle<br/>- Extend position clamp<br/>- Extend wood secure clamp<br/>- Reset control flags</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: 0"<br/>• Position motor: 3.45"</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
     // Extend cutter with motor positions
-    extend [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5.2</b></font></td></tr><tr><td align="left">Move Cut Motor Forward<br/>- Cut motor moves away from home<br/>- Performs cutting operation</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: 7.2"<br/>• Position motor: 3.45"</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    extend [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5.2</b></font></td></tr><tr><td align="left">Move Cut Motor Forward<br/>- ONLY Cut motor moves (position motor stays fixed)<br/>- Performs cutting operation</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: 7.2"<br/>• Position motor: 3.45" (unchanged)</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
     
     // Signal transfer arm with motor positions - UPDATED to keep cut motor at FORWARD position
     signal [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 5.3</b></font></td></tr><tr><td align="left">Signal Transfer Arm<br/>- Send 500ms HIGH pulse<br/>- Signal completed</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motor Positions:<br/>• Cut motor: 7.2"<br/>• Position motor: 3.45"</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
@@ -59,9 +59,9 @@ digraph cutting_process {
     error -> errorwood [color="#C0392B", penwidth=1.2, style="dotted"];
     extend -> errorwood [style="dashed", label="if suction failure", color="#C0392B", penwidth=1.2];
     
-    // Add information notes for process understanding - UPDATED to remove note about cut motor returning home
-    note_before2 [label="Before Step 2:\nPosition motor moves to\ncutting position (3.45\")", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
-    note_during2 [label="During Step 2:\nCut motor moves to\nforward position (7.2\")", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    // Add information notes for process understanding
+    note_before2 [label="Position motor stays at\n3.45\" throughout cutting process", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    note_during2 [label="ONLY the cut motor moves\nduring cutting (to 7.2\")", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     note_step3 [label="Step 3 (Signal Transfer):\nCut motor stays at forward position,\nPosition motor at cutting position", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
     
     // Connect notes

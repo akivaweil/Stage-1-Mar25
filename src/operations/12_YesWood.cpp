@@ -92,16 +92,4 @@ void setYesWoodIndicator() {
   setGreenLed(false);
   setBlueLed(false);
   setRedLed(false);
-}
-
-// Wait for cycle switch to be toggled to continue
-void waitForCycleSwitch() {
-  if (cycleToggleDetected()) {
-    // Reset flags for next cutting cycle
-    hasTransferArmBeenSignaled = false;
-    hasSuctionBeenChecked = false;
-    
-    // Return to ready state when cycle switch is toggled
-    enterState(READY_STATE);
-  }
 } 
