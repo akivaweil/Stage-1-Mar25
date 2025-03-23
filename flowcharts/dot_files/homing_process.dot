@@ -1,0 +1,64 @@
+digraph homing_process {
+    // Graph styling
+    graph [fontname="Arial", rankdir="TB", splines="polyline", overlap=false, nodesep=0.8, ranksep=0.9, pad=0.7, label="Homing Operation Process Flow", fontsize=22, labelloc="t", bgcolor="#F8F8F8", fontcolor="#333333"];
+    node [shape="box", style="rounded,filled", fillcolor="lightblue", fontname="Arial", margin="0.3,0.2", color="#555555", penwidth=1.2];
+    edge [fontname="Arial", fontsize=10, color="#777777", penwidth=1.0, arrowsize=0.8];
+
+    // Add a legend
+    subgraph cluster_legend {
+        label="Legend";
+        style="rounded,filled";
+        color="#666666";
+        fillcolor="#F0F0F0";
+        fontsize=14;
+        margin=10;
+        rank="sink";
+        
+        legend_node [shape=none, label=<<table border="0" cellborder="0" cellspacing="3">
+            <tr><td port="main" bgcolor="#D6EAF8" width="20" height="12"></td><td align="left">Main Flow</td></tr>
+            <tr><td port="error" bgcolor="#F5B7B1" width="20" height="12"></td><td align="left">Error Condition</td></tr>
+        </table>>];
+    }
+
+    // States and transitions for homing process
+    start [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Start Homing</b></font></td></tr><tr><td>Initialize homing variables</td></tr></table>>, shape="oval", fillcolor="#D6EAF8", color="#2874A6", penwidth=1.8];
+    
+    // Step 1: Configure for homing
+    config [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2.1</b></font></td></tr><tr><td align="left">Configure Motors<br/>- Set homing speeds<br/>- Set motor acceleration</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Motors not yet at known positions</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    
+    // Step 2: Home cut motor
+    home_cut [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2.2</b></font></td></tr><tr><td align="left">Home Cut Motor<br/>- Move toward home switch<br/>- Detect home switch</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Cut motor finds home position</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    
+    // Step 3: Home position motor
+    home_position [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2.3</b></font></td></tr><tr><td align="left">Home Position Motor<br/>- Move toward home switch<br/>- Detect home switch</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Position motor finds home position</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    
+    // Step 4: Reset positions
+    reset_pos [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2.4</b></font></td></tr><tr><td align="left">Reset Motor Positions<br/>- Set cut motor to 0"<br/>- Set position motor to 0"</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Both motors now at 0" position</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    
+    // Step 5: Complete homing
+    complete [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2874A6" point-size="14"><b>Step 2.5</b></font></td></tr><tr><td align="left">Complete Homing<br/>- Set homing complete flag<br/>- Enter READY state</td></tr><tr><td align="left"><font color="#555555" point-size="11"><i>Final Motor Positions:<br/>• Cut motor: 0"<br/>• Position motor: 0"</i></font></td></tr></table>>, fillcolor="#D6EAF8", color="#2874A6", penwidth=1.2];
+    
+    // Error states
+    cut_error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>CUT_MOTOR_HOME_ERROR</b></font></td></tr><tr><td align="left">Cut Motor Homing Error<br/>- Cannot find home switch<br/>- Timeout exceeded</td></tr></table>>, shape="oval", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
+    
+    position_error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>POSITION_MOTOR_HOME_ERROR</b></font></td></tr><tr><td align="left">Position Motor Homing Error<br/>- Cannot find home switch<br/>- Timeout exceeded</td></tr></table>>, shape="oval", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
+    
+    // Flow connections
+    start -> config [color="#2874A6", penwidth=1.2];
+    config -> home_cut [color="#2874A6", penwidth=1.2];
+    home_cut -> home_position [color="#2874A6", penwidth=1.2];
+    home_position -> reset_pos [color="#2874A6", penwidth=1.2];
+    reset_pos -> complete [color="#2874A6", penwidth=1.2];
+    
+    // Error paths
+    home_cut -> cut_error [style="dashed", label="if timeout", color="#C0392B", penwidth=1.2];
+    home_position -> position_error [style="dashed", label="if timeout", color="#C0392B", penwidth=1.2];
+    
+    // Add information notes for process understanding
+    note_start [label="At start:\nMotor positions unknown", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    note_end [label="At completion:\nBoth motors at 0\" (home)\nReady for operation", shape="note", fillcolor="#FFFACD", color="#555555", style="filled"];
+    
+    // Connect notes
+    note_start -> start [style="dashed", color="#999999"];
+    note_end -> complete [style="dashed", color="#999999"];
+} 
