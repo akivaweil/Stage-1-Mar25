@@ -92,7 +92,7 @@ void executeCutting() {
       bool skipCutting;
       configureForCutPosition(0, skipCutting);
       
-      // Set cutting indicator LED
+      // Set cutting indicator LED - Yellow only
       setYellowLed(true);
       setBlueLed(false);
       setGreenLed(false);
@@ -119,6 +119,8 @@ void executeCutting() {
       // Wait a moment for the wood sensor to stabilize after transfer arm operation
       if (Wait(500, &woodCheckTimer)) {
         // Check wood presence while cut motor is still at forward position (7.2")
+        // IMPORTANT: Cut and Position motors are at their extended positions (7.2", 3.45") 
+        // when transferring to YESWOOD or NOWOOD states. Those states will handle returning home.
         if (isWoodPresent()) {
           enterState(YESWOOD_STATE);
         } else {
