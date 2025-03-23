@@ -82,9 +82,9 @@ digraph cutting_process {
         yw1 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.1</b></font></td></tr><tr><td align="left">Show indicator<br/>(Green + Yellow LEDs)</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.2</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.3</b></font></td></tr><tr><td align="left">Move motors to home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.4</b></font></td></tr><tr><td align="left">Retract position clamp<br/>at 3.35 inches</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.4</b></font></td></tr><tr><td align="left">Retract position clamp<br/>when position motor is at home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.5</b></font></td></tr><tr><td align="left">Extend position clamp<br/>immediately when position<br/>motor reaches home</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
-        yw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.6</b></font></td></tr><tr><td align="left">Check cut motor homing sensor<br/>100ms after motor reaches home<br/>to detect any slippage</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
+        yw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.6</b></font></td></tr><tr><td align="left">Check CUT motor homing sensor<br/>100ms after CUT motor reaches home<br/>to detect any slippage</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw7 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.7</b></font></td></tr><tr><td align="left">Move position motor<br/>to 3.45" position</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         yw8 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#1E8449" point-size="14"><b>Step 6.8</b></font></td></tr><tr><td align="left">Return to READY_STATE<br/>to continue cycling</td></tr></table>>, fillcolor="#D5F5E3", color="#1E8449"];
         
@@ -111,14 +111,12 @@ digraph cutting_process {
         nw2 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.2</b></font></td></tr><tr><td align="left">Retract secure wood clamp</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         nw3 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.3</b></font></td></tr><tr><td align="left">Return both motors home</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         nw4 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.4</b></font></td></tr><tr><td align="left">Release both clamps</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.5</b></font></td></tr><tr><td align="left">Set cycle switch toggle flag</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
-        nw6 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.6</b></font></td></tr><tr><td align="left">Return to READY_STATE</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
+        nw5 [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 7.5</b></font></td></tr><tr><td align="left">Set cycle switch toggle flag<br/>and return to READY_STATE<br/>(requires cycle switch toggle OFF)</td></tr></table>>, fillcolor="#D4E6F1", color="#2471A3"];
         
         nw1 -> nw2 [color="#2471A3"];
         nw2 -> nw3 [color="#2471A3"];
         nw3 -> nw4 [color="#2471A3"];
         nw4 -> nw5 [color="#2471A3"];
-        nw5 -> nw6 [color="#2471A3"];
     }
     
     // Connect main flow to subgraphs

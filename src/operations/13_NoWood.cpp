@@ -6,25 +6,23 @@
 static unsigned long noWoodWaitTime = 0;
 static bool prevCycleSwitchState = false;
 
-// Handle no wood state - indicates wood is not present after cutting
+// Handle no wood state - indicates wood is no longer present after cutting
 void handleNoWoodState() {
   switch (subState) {
-    case 0: // Step 7.1: Show indicator LEDs first - Green + Blue
-      // Show the NoWood indicator - Green and Blue LEDs
-      setBlueLed(true);
-      setGreenLed(true);
-      setYellowLed(false);
-      setRedLed(false);
+    case 0: // Step 7.1: Show NOWOOD indicator LEDs (Green + Blue)
+      // Set LED indicators for NoWood path at the beginning of the state
+      showNoWoodIndicator();
+      
       subState = 1;
       break;
-
+      
     case 1: // Step 7.2: Retract secure wood clamp
       retractWoodSecureClamp();
-      extendPositionClamp(); // Ensure position clamp stays extended
+      
       subState = 2;
       break;
       
-    case 2: // Step 7.3: Return both motors home simultaneously
+    case 2: // Step 7.3: Return both motors home
       // Set motors to return settings for faster return
       Motors_RETURN_settings();
       
@@ -44,38 +42,36 @@ void handleNoWoodState() {
       subState = 4;
       break;
       
-    case 4: // Step 7.5: Set cycle switch toggle flag
+    case 4: // Step 7.5: Set cycle switch toggle flag and wait for cycle switch toggle OFF
       // UNLIKE YESWOOD, this state REQUIRES cycle switch to be toggled
       needCycleSwitchToggle = true;
-      prevCycleSwitchState = readCycleSwitch();
-      subState = 5;
-      break;
       
-    case 5: // Step 7.6: Wait for cycle switch to be flipped off and return to READY
       // Check cycle switch state
       bool currentCycleSwitchState = readCycleSwitch();
+      static bool prevSwitchState = currentCycleSwitchState;
       
-      // If cycle switch was on and is now off (toggled off)
-      if (prevCycleSwitchState == true && currentCycleSwitchState == false) {
-        // Reset flags for next cutting cycle
-        hasTransferArmBeenSignaled = false;
-        hasSuctionBeenChecked = false;
-        needCycleSwitchToggle = false;
-        
-        // Return to ready state
-        enterState(READY_STATE);
+      // If cycle switch was ON and is now OFF (toggled off)
+      if (prevSwitchState && !currentCycleSwitchState) {
+        // Return to READY state
+        currentState = READY_STATE;
+        subState = 0;
       }
       
       // Update previous state for next check
-      prevCycleSwitchState = currentCycleSwitchState;
+      prevSwitchState = currentCycleSwitchState;
+      break;
+      
+    default:
+      // Reset to initial substate if we get an invalid state
+      subState = 0;
       break;
   }
 }
 
-// Show no wood indicator (Blue LED only)
+// Show the NoWood state indicator (Green + Blue LEDs)
 void showNoWoodIndicator() {
+  setGreenLed(true);
   setBlueLed(true);
-  setGreenLed(false);
   setYellowLed(false);
   setRedLed(false);
 } 
