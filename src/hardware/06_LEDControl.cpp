@@ -28,11 +28,15 @@ void setRedLed(bool state) {
 void setYesWoodPattern() {
   setGreenLed(true);
   setYellowLed(true);
+  setBlueLed(false);
+  setRedLed(false);
 }
 
 void setNoWoodPattern() {
   setBlueLed(true);
   setGreenLed(true);
+  setYellowLed(false);
+  setRedLed(false);
 }
 
 void updateBlueBlinkPattern() {

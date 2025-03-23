@@ -9,29 +9,22 @@ static bool prevCycleSwitchState = false;
 // Handle no wood state - indicates wood is not present after cutting
 void handleNoWoodState() {
   switch (subState) {
-    case 0: // Step 7B: Set LED Indicators (Turn ON blue LED, Turn OFF other LEDs)
-      // Show the NoWood indicator - only blue LED
+    case 0: // Step 7.1: Show indicator LEDs first - Green + Blue
+      // Show the NoWood indicator - Green and Blue LEDs
       setBlueLed(true);
-      setGreenLed(false);
+      setGreenLed(true);
       setYellowLed(false);
       setRedLed(false);
       subState = 1;
       break;
 
-    case 1: // Step 8B: Set cycle switch toggle flag
-      // Set the flag that requires cycle switch to be toggled
-      needCycleSwitchToggle = true;
-      prevCycleSwitchState = readCycleSwitch();
+    case 1: // Step 7.2: Retract secure wood clamp
+      retractWoodSecureClamp();
+      extendPositionClamp(); // Ensure position clamp stays extended
       subState = 2;
       break;
       
-    case 2: // Step 9B: Retract secure wood clamp (keep position clamp extended)
-      retractWoodSecureClamp();
-      extendPositionClamp(); // Ensure position clamp stays extended
-      subState = 3;
-      break;
-      
-    case 3: // Step 10B: Return both motors home simultaneously
+    case 2: // Step 7.3: Return both motors home simultaneously
       // Set motors to return settings for faster return
       Motors_RETURN_settings();
       
@@ -41,17 +34,24 @@ void handleNoWoodState() {
       
       // When both motors are at home position, proceed to next step
       if (isMotorInPosition(cutMotor, 0) && isMotorInPosition(positionMotor, 0)) {
-        subState = 4;
+        subState = 3;
       }
       break;
       
-    case 4: // Step 11B: Release both clamps
+    case 3: // Step 7.4: Release both clamps
       retractPositionClamp();
       retractWoodSecureClamp(); // Redundant but ensures it's retracted
+      subState = 4;
+      break;
+      
+    case 4: // Step 7.5: Set cycle switch toggle flag
+      // Set the flag that requires cycle switch to be toggled
+      needCycleSwitchToggle = true;
+      prevCycleSwitchState = readCycleSwitch();
       subState = 5;
       break;
       
-    case 5: // Step 12B: Wait for cycle switch to be flipped off
+    case 5: // Step 7.6: Wait for cycle switch to be flipped off and return to READY
       // Check cycle switch state
       bool currentCycleSwitchState = readCycleSwitch();
       
