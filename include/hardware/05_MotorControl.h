@@ -29,6 +29,15 @@ void movePositionMotorToPosition(float positionInches);
 bool isMotorInPosition(AccelStepper& motor, float targetPosition);
 void ensureMotorsAtHome();
 
+// Homing functions
+void stopCutMotor();
+void stopPositionMotor();
+void moveCutMotorToHome();
+void movePositionMotorToHome();
+void resetCutMotorPosition();
+void resetPositionMotorPosition();
+bool isCutMotorAtHome();
+
 // Utility functions
 float inchesToSteps(float inches, float stepsPerInch);
 float stepsToInches(long steps, float stepsPerInch);

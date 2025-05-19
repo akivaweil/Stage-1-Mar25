@@ -1,4 +1,5 @@
 #include "../../include/hardware/05_MotorControl.h"
+#include "../../include/hardware/07_SwitchSensor.h"
 
 // Motor instances
 AccelStepper cutMotor(AccelStepper::DRIVER, CUT_MOTOR_PULSE_PIN, CUT_MOTOR_DIR_PIN);
@@ -115,4 +116,47 @@ void PositionMotor_RETURN_settings() {
 void CutMotor_CUTTING_settings() {
   cutMotor.setMaxSpeed(CUT_MOTOR_CUTTING_SPEED);
   cutMotor.setAcceleration(CUT_MOTOR_ACCELERATION);
+}
+
+// Motor homing functions
+
+// Stop the cut motor
+void stopCutMotor() {
+  cutMotor.stop();
+}
+
+// Stop the position motor
+void stopPositionMotor() {
+  positionMotor.stop();
+}
+
+// Move the cut motor toward home position
+void moveCutMotorToHome() {
+  CutMotor_HOMING_settings();
+  if (!cutMotor.isRunning()) {
+    cutMotor.move(1000); // Move toward home switch with enough steps
+  }
+}
+
+// Move the position motor toward home position
+void movePositionMotorToHome() {
+  PositionMotor_HOMING_settings();
+  if (!positionMotor.isRunning()) {
+    positionMotor.move(1000); // Move toward home switch with enough steps
+  }
+}
+
+// Reset cut motor position to 0
+void resetCutMotorPosition() {
+  cutMotor.setCurrentPosition(0);
+}
+
+// Reset position motor position to 0
+void resetPositionMotorPosition() {
+  positionMotor.setCurrentPosition(0);
+}
+
+// Check if cut motor is at home position
+bool isCutMotorAtHome() {
+  return readCutMotorHomingSwitch();
 } 

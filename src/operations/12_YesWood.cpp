@@ -6,12 +6,20 @@
 static unsigned long cutMotorHomeCheckTimer = 0;
 static bool positionMotorHomed = false;
 
+// Show the YesWood state indicator (Yellow LED only)
+void showYesWoodIndicator() {
+  setYellowLed(true);
+  setGreenLed(false);
+  setBlueLed(false);
+  setRedLed(false);
+}
+
 // Handle yes wood state - indicates wood is present after cutting
 void handleYesWoodState() {
   switch (subState) {
     case 0: // Step 6.1: Show indicator LEDs first - Yellow only
       // Set LED indicators for YesWood path at the beginning of the state
-      setYesWoodIndicator();
+      showYesWoodIndicator();
       
       // Reset position motor homed flag at the start of the state
       positionMotorHomed = false;
@@ -84,12 +92,4 @@ void handleYesWoodState() {
       }
       break;
   }
-}
-
-// Show the YesWood state indicator (Yellow LED only)
-void setYesWoodIndicator() {
-  setYellowLed(true);
-  setGreenLed(false);
-  setBlueLed(false);
-  setRedLed(false);
 } 

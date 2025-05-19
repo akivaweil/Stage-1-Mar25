@@ -66,7 +66,7 @@ void configureForCutPosition(int position, bool& skipCutting) {
 
 // Signal transfer arm to retrieve the wood piece
 void signalTransferArm(int state) {
-  digitalWrite(TRANSFER_ARM_SIGNAL_PIN, state);
+  digitalWrite(SIGNAL_TO_TRANSFER_ARM_PIN, state);
   hasTransferArmBeenSignaled = (state == HIGH) ? true : hasTransferArmBeenSignaled;
 }
 

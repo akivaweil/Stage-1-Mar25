@@ -139,7 +139,7 @@ void handleReloadState() {
 
 // Handle error state
 void handleErrorState() {
-  updateRedLEDErrorPattern(currentError);
+  updateErrorLED(currentError);
   
   extendPositionClamp();
   extendWoodSecureClamp();
@@ -153,7 +153,7 @@ void handleErrorState() {
 
 // Handle wood suction error state
 void handleWoodSuctionErrorState() {
-  updateRedLEDErrorPattern(WOOD_SUCTION_ERROR);
+  updateErrorLED(WOOD_SUCTION_ERROR);
   
   extendPositionClamp();
   extendWoodSecureClamp();
@@ -167,7 +167,7 @@ void handleWoodSuctionErrorState() {
 
 // Handle cut motor home error state
 void handleCutMotorHomeErrorState() {
-  updateRedLEDErrorPattern(CUT_MOTOR_HOME_ERROR);
+  updateErrorLED(CUT_MOTOR_HOME_ERROR);
   
   extendPositionClamp();
   extendWoodSecureClamp();

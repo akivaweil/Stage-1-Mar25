@@ -10,5 +10,6 @@
 // Function prototypes
 void updateErrorLED(ErrorType errorType);
 void resetErrorState();
+void setPositionMotorHomeErrorPattern();
 
 #endif // ERROR_H 

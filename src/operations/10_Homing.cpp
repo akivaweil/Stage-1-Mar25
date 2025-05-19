@@ -88,7 +88,7 @@ bool homeCutMotor(int &nextSubState) {
     }
     
     // Check if cut motor has reached home position
-    if (readCutMotorHomeSwitch()) {
+    if (readCutMotorHomingSwitch()) {
         stopCutMotor();
         isCutMotorHomed = true;
         nextSubState = 1; // Move to position motor homing
@@ -111,10 +111,10 @@ bool homePositionMotor(int &nextSubState) {
     }
     
     // Check if position motor has reached home position
-    if (readPositionMotorHomeSwitch()) {
+    if (readPositionMotorHomingSwitch()) {
         stopPositionMotor();
         isPositionMotorHomed = true;
-        nextSubState = 2; // Move to finalization
+        nextSubState = 2; // Move to finalizing homing
         return false;
     }
     

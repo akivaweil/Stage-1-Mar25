@@ -1,0 +1,99 @@
+digraph stage1_process {
+    // Graph styling
+    graph [fontname="Arial", rankdir="TB", splines="polyline", overlap=false, nodesep=0.8, ranksep=0.9, pad=0.7, label="Stage 1 Table Saw Control System", fontsize=22, labelloc="t", bgcolor="#F8F8F8", fontcolor="#333333"];
+    node [shape="box", style="rounded,filled", fillcolor="lightblue", fontname="Arial", margin="0.3,0.2", color="#555555", penwidth=1.2];
+    edge [fontname="Arial", fontsize=10, color="#777777", penwidth=1.0, arrowsize=0.8];
+
+    // Add a legend
+    subgraph cluster_legend {
+        label="Legend";
+        style="rounded,filled";
+        color="#666666";
+        fillcolor="#F0F0F0";
+        fontsize=14;
+        margin=10;
+        rank="sink";
+        
+        legend_node [shape=none, label=<<table border="0" cellborder="0" cellspacing="3">
+            <tr><td port="main" bgcolor="#FFFFCC" width="20" height="12"></td><td align="left">Main Flow</td></tr>
+            <tr><td port="alt" bgcolor="#D6EAF8" width="20" height="12"></td><td align="left">Alternative Path</td></tr>
+            <tr><td port="error" bgcolor="#F5B7B1" width="20" height="12"></td><td align="left">Error Condition</td></tr>
+        </table>>];
+    }
+
+    // States and transitions for main process flow
+    start [label="Start System", shape="oval", fillcolor="#FFFFCC", color="#996600", penwidth=1.8];
+    
+    // Step 1: Startup
+    startup [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 1: Startup</b></font></td></tr><tr><td align="left">• Initialize hardware<br/>• Configure motor pins<br/>• Set clamps to engaged position</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 2: Homing
+    homing [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 2: Homing Sequence</b></font></td></tr><tr><td align="left">• Home cut motor to switch<br/>• Home position motor to switch<br/>• Move position motor to 3.45"</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 3: Ready State
+    ready [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 3: Ready State</b></font></td></tr><tr><td align="left">• System ready for operation<br/>• Green LED on<br/>• Waiting for cycle switch</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 4: Start Cutting
+    cutting_start [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 4: Start Cutting</b></font></td></tr><tr><td align="left">• Engage both clamps<br/>• Yellow LED on<br/>• Move cut motor forward</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 5: Check wood suction
+    wood_suction [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 5: Check Wood Suction</b></font></td></tr><tr><td align="left">• At 1" into cut<br/>• Verify no wood in suction sensor</td></tr></table>>, shape="diamond", fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 6: Complete Cut
+    complete_cut [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 6: Complete Cut</b></font></td></tr><tr><td align="left">• Cut motor reaches 7.5"<br/>• Signal to Stage 2<br/>• Check wood sensor</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 7: Wood Detection
+    wood_detection [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 7: Check Wood Presence</b></font></td></tr><tr><td align="left">• Verify wood sensor<br/>• Determine next sequence</td></tr></table>>, shape="diamond", fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 8A: Normal Return (with wood)
+    normal_return [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 8A: Normal Return</b></font></td></tr><tr><td align="left">• Return cut motor to home<br/>• Release position clamp<br/>• Return position motor to home</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 9A: Engage Position Clamp
+    engage_position [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 9A: Engage Position Clamp</b></font></td></tr><tr><td align="left">• Engage position clamp at home<br/>• Verify cut motor at home<br/>• Move position motor to 3.45"</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 10A: Complete Cycle
+    complete_cycle [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#996600" point-size="14"><b>Step 10A: Complete Cycle</b></font></td></tr><tr><td align="left">• Engage secure wood clamp<br/>• Return to ready state<br/>• Green LED on</td></tr></table>>, fillcolor="#FFFFCC", color="#996600", penwidth=1.2];
+    
+    // Step 8B: No Wood Sequence
+    no_wood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 8B: No Wood Sequence</b></font></td></tr><tr><td align="left">• Return cut motor to home<br/>• Retract wood secure clamp<br/>• Position motor sequence</td></tr></table>>, fillcolor="#D6EAF8", color="#2471A3", penwidth=1.2];
+    
+    // Step 9B: Position Steps
+    no_wood_position [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 9B: Position Motor Steps</b></font></td></tr><tr><td align="left">• Position motor to 0"<br/>• Position motor to 2.0"<br/>• Position motor to 0" again</td></tr></table>>, fillcolor="#D6EAF8", color="#2471A3", penwidth=1.2];
+    
+    // Step 10B: Complete No Wood
+    complete_no_wood [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Step 10B: Complete No Wood</b></font></td></tr><tr><td align="left">• Position motor to 3.45"<br/>• Blue LED on<br/>• Require switch reset</td></tr></table>>, fillcolor="#D6EAF8", color="#2471A3", penwidth=1.2];
+    
+    // Error states
+    suction_error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Wood Suction Error</b></font></td></tr><tr><td align="left">• Flash red LED<br/>• System restart</td></tr></table>>, shape="octagon", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
+    
+    home_error [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#C0392B" point-size="14"><b>Home Position Error</b></font></td></tr><tr><td align="left">• Red LED on<br/>• Wait for acknowledgment<br/>• Restart system</td></tr></table>>, shape="octagon", fillcolor="#F5B7B1", color="#C0392B", penwidth=1.2];
+    
+    // Flow connections
+    start -> startup [color="#996600", penwidth=1.2];
+    startup -> homing [color="#996600", penwidth=1.2];
+    homing -> ready [color="#996600", penwidth=1.2];
+    ready -> cutting_start [label="Cycle switch ON", color="#996600", penwidth=1.2];
+    cutting_start -> wood_suction [color="#996600", penwidth=1.2];
+    wood_suction -> complete_cut [label="No wood in suction", color="#996600", penwidth=1.2];
+    wood_suction -> suction_error [label="Wood detected in suction", color="#C0392B", penwidth=1.2, style="dashed"];
+    complete_cut -> wood_detection [color="#996600", penwidth=1.2];
+    wood_detection -> normal_return [label="Wood detected", color="#996600", penwidth=1.2];
+    wood_detection -> no_wood [label="No wood detected", color="#2471A3", penwidth=1.2];
+    normal_return -> engage_position [color="#996600", penwidth=1.2];
+    engage_position -> home_error [label="Home switch issue", color="#C0392B", penwidth=1.2, style="dashed"];
+    engage_position -> complete_cycle [color="#996600", penwidth=1.2];
+    complete_cycle -> ready [color="#996600", penwidth=1.2];
+    no_wood -> no_wood_position [color="#2471A3", penwidth=1.2];
+    no_wood_position -> complete_no_wood [color="#2471A3", penwidth=1.2];
+    complete_no_wood -> ready [color="#2471A3", penwidth=1.2];
+    
+    // Add reload mode option
+    reload_mode [label=<<table border="0" cellborder="0" cellspacing="0"><tr><td><font color="#2471A3" point-size="14"><b>Reload Mode</b></font></td></tr><tr><td align="left">• Retract both clamps<br/>• Yellow LED on<br/>• Waiting for reload switch OFF</td></tr></table>>, fillcolor="#D6EAF8", color="#2471A3", penwidth=1.2];
+    ready -> reload_mode [label="Reload switch ON", color="#2471A3", penwidth=1.2, style="dashed"];
+    reload_mode -> ready [label="Reload switch OFF", color="#2471A3", penwidth=1.2, style="dashed"];
+    
+    // Add continuous mode note
+    continuous_mode [label="Continuous Mode:\nSystem can auto-repeat\ncycles when start switch\nstays ON", shape="note", fillcolor="#FFF9C4", color="#555555", style="filled"];
+    
+    continuous_mode -> ready [style="dotted", color="#999999"];
+} 

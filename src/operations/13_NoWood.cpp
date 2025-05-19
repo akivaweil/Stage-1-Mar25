@@ -4,10 +4,14 @@
 
 // Global variables for this module
 static unsigned long noWoodWaitTime = 0;
-static bool prevCycleSwitchState = false;
+bool prevCycleSwitchState; // Using the extern declaration from SwitchSensor.h
 
 // Handle no wood state - indicates wood is no longer present after cutting
 void handleNoWoodState() {
+  // Variables needed for state processing - declared outside switch
+  bool currentCycleSwitchState;
+  static bool prevSwitchState = false;
+  
   switch (subState) {
     case 0: // Step 7.1: Show NOWOOD indicator LEDs (Blue only)
       // Set LED indicators for NoWood path at the beginning of the state
@@ -47,8 +51,7 @@ void handleNoWoodState() {
       needCycleSwitchToggle = true;
       
       // Check cycle switch state
-      bool currentCycleSwitchState = readCycleSwitch();
-      static bool prevSwitchState = currentCycleSwitchState;
+      currentCycleSwitchState = readCycleSwitch();
       
       // If cycle switch was ON and is now OFF (toggled off)
       if (prevSwitchState && !currentCycleSwitchState) {

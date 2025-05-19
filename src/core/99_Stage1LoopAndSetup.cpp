@@ -9,9 +9,9 @@
 #include "../../include/hardware/08_PeripheralControl.h"
 
 #include "../../include/operations/09_StateMachine.h"
-#include "../../include/operations/11_CuttingOperations.h"
-#include "../../include/operations/12_YesWoodOperations.h"
-#include "../../include/operations/13_NoWoodOperations.h"
+#include "../../include/operations/11_Cutting.h"
+#include "../../include/operations/12_YesWood.h"
+#include "../../include/operations/13_NoWood.h"
 
 // Global state variables
 State currentState = STARTUP_STATE;

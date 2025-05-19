@@ -22,10 +22,15 @@ extern unsigned long subStateTimer;
 extern bool hasSuctionBeenChecked;
 extern bool hasTransferArmBeenSignaled;
 extern bool needCycleSwitchToggle;
+extern int homingAttemptCount;
 
 // State machine functions
 void updateStateMachine();
 void enterState(State newState);
+void resetErrorAndHomeSystem();
+void moveAwayThenHomeCutMotor();
+void moveAwayThenHomePositionMotor();
+void ensureMotorsAtHome();
 
 // State handler functions
 void handleStartupState();
@@ -35,7 +40,7 @@ void handleReloadState();
 // executeCutting() defined in 11_Cutting.h
 // handleYesWoodState() defined in 12_YesWood.h 
 // handleNoWoodState() defined in 13_NoWood.h
-// handleErrorState() defined in 15_Error.h
+void handleErrorState();
 void handleWoodSuctionErrorState();
 void handleCutMotorHomeErrorState();
 void handlePositionMotorHomeErrorState();

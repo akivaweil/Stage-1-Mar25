@@ -5,7 +5,7 @@ const char* ssid = "Everwood";         // WiFi network name
 const char* password = "Everwood-Staff"; // WiFi password
 
 // OTA Password - change this for security
-const char* otaPassword = "esp32s3admin";
+const char* otaPassword = "esp32admin";
 
 // Variables for connection status
 bool wifiConnected = false;

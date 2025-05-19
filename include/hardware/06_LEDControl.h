@@ -13,11 +13,12 @@ void setRedLed(bool state);
 void setYesWoodPattern();
 void setNoWoodPattern();
 void updateBlueBlinkPattern();
+void blinkBlueLed();
 void setWoodSuctionErrorPattern();
 void setCutMotorHomeErrorPattern();
 void setPositionMotorHomeErrorPattern();
 void setGeneralErrorPattern();
-void updateRedLEDErrorPattern(ErrorType errorType);
+void updateErrorLED(ErrorType errorType);
 void updateLEDsForState(State currentState);
 void updateAllLEDs(); // Main function called from loop
 
