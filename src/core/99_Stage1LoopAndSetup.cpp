@@ -1,5 +1,5 @@
+#include "../../include/core/GlobalPinDefinitions.h"
 #include "../../include/core/01_CommonDefinitions.h"
-#include "../../include/core/02_PinDefinitions.h"
 #include "../../include/core/03_Utilities.h"
 #include "../../include/core/00_WifiAndOTA.h"
 

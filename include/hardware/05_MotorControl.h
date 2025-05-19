@@ -2,7 +2,7 @@
 #define MOTOR_CONTROL_H
 
 #include "../core/01_CommonDefinitions.h"
-#include "../core/02_PinDefinitions.h"
+#include "../core/GlobalPinDefinitions.h"
 #include <AccelStepper.h>
 
 // Motor instances

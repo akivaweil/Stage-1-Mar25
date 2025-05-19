@@ -2,8 +2,9 @@
 #define MOTOR_CONTROL_CLASS_H
 
 #include <Arduino.h>
+#include <FastAccelStepper.h>
+#include "../core/GlobalPinDefinitions.h"
 #include <AccelStepper.h>
-#include "../core/02_PinDefinitions.h"
 #include "../core/04_Config.h"
 
 /**
