@@ -4,6 +4,7 @@
 #include <Bounce2.h>
 #include "../core/01_CommonDefinitions.h"
 #include "../core/02_PinDefinitions.h"
+#include "../core/GlobalPinDefinitions.h"
 
 // Switch debouncing instances
 extern Bounce cutMotorHomingSwitch;
@@ -12,7 +13,6 @@ extern Bounce reloadSwitch;
 extern Bounce cycleSwitch;
 extern Bounce yesOrNoWoodSensor;
 extern Bounce wasWoodSuctionedSensor;
-extern Bounce cutMotorEmergencySwitch;
 
 // Constants
 extern const unsigned long DEBOUNCE_TIME;
@@ -28,7 +28,6 @@ bool readCutMotorHomingSwitch();
 bool readPositionMotorHomingSwitch();
 bool readReloadSwitch();
 bool readCycleSwitch();
-bool readCutMotorEmergencySwitch();
 bool isWoodPresent();
 bool isWoodSuctionProper();
 bool performStartupSafetyCheck();
